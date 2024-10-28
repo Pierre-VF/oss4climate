@@ -62,11 +62,14 @@ def discover_repositories_in_existing_readmes(output_file: str) -> None:
         return x
 
     def _url_qualifies(x: str) -> bool:
-        if x.startswith("https://github.com/user-attachments/"):
-            return False
-
-        elif x.startswith("https://github.com/"):
+        if x.startswith("https://github.com/"):
             if (
+                x.startswith("https://github.com/settings/")
+                or x.startswith("https://github.com/user-attachments/")
+                or x.startswith("https://github.com/sponsors/")
+            ):
+                return False
+            elif (
                 x.endswith("/wiki")
                 or ("/wiki/" in x)
                 or x.endswith("/discussions")
@@ -84,12 +87,15 @@ def discover_repositories_in_existing_readmes(output_file: str) -> None:
                 or x.endswith("/tags")
                 or ("/tag/" in x)
                 # Specific endings
-                or ("/-/" in x)
+                or ("/actions" in x)
+                or ("/security/policy" in x)
                 # Specific sub-paths
                 or ("/-/" in x)
                 or ("/assets/" in x)
                 or ("/badges/" in x)
                 or ("/blob/" in x)
+                or ("/commit/" in x)
+                or ("/labels/" in x)
                 or ("/graphs/" in x)
                 or ("/public/" in x)
                 or ("/raw/" in x)
@@ -98,8 +104,16 @@ def discover_repositories_in_existing_readmes(output_file: str) -> None:
                 return False
             else:
                 return True
-        else:
-            return True
+        elif x.startswith("https://gitlab.com/"):
+            if (
+                ("/-/" in x)
+                or ("/blob/" in x)
+                or ("/badges/" in x)
+                or x.endswith("/examples")
+            ):
+                return False
+        # If hit nothing up thil here, then it's valid
+        return True
 
     # Removing problematic resources
     full_targets.github_organisations = [
