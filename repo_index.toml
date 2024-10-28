@@ -786,6 +786,7 @@ repositories = [
     "https://github.com/PerovskiteSCModelling/IonMonger",
     "https://github.com/PetervanLunteren/EcoAssist",
     "https://github.com/PhilipMostert/PointedSDMs",
+    "https://github.com/Pierre-VF/EPA_dashboard",
     "https://github.com/Pierre-VF/Enedis-data-io",
     "https://github.com/Pierre-VF/oss4climate",
     "https://github.com/PierrickP/multicycles",
