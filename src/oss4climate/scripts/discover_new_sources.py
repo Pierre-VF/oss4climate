@@ -33,7 +33,7 @@ def discover_repositories_in_existing_organisations(output_file: str) -> None:
     # Cleaning up and exporting to TOML file
     log_info("Cleaning up targets")
     extended_targets.cleanup()
-    log_info("Exporting to {output_file}")
+    log_info(f"Exporting to {output_file}")
     extended_targets.to_toml(output_file)
 
 
@@ -54,8 +54,72 @@ def discover_repositories_in_existing_readmes(output_file: str) -> None:
         except Exception as e:
             print(f"Error with {r} // e={e}")
 
+    def _url_cleanup(x: str) -> str:
+        x = x.split("?")[0]
+        x = x.split("#")[0]
+        if x.endswith("/"):
+            x = x[:-1]
+        return x
+
+    def _url_qualifies(x: str) -> bool:
+        if x.startswith("https://github.com/user-attachments/"):
+            return False
+
+        elif x.startswith("https://github.com/"):
+            if (
+                x.endswith("/wiki")
+                or ("/wiki/" in x)
+                or x.endswith("/discussions")
+                or ("/discussions/" in x)
+                or x.endswith("/issues")
+                or ("/issues/" in x)
+                or x.endswith("/milestones")
+                or ("/milestone/" in x)
+                or x.endswith("/projects")
+                or ("/projects/" in x)
+                or x.endswith("/pulls")
+                or ("/pull/" in x)
+                or x.endswith("/releases")
+                or ("/releases/" in x)
+                or x.endswith("/tags")
+                or ("/tag/" in x)
+                # Specific endings
+                or ("/-/" in x)
+                # Specific sub-paths
+                or ("/-/" in x)
+                or ("/assets/" in x)
+                or ("/badges/" in x)
+                or ("/blob/" in x)
+                or ("/graphs/" in x)
+                or ("/public/" in x)
+                or ("/raw/" in x)
+                or ("/workflows/" in x)
+            ):
+                return False
+            else:
+                return True
+        else:
+            return True
+
+    # Removing problematic resources
+    full_targets.github_organisations = [
+        i for i in full_targets.github_organisations if "?" not in i
+    ]
+    full_targets.github_repositories = [
+        _url_cleanup(i) for i in full_targets.github_repositories if _url_qualifies(i)
+    ]
+    full_targets.gitlab_projects = [
+        _url_cleanup(i) for i in full_targets.gitlab_projects if _url_qualifies(i)
+    ]
+    full_targets.unknown = [
+        _url_cleanup(i) for i in full_targets.unknown if _url_qualifies(i)
+    ]
+    full_targets.invalid = [
+        _url_cleanup(i) for i in full_targets.invalid if _url_qualifies(i)
+    ]
+
     # Cleaning up and exporting to TOML file
     log_info("Cleaning up targets")
     full_targets.cleanup()
-    log_info("Exporting to {output_file}")
+    log_info(f"Exporting to {output_file}")
     full_targets.to_toml(output_file)
