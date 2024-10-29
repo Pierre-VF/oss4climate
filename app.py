@@ -168,7 +168,7 @@ def _search_for_results(query: str) -> pd.DataFrame:
     )
 
     df_out["score"] = (
-        df_out["score"].fillna(0)
+        df_out["score"].astype(float).fillna(0)
         + df_out["name"].apply(_f_score_in_name) * 10
         + df_out["organisation"].apply(_f_score_in_name) * 10
     )
@@ -184,7 +184,7 @@ async def search_results(
     n_results: int = 100,
     offset: int | None = None,
 ):
-    df_out = _search_for_results(query.strip())
+    df_out = _search_for_results(query.strip().lower())
 
     # Adding a primitive refinment mechanism by language (not implemented in the most effective manner)
     if language and (language != "*"):
