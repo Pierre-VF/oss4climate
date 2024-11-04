@@ -33,7 +33,7 @@ gunicorn = "^23.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
-jupyterlab = "^4.2.5"
+jupyterlab = "^4.3.0"
 matplotlib = "^3.9.2"
 pre-commit = "^4.0.1"
 
