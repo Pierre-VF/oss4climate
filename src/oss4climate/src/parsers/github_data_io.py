@@ -278,13 +278,3 @@ def fetch_repository_file_tree(
             raise e
         file_tree = f"ERROR with file tree ({e})"
     return file_tree
-
-
-if __name__ == "__main__":
-    r_master = fetch_repository_readme("https://github.com/trynthink/scout", "main")
-    r = fetch_repository_details("https://github.com/recurve-methods/flexvalue")
-    r = fetch_repositories_in_organisation("https://github.com/Pierre-VF/")
-    test_repo = "https://github.com/yezz123/fastapi"  # "https://github.com/fastapi/fastapi"  # "https://github.com/Pierre-VF/oss4climate/"
-    r1 = fetch_repository_details(test_repo)
-    r2 = fetch_repository_file_tree(test_repo)
-    print("Done")

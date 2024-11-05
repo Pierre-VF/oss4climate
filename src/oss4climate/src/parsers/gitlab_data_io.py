@@ -179,12 +179,3 @@ def fetch_repository_details(repo_path: str) -> ProjectDetails:
         forked_from=forked_from,
     )
     return details
-
-
-if __name__ == "__main__":
-    r0_forked = fetch_repository_details("https://gitlab.com/eaternity/eos")
-
-    r00 = fetch_repositories_in_group("https://gitlab.com/polito-edyce-prelude")
-    r1_forked = fetch_repository_details("https://gitlab.com/giacomo.chiesa/predyce")
-    r0 = fetch_repository_details("https://gitlab.com/polito-edyce-prelude/predyce")
-    print(r0)
