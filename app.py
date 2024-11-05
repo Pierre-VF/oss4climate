@@ -42,7 +42,7 @@ URL_CODE_REPOSITORY = "https://github.com/Pierre-VF/oss4climate/"
 def _refresh_data(force_refresh: bool = False):
     if force_refresh or not os.path.exists(FILE_OUTPUT_LISTING_FEATHER):
         log_warning("- Listing not found, downloading again")
-        listing_search.download_data()
+        listing_search.download_listing_data_for_app()
     log_info("- Loading documents")
     SEARCH_RESULTS.load_documents(FILE_OUTPUT_LISTING_FEATHER)
     for __, r in tqdm(SEARCH_RESULTS.documents.iterrows()):
