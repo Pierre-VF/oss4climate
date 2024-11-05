@@ -148,13 +148,20 @@ def extract_repository_organisation(repo_path: str) -> str:
     return organisation
 
 
-def fetch_repository_details(repo_path: str) -> ProjectDetails:
+def fetch_repository_details(
+    repo_path: str,
+    fail_on_issue: bool = True,
+) -> ProjectDetails:
     repo_path = _extract_organisation_and_repository_as_url_block(repo_path)
 
     r = _web_get(f"https://api.github.com/repos/{repo_path}")
     branch2use = _master_branch_name(repo_path)
 
     if branch2use is None:
+        if fail_on_issue:
+            raise ValueError(
+                f"Unable to identify the right branch on {GITHUB_URL_BASE}{repo_path}"
+            )
         last_commit = None
     else:
         # If ever getting issues with the size here, "?per_page=10" can be added to the URL
@@ -203,28 +210,58 @@ def fetch_repository_details(repo_path: str) -> ProjectDetails:
         open_pull_requests=n_open_pull_requests,
         raw_details=r,
         master_branch=branch2use,
-        readme=fetch_repository_readme(repo_path),
+        readme=fetch_repository_readme(
+            repo_path, branch=branch2use, fail_on_issue=fail_on_issue
+        ),
         is_fork=is_fork,
         forked_from=forked_from,
     )
     return details
 
 
-def fetch_repository_readme(repo_name: str) -> str | None:
+def fetch_repository_readme(
+    repo_name: str,
+    branch: str = "main",
+    fail_on_issue: bool = True,
+) -> str | None:
     repo_name = _extract_organisation_and_repository_as_url_block(repo_name)
-    try:
-        md_content = _web_get(
-            f"https://raw.githubusercontent.com/{repo_name}/main/README.md",
-            with_headers=None,
-            is_json=False,
+
+    md_content = None
+
+    file_tree = fetch_repository_file_tree(repo_name, fail_on_issue=fail_on_issue)
+    for i in file_tree:
+        if i.lower().startswith("readme."):
+            try:
+                if branch == "main":
+                    # Keeping what worked well so far
+                    readme_url = (
+                        f"https://raw.githubusercontent.com/{repo_name}/main/{i}"
+                    )
+                else:
+                    readme_url = f"https://raw.githubusercontent.com/{repo_name}/refs/heads/{branch}/{i}"
+                md_content = _web_get(
+                    readme_url,
+                    with_headers=None,
+                    is_json=False,
+                )
+            except Exception as e:
+                md_content = f"ERROR with {i} ({e})"
+
+            # Only using the first file matching
+            break
+
+    if (md_content is None) and fail_on_issue:
+        raise ValueError(
+            f"Unable to identify a README on the repository: {GITHUB_URL_BASE}{repo_name}"
         )
-    except Exception as e:
-        md_content = f"ERROR with README.md ({e})"
 
     return md_content
 
 
-def fetch_repository_file_tree(repository_url: str) -> list[str] | str:
+def fetch_repository_file_tree(
+    repository_url: str,
+    fail_on_issue: bool = True,
+) -> list[str] | str:
     repo_name = _extract_organisation_and_repository_as_url_block(repository_url)
     branch = _master_branch_name(repo_name)
     if branch is None:
@@ -232,18 +269,12 @@ def fetch_repository_file_tree(repository_url: str) -> list[str] | str:
     try:
         r = _web_get(
             url=f"https://api.github.com/repos/{repo_name}/git/trees/{branch}?recursive=1",
-            with_headers=None,
+            with_headers=True,
             is_json=True,
         )
         file_tree = [i["path"] for i in r["tree"]]
     except Exception as e:
+        if fail_on_issue:
+            raise e
         file_tree = f"ERROR with file tree ({e})"
     return file_tree
-
-
-if __name__ == "__main__":
-    r = fetch_repositories_in_organisation("https://github.com/Pierre-VF/")
-    test_repo = "https://github.com/yezz123/fastapi"  # "https://github.com/fastapi/fastapi"  # "https://github.com/Pierre-VF/oss4climate/"
-    r1 = fetch_repository_details(test_repo)
-    r2 = fetch_repository_file_tree(test_repo)
-    print("Done")
