@@ -43,9 +43,10 @@ async def lifespan(app: FastAPI):
     log_info("Starting app")
     if not os.path.exists(FILE_OUTPUT_LISTING_FEATHER):
         log_warning("- Listing not found, downloading again")
-        listing_search.download_data()
+        listing_search.download_listing_data_for_app()
     log_info("- Loading documents")
     SEARCH_RESULTS.load_documents(FILE_OUTPUT_LISTING_FEATHER)
+    log_info(" -- Feather file loaded")
     for __, r in tqdm(SEARCH_RESULTS.documents.iterrows()):
         # Skip repos with missing info
         for k in ["readme", "description"]:
@@ -53,11 +54,18 @@ async def lifespan(app: FastAPI):
                 r[k] = ""
         SEARCH_ENGINE_DESCRIPTIONS.index(url=r["url"], content=r["description"])
         SEARCH_ENGINE_READMES.index(r["url"], content=r["readme"])
+    log_info(" -- All repos loaded")
     yield
     log_info("Exiting app")
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title="OSS4climate",
+    description="""
+A search engine for open-source code for climate applications
+""",
+    lifespan=lifespan,
+)
 templates = Jinja2Templates(directory=str(templates_path))
 app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
 
