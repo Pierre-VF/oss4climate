@@ -63,6 +63,9 @@ GITHUB_API_TOKEN="...[add your token here]..."
 # This is your token generated here: https://gitlab.com/-/user_settings/personal_access_tokens
 GITLAB_ACCESS_TOKEN="...[add your token here]..."
 
+# For app operation, a key to refresh the data (to avoid undesirable refreshing)
+DATA_REFRESH_KEY="...[add a random key here]..."
+
 # You can adjust the position of the cache database here (leave to default if you don't need adjustment)
 SQLITE_DB=".data/db.sqlite"
 

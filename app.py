@@ -13,7 +13,7 @@ from typing import Optional
 
 import pandas as pd
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from tqdm import tqdm
@@ -23,6 +23,7 @@ from oss4climate.scripts import (
     FILE_OUTPUT_LISTING_FEATHER,
     listing_search,
 )
+from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info, log_warning
 from oss4climate.src.nlp.search import SearchResults
 from oss4climate.src.nlp.search_engine import SearchEngine
@@ -38,10 +39,8 @@ SEARCH_RESULTS = SearchResults()
 URL_CODE_REPOSITORY = "https://github.com/Pierre-VF/oss4climate/"
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    log_info("Starting app")
-    if not os.path.exists(FILE_OUTPUT_LISTING_FEATHER):
+def _refresh_data(force_refresh: bool = False):
+    if force_refresh or not os.path.exists(FILE_OUTPUT_LISTING_FEATHER):
         log_warning("- Listing not found, downloading again")
         listing_search.download_data()
     log_info("- Loading documents")
@@ -53,6 +52,12 @@ async def lifespan(app: FastAPI):
                 r[k] = ""
         SEARCH_ENGINE_DESCRIPTIONS.index(url=r["url"], content=r["description"])
         SEARCH_ENGINE_READMES.index(r["url"], content=r["readme"])
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    log_info("Starting app")
+    _refresh_data()
     yield
     log_info("Exiting app")
 
@@ -62,6 +67,14 @@ templates = Jinja2Templates(directory=str(templates_path))
 app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
 
 
+@app.get("/favicon.ico")
+def _favicon():
+    # This is just a dummy favicon for now (waiting for a better logo)
+    return RedirectResponse(
+        "https://www.pierrevf.consulting/wp-content/uploads/2023/11/cropped-logo_base_png-32x32.png"
+    )
+
+
 def get_top_urls(scores_dict: dict, n: int):
     sorted_urls = sorted(scores_dict.items(), key=lambda x: x[1], reverse=True)
     top_n_urls = sorted_urls[:n]
@@ -69,13 +82,8 @@ def get_top_urls(scores_dict: dict, n: int):
     return top_n_dict
 
 
-@app.get("/")
-async def base_landing():
-    return RedirectResponse("/ui/search", status_code=307)
-
-
 # ----------------------------------------------------------------------------------
-# UI endpoints
+# Auxiliary functions with caching
 # ----------------------------------------------------------------------------------
 
 
@@ -100,30 +108,9 @@ def _unique_languages() -> list[str]:
     return x.tolist()
 
 
-def _render_template(request: Request, template_file: str, content: dict | None = None):
-    resp = {"request": request, "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY}
-    if content is not None:
-        resp = resp | content
-    return templates.TemplateResponse(template_file, resp)
-
-
 @lru_cache(maxsize=1)
 def n_repositories_indexed():
     return SEARCH_RESULTS.n_documents
-
-
-@app.get("/ui/search", response_class=HTMLResponse, include_in_schema=False)
-async def search(request: Request):
-    return _render_template(
-        request=request,
-        template_file="search.html",
-        content={
-            "n_repositories_indexed": n_repositories_indexed(),
-            "languages": _unique_languages(),
-            "licenses": _unique_licenses(),
-            "free_text": " ",
-        },
-    )
 
 
 @lru_cache(maxsize=10)
@@ -173,6 +160,44 @@ def _search_for_results(query: str) -> pd.DataFrame:
         + df_out["organisation"].apply(_f_score_in_name) * 10
     )
     return df_out.query("score>0").sort_values(by="score", ascending=False)
+
+
+def _clear_cache():
+    _unique_licenses.cache_clear()
+    _unique_languages.cache_clear()
+    n_repositories_indexed.cache_clear()
+    _search_for_results.cache_clear()
+
+
+# ----------------------------------------------------------------------------------
+# UI endpoints
+# ----------------------------------------------------------------------------------
+
+
+@app.get("/")
+async def base_landing():
+    return RedirectResponse("/ui/search", status_code=307)
+
+
+def _render_template(request: Request, template_file: str, content: dict | None = None):
+    resp = {"request": request, "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY}
+    if content is not None:
+        resp = resp | content
+    return templates.TemplateResponse(template_file, resp)
+
+
+@app.get("/ui/search", response_class=HTMLResponse, include_in_schema=False)
+async def search(request: Request):
+    return _render_template(
+        request=request,
+        template_file="search.html",
+        content={
+            "n_repositories_indexed": n_repositories_indexed(),
+            "languages": _unique_languages(),
+            "licenses": _unique_licenses(),
+            "free_text": " ",
+        },
+    )
 
 
 @app.get("/ui/results", response_class=HTMLResponse, include_in_schema=False)
@@ -250,9 +275,22 @@ def read_about(request: Request):
 # API endpoints
 # ----------------------------------------------------------------------------------
 
+
+@app.get("/api/refresh_data")
+async def refresh_data(key: Optional[str] = None):
+    if key != SETTINGS.DATA_REFRESH_KEY:
+        return PlainTextResponse(
+            "You are not allowed to refresh the data (invalid key)",
+            status_code=403,
+        )
+    log_info("DATA refreshing START")
+    _refresh_data(force_refresh=True)
+    _clear_cache()
+    log_info("DATA refreshing END")
+    return PlainTextResponse("Data was successfully refreshed")
+
+
 # For now, only redirects
-
-
 @app.get("/api/code")
 async def api_code():
     return RedirectResponse(URL_CODE_REPOSITORY, status_code=307)
