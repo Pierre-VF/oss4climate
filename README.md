@@ -1,24 +1,6 @@
 # Listing of open-source for climate and energy applications
 
-(This is a work in progress - the resulting index will be published when available, so please keep an eye on this repository and tip the project about any resources that you are aware of)
-
-A first search prototype is available here: https://oss4climate.pierrevf.consulting/ 
-
-The raw datasets are published here (nice layout has not been made yet):
-
-- [Raw index](https://data.pierrevf.consulting/oss4climate/summary.toml)
-- [Listing as CSV](https://data.pierrevf.consulting/oss4climate/listing_data.csv)
-
-Input to the discovery process are given here (you are welcome to add your own contribution):
-- the listings scraped are listed in **listing_index.toml** 
-- repositories found in the listings and added manually are found in **repo_index.toml**  
-- the associated scrapers in the folder **"src/oss4climate/src/parsers"**
-
-Other mapping initiatives that you may want to consider looking at (all the repositories that these linked to have been indexed here):
-
-- https://landscape.lfenergy.org/
-- https://opensustain.tech/ (with further listings at the end of the list)
-
+TLDR; if you're just looking for the search engine, you will find it here: https://oss4climate.pierrevf.consulting/ .
 
 
 ## What is the vision of this project, is it just yet another listing?
@@ -35,8 +17,35 @@ All of this should be provided in a way that makes it easy to search and interfa
 
 However, in the current stage it is indeed not providing all of these features yet. Help is appreciated to get there (see [open issues](https://github.com/Pierre-VF/oss4climate/issues)).
 
+## Do you just want to carry out a search for open-source matching your needs?
 
-## Installation
+To carry out a search without installing anything, you can just use the **web-app** here: https://oss4climate.pierrevf.consulting/ 
+
+## Where is the data coming from?
+
+Input to the discovery process are given in the files in the **indexes** folder (you are welcome to add your own contribution):
+
+- the listings scraped are listed in **listings.toml** (if you are interested in project listings, you should check all URLs in this file)
+- repositories found in the listings and added manually are found in **repositories.toml**  
+- the associated scrapers in the folder **"src/oss4climate/src/parsers"**
+
+
+## Do you just want to get access to the listing data?
+
+If you just want to access the raw datasets, you can just download them from there (nice layout has not been made yet):
+
+- [Raw index as TOML](https://data.pierrevf.consulting/oss4climate/summary.toml)
+- [Listing as CSV](https://data.pierrevf.consulting/oss4climate/listing_data.csv)
+- [Full listing as FEATHER (for pandas)](https://data.pierrevf.consulting/oss4climate/listing_data.feather)
+
+Note that re-running the listing scraping is resource-intensive (with the associated carbon footprint), so unless you have to do it, you should favour downloading the files instead.
+
+
+## Development and contribution
+
+### Installation
+
+Installation
 
 The installation is straightforward if you are used to Python.
 
@@ -72,7 +81,7 @@ EXPORT_FTP_USER=""
 EXPORT_FTP_PASSWORD=""
 ```
 
-## Running the code
+### Running the code
 
 Once you have completed the steps above, you can run the following commands (only valid on Unix systems):
 

@@ -250,10 +250,13 @@ def fetch_repository_readme(
             # Only using the first file matching
             break
 
-    if (md_content is None) and fail_on_issue:
-        raise ValueError(
-            f"Unable to identify a README on the repository: {GITHUB_URL_BASE}{repo_name}"
-        )
+    if md_content is None:
+        if fail_on_issue:
+            raise ValueError(
+                f"Unable to identify a README on the repository: {GITHUB_URL_BASE}{repo_name}"
+            )
+        else:
+            md_content = "(NO README)"
 
     return md_content
 
