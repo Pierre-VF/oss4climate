@@ -125,8 +125,17 @@ def fetch_repositories_in_organisation(organisation_name: str) -> dict[str, str]
 
 def _master_branch_name(cleaned_repo_path: str) -> str | None:
     # Gather extra metadata
-    r_branches = _web_get(f"https://api.github.com/repos/{cleaned_repo_path}/branches")
-    branches_names = [i["name"] for i in r_branches]
+    more_data_needed = True
+    branches_names = []
+    page = 1
+    while more_data_needed:
+        r_branches = _web_get(
+            f"https://api.github.com/repos/{cleaned_repo_path}/branches?per_page=100&page={page}"
+        )
+        branches_names += [i["name"] for i in r_branches]
+        page += 1
+        more_data_needed = len(branches_names) == 100
+
     if len(branches_names) == 1:
         # If only one branch, then the choice is clear
         branch2use = branches_names[0]
@@ -278,3 +287,8 @@ def fetch_repository_file_tree(
             raise e
         file_tree = f"ERROR with file tree ({e})"
     return file_tree
+
+
+if __name__ == "__main__":
+    r = fetch_repository_details("https://github.com/DTUWindEnergy/WindEnergyToolbox")
+    print(r)
