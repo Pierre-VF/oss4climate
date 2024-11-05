@@ -27,14 +27,19 @@ class SearchResults:
         if documents:
             self.load_documents(documents)
 
-    def load_documents(self, documents: pd.DataFrame | str):
+    def load_documents(self, documents: pd.DataFrame | str, limit: int | None = None):
         if isinstance(documents, str):
             assert documents.endswith(
                 ".feather"
             ), f"Only accepting .feather files (not {documents})"
             new_docs = pd.read_feather(documents)
+            if limit is not None:
+                new_docs = new_docs.head(int(limit))
         else:
-            new_docs = documents.copy()
+            if limit is not None:
+                new_docs = documents.head(int(limit))
+            else:
+                new_docs = documents.copy()
         if self.__documents:
             self.__documents += new_docs
         else:
