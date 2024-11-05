@@ -18,7 +18,10 @@ from oss4climate.src.parsers import (
 )
 
 
-def scrape_all(target_output_file: str = FILE_OUTPUT_LISTING_CSV) -> None:
+def scrape_all(
+    target_output_file: str = FILE_OUTPUT_LISTING_CSV,
+    fail_on_issue=False,
+) -> None:
     """
     Script to run fetching of the data from the repositories
 
@@ -82,7 +85,9 @@ def scrape_all(target_output_file: str = FILE_OUTPUT_LISTING_CSV) -> None:
     log_info("Fetching data for all repositories in Gitlab")
     for i in targets.gitlab_projects:
         try:
-            screening_results.append(gitlab_data_io.fetch_repository_details(i))
+            screening_results.append(
+                gitlab_data_io.fetch_repository_details(i, fail_on_issue=fail_on_issue)
+            )
         except Exception as e:
             scrape_failures["GITLAB_PROJECT:" + i] = e
             log_warning(f" > Error with repo ({e})")
@@ -93,7 +98,9 @@ def scrape_all(target_output_file: str = FILE_OUTPUT_LISTING_CSV) -> None:
         try:
             if i.endswith("/.github"):
                 continue
-            screening_results.append(github_data_io.fetch_repository_details(i))
+            screening_results.append(
+                github_data_io.fetch_repository_details(i, fail_on_issue=fail_on_issue)
+            )
         except Exception as e:
             scrape_failures["GITHUB_REPO:" + i] = e
             log_warning(f" > Error with repo ({e})")

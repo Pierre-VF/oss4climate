@@ -122,7 +122,10 @@ def fetch_repositories_in_group(organisation_name: str) -> dict[str, str]:
     return {r["name"]: r["web_url"] for r in res}
 
 
-def fetch_repository_details(repo_path: str) -> ProjectDetails:
+def fetch_repository_details(
+    repo_path: str,
+    fail_on_issue: bool = True,
+) -> ProjectDetails:
     gitlab_host = _extract_gitlab_host(url=repo_path)
     repo_id = _extract_organisation_and_repository_as_url_block(repo_path)
     r = _web_get(
@@ -133,11 +136,17 @@ def fetch_repository_details(repo_path: str) -> ProjectDetails:
     organisation = repo_id.split("/")[0]
     license = r.get("license", {}).get("name")
 
-    url_readme_file = r["readme_url"].replace("/blob/", "/raw/") + "?inline=false"
-    readme = _web_get(url_readme_file, with_headers=False, is_json=False)
+    try:
+        url_readme_file = r["readme_url"].replace("/blob/", "/raw/") + "?inline=false"
+        readme = _web_get(url_readme_file, with_headers=False, is_json=False)
+    except Exception as e:
+        if fail_on_issue:
+            raise e
+        else:
+            readme = "(NO README)"
 
     # Fields treated as optional or unstable across non-"gitlab.com" instances
-    fork_details = r.get("forked_from_project")
+    fork_details = r.get("forked_from_project", {})
     if isinstance(fork_details, dict):
         forked_from = fork_details.get("namespace", {}).get("web_url")
     else:
