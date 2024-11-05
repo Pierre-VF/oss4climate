@@ -46,6 +46,7 @@ async def lifespan(app: FastAPI):
         listing_search.download_listing_data_for_app()
     log_info("- Loading documents")
     SEARCH_RESULTS.load_documents(FILE_OUTPUT_LISTING_FEATHER)
+    log_info(" -- Feather file loaded")
     for __, r in tqdm(SEARCH_RESULTS.documents.iterrows()):
         # Skip repos with missing info
         for k in ["readme", "description"]:
@@ -53,6 +54,7 @@ async def lifespan(app: FastAPI):
                 r[k] = ""
         SEARCH_ENGINE_DESCRIPTIONS.index(url=r["url"], content=r["description"])
         SEARCH_ENGINE_READMES.index(r["url"], content=r["readme"])
+    log_info(" -- All repos loaded")
     yield
     log_info("Exiting app")
 
