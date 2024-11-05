@@ -269,7 +269,7 @@ def fetch_repository_file_tree(
     try:
         r = _web_get(
             url=f"https://api.github.com/repos/{repo_name}/git/trees/{branch}?recursive=1",
-            with_headers=None,
+            with_headers=True,
             is_json=True,
         )
         file_tree = [i["path"] for i in r["tree"]]
@@ -281,7 +281,7 @@ def fetch_repository_file_tree(
 
 
 if __name__ == "__main__":
-    r_master = fetch_repository_readme("https://github.com/trynthink/scout", "master")
+    r_master = fetch_repository_readme("https://github.com/trynthink/scout", "main")
     r = fetch_repository_details("https://github.com/recurve-methods/flexvalue")
     r = fetch_repositories_in_organisation("https://github.com/Pierre-VF/")
     test_repo = "https://github.com/yezz123/fastapi"  # "https://github.com/fastapi/fastapi"  # "https://github.com/Pierre-VF/oss4climate/"
