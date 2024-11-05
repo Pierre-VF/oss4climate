@@ -59,7 +59,13 @@ async def lifespan(app: FastAPI):
     log_info("Exiting app")
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title="OSS4climate",
+    description="""
+A search engine for open-source code for climate applications
+""",
+    lifespan=lifespan,
+)
 templates = Jinja2Templates(directory=str(templates_path))
 app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
 
