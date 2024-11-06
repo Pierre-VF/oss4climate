@@ -15,8 +15,8 @@ from oss4climate.src.nlp.search import SearchResults
 from oss4climate.src.parsers import (
     ParsingTargets,
     fetch_all_project_urls_from_markdown_str,
+    github_data_io,
 )
-from oss4climate.src.parsers.github_data_io import extract_repository_organisation
 
 
 def discover_repositories_in_existing_organisations(output_file: str) -> None:
@@ -24,7 +24,10 @@ def discover_repositories_in_existing_organisations(output_file: str) -> None:
     targets = ParsingTargets.from_toml(FILE_INPUT_INDEX)
 
     # Extract organisation to screen for new repositories
-    orgs = [extract_repository_organisation(i) for i in targets.github_repositories]
+    orgs = [
+        github_data_io.extract_repository_organisation(i)
+        for i in targets.github_repositories
+    ]
 
     extended_targets = ParsingTargets(
         github_organisations=orgs,
@@ -62,7 +65,7 @@ def discover_repositories_in_existing_readmes(output_file: str) -> None:
         return x
 
     def _url_qualifies(x: str) -> bool:
-        if x.startswith("https://github.com/"):
+        if x.startswith(github_data_io.GITHUB_URL_BASE):
             if (
                 x.startswith("https://github.com/settings/")
                 or x.startswith("https://github.com/user-attachments/")
