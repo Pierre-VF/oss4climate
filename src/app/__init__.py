@@ -143,7 +143,7 @@ def _search_for_results(query: str) -> pd.DataFrame:
 
     print(f"Searching for {query}")
     res_desc = SEARCH_ENGINE_DESCRIPTIONS.search(query)
-    res_readme = SEARCH_ENGINE_DESCRIPTIONS.search(query)
+    res_readme = SEARCH_ENGINE_READMES.search(query)
 
     df_combined = (
         res_desc.to_frame("description")
