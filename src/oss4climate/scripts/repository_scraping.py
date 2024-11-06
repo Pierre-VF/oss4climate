@@ -131,9 +131,16 @@ def scrape_all(
 
     # Cleaning up markdown
     def _f_readme_cleanup(x):
-        return markdown_io.markdown_to_clean_plaintext(
-            x, remove_code=True, remove_linebreaks=True
-        )
+        if x is None:
+            return "(NO DATA)"
+        try:
+            out = markdown_io.markdown_to_clean_plaintext(
+                x, remove_code=True, remove_linebreaks=True
+            )
+        except Exception:
+            # This is to avoid issues if the text is not markdown
+            out = x
+        return out
 
     df2export["readme"] = df2export["readme"].apply(_f_readme_cleanup)
 
