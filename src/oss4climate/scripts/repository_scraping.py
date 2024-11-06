@@ -137,6 +137,9 @@ def scrape_all(
 
     df2export["readme"] = df2export["readme"].apply(_f_readme_cleanup)
 
+    # Dropping duplicates, if any
+    df2export.drop_duplicates(subset=["url"], inplace=True)
+
     if target_output_file.endswith(".csv"):
         # Dropping READMEs for CSV to look reasonable
         df.drop(columns=["readme"]).to_csv(target_output_file, sep=";")
