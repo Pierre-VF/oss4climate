@@ -11,6 +11,7 @@ from oss4climate.scripts import (
 )
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
+from oss4climate.src.nlp import markdown_io
 from oss4climate.src.parsers import (
     ParsingTargets,
     RateLimitError,
@@ -126,9 +127,16 @@ def scrape_all(
         log_warning("Rate limit hit for Github - STOPPING Github scraping")
 
     df = pd.DataFrame([i.__dict__ for i in screening_results])
-    df.set_index("id", inplace=True)
+    df2export = df.set_index("id").drop(columns=["raw_details"])
 
-    df2export = df.drop(columns=["raw_details"])
+    # Cleaning up markdown
+    def _f_readme_cleanup(x):
+        return markdown_io.markdown_to_clean_plaintext(
+            x, remove_code=True, remove_linebreaks=True
+        )
+
+    df2export["readme"] = df2export["readme"].apply(_f_readme_cleanup)
+
     if target_output_file.endswith(".csv"):
         # Dropping READMEs for CSV to look reasonable
         df.drop(columns=["readme"]).to_csv(target_output_file, sep=";")
