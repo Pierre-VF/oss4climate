@@ -9,6 +9,7 @@ Note:
 from datetime import datetime
 from enum import Enum
 from functools import lru_cache
+from typing import Any
 from urllib.parse import quote_plus, urlparse
 
 from oss4climate.src.config import SETTINGS
@@ -122,6 +123,13 @@ def fetch_repositories_in_group(organisation_name: str) -> dict[str, str]:
     return {r["name"]: r["web_url"] for r in res}
 
 
+def _get_from_dict_with_default(d: dict, key: str, default: Any) -> Any:
+    if key in d:
+        return d[key]
+    else:
+        return default
+
+
 def fetch_repository_details(
     repo_path: str,
     fail_on_issue: bool = True,
@@ -134,7 +142,7 @@ def fetch_repository_details(
     )
     # organisation_url = f"https://{gitlab_host}/{repo_id.split('/')[0]}"
     organisation = repo_id.split("/")[0]
-    license = r.get("license", {}).get("name")
+    license = _get_from_dict_with_default(r, "license", {}).get("name")
 
     try:
         url_readme_file = r["readme_url"].replace("/blob/", "/raw/") + "?inline=false"
@@ -146,9 +154,11 @@ def fetch_repository_details(
             readme = "(NO README)"
 
     # Fields treated as optional or unstable across non-"gitlab.com" instances
-    fork_details = r.get("forked_from_project", {})
+    fork_details = _get_from_dict_with_default(r, "forked_from_project", {})
     if isinstance(fork_details, dict):
-        forked_from = fork_details.get("namespace", {}).get("web_url")
+        forked_from = _get_from_dict_with_default(fork_details, "namespace", {}).get(
+            "web_url"
+        )
     else:
         forked_from = None
     if "updated_at" in r:
@@ -162,7 +172,7 @@ def fetch_repository_details(
         last_commit = None
 
     n_open_prs = None
-    url_open_pr_raw = r.get("_links", {})
+    url_open_pr_raw = _get_from_dict_with_default(r, "_links", {})
     if url_open_pr_raw:
         url_open_pr = url_open_pr_raw.get("merge_requests")
         if url_open_pr:
@@ -188,3 +198,8 @@ def fetch_repository_details(
         forked_from=forked_from,
     )
     return details
+
+
+if __name__ == "__main__":
+    r = fetch_repository_details("https://gitlab.com/aossie/CarbonFootprint")
+    print(r)
