@@ -3431,4 +3431,12 @@ urls = [
     "https://wiki.openmod-initiative.org/wiki/Open_Models",
     "https://www.earthdata.nasa.gov/",
 ]
-invalid_urls = []
+invalid_urls = [
+    'https://github.com/KKulma/intensegRid "LINK"',
+    'https://github.com/bluegreen-labs/ecmwfr "LINK"',
+    'https://github.com/meteostat/meteostat-python "LINK"',
+    'https://github.com/rockita/Environmental_Intelligence "LINK"',
+    'https://github.com/ropengov/eurostat "LINK"',
+    'https://github.com/ropensci/rnoaa "LINK"',
+    'https://github.com/ropensci/ropenaq "LINK"',
+]

@@ -161,11 +161,38 @@ class ParsingTargets:
             + self.gitlab_projects
         )
 
+    def _target_is_valid(self, url: str) -> bool:
+        if '"LINK"' in url:
+            return False
+        else:
+            return True
+
+    def _check_targets_validity(self, x: list[str]) -> list[str]:
+        out = []
+        for i in x:
+            if self._target_is_valid(i):
+                out.append(i)
+            else:
+                self.invalid.append(i)
+        return out
+
+    def ensure_targets_validity(self) -> None:
+        self.github_organisations = self._check_targets_validity(
+            self.github_organisations
+        )
+        self.github_repositories = self._check_targets_validity(
+            self.github_repositories
+        )
+        self.gitlab_groups = self._check_targets_validity(self.gitlab_groups)
+        self.gitlab_projects = self._check_targets_validity(self.gitlab_projects)
+
     def cleanup(self) -> None:
         """
         Method to cleanup the object (removing obsolete entries and redundancies)
         """
         self.ensure_sorted_and_unique_elements()
+        # Ensuring that only valid targets are used
+        self.ensure_targets_validity()
         # Removing all repos that are listed in organisations/groups
         self.github_repositories = [
             i for i in self.github_repositories if i not in self.github_organisations
