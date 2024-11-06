@@ -7,7 +7,7 @@ from typing import Optional
 
 import pandas as pd
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from tqdm import tqdm
@@ -16,6 +16,7 @@ from oss4climate.scripts import (
     FILE_OUTPUT_LISTING_FEATHER,
     listing_search,
 )
+from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info, log_warning
 from oss4climate.src.nlp.search import SearchResults
 from oss4climate.src.nlp.search_engine import SearchEngine
@@ -78,18 +79,9 @@ async def base_landing():
     return RedirectResponse("/ui/search", status_code=307)
 
 
-# ----------------------------------------------------------------------------------
-# UI endpoints
-# ----------------------------------------------------------------------------------
-
-
-def _f_none_to_unknown(x: str | date | None) -> str:
-    if x is None:
-        return "(unknown)"
-    else:
-        return str(x)
-
-
+# -------------------------------------------------------------------------------------
+# Functions with caching
+# -------------------------------------------------------------------------------------
 @lru_cache(maxsize=1)
 def _unique_licenses() -> list[str]:
     x = SEARCH_RESULTS.documents["license"].apply(_f_none_to_unknown).unique()
@@ -104,34 +96,9 @@ def _unique_languages() -> list[str]:
     return x.tolist()
 
 
-def _render_template(request: Request, template_file: str, content: dict | None = None):
-    resp = {
-        "request": request,
-        "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
-        "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
-    }
-    if content is not None:
-        resp = resp | content
-    return templates.TemplateResponse(request, template_file, resp)
-
-
 @lru_cache(maxsize=1)
 def n_repositories_indexed():
     return SEARCH_RESULTS.n_documents
-
-
-@app.get("/ui/search", response_class=HTMLResponse, include_in_schema=False)
-async def search(request: Request):
-    return _render_template(
-        request=request,
-        template_file="search.html",
-        content={
-            "n_repositories_indexed": n_repositories_indexed(),
-            "languages": _unique_languages(),
-            "licenses": _unique_licenses(),
-            "free_text": " ",
-        },
-    )
 
 
 @lru_cache(maxsize=10)
@@ -186,6 +153,65 @@ def _search_for_results(query: str) -> pd.DataFrame:
     df_out.sort_values(by="score", ascending=False, inplace=True)
     df_out.drop_duplicates(subset=["url"], inplace=True)
     return df_out
+
+
+def _clear_cache():
+    _unique_licenses.cache_clear()
+    _unique_languages.cache_clear()
+    n_repositories_indexed.cache_clear()
+    _search_for_results.cache_clear()
+
+
+def _refresh_data(force_refresh: bool = False):
+    if force_refresh or not os.path.exists(FILE_OUTPUT_LISTING_FEATHER):
+        log_warning("- Listing not found, downloading again")
+        listing_search.download_listing_data_for_app()
+    log_info("- Loading documents")
+    SEARCH_RESULTS.load_documents(FILE_OUTPUT_LISTING_FEATHER)
+    for __, r in tqdm(SEARCH_RESULTS.documents.iterrows()):
+        # Skip repos with missing info
+        for k in ["readme", "description"]:
+            if r[k] is None:
+                r[k] = ""
+        SEARCH_ENGINE_DESCRIPTIONS.index(url=r["url"], content=r["description"])
+        SEARCH_ENGINE_READMES.index(r["url"], content=r["readme"])
+
+
+# ----------------------------------------------------------------------------------
+# UI endpoints
+# ----------------------------------------------------------------------------------
+
+
+def _f_none_to_unknown(x: str | date | None) -> str:
+    if x is None:
+        return "(unknown)"
+    else:
+        return str(x)
+
+
+def _render_template(request: Request, template_file: str, content: dict | None = None):
+    resp = {
+        "request": request,
+        "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
+        "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
+    }
+    if content is not None:
+        resp = resp | content
+    return templates.TemplateResponse(request, template_file, resp)
+
+
+@app.get("/ui/search", response_class=HTMLResponse, include_in_schema=False)
+async def search(request: Request):
+    return _render_template(
+        request=request,
+        template_file="search.html",
+        content={
+            "n_repositories_indexed": n_repositories_indexed(),
+            "languages": _unique_languages(),
+            "licenses": _unique_licenses(),
+            "free_text": " ",
+        },
+    )
 
 
 @app.get("/ui/results", response_class=HTMLResponse, include_in_schema=False)
@@ -284,3 +310,22 @@ async def api_data():
     return RedirectResponse(
         "https://data.pierrevf.consulting/oss4climate/listing_data.csv", status_code=307
     )
+
+
+@app.get("/api/refresh_data")
+async def refresh_data(key: Optional[str] = None):
+    if SETTINGS.DATA_REFRESH_KEY is None:
+        return PlainTextResponse(
+            "Not allowed to refresh when passkey is not set",
+            status_code=403,
+        )
+    if key != SETTINGS.DATA_REFRESH_KEY:
+        return PlainTextResponse(
+            "You are not allowed to refresh the data (invalid key)",
+            status_code=403,
+        )
+    log_info("DATA refreshing START")
+    _refresh_data(force_refresh=True)
+    _clear_cache()
+    log_info("DATA refreshing END")
+    return PlainTextResponse("Data was successfully refreshed")
