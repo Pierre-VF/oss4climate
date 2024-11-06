@@ -221,10 +221,13 @@ def fetch_repository_details(
 
 def fetch_repository_readme(
     repo_name: str,
-    branch: str = "main",
+    branch: str | None = None,
     fail_on_issue: bool = True,
 ) -> str | None:
     repo_name = _extract_organisation_and_repository_as_url_block(repo_name)
+
+    if branch is None:
+        branch = _master_branch_name(repo_name)
 
     md_content = None
 
