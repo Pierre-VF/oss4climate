@@ -36,6 +36,7 @@ SEARCH_RESULTS = SearchResults()
 
 # Configuration (for avoidance of information duplication)
 URL_CODE_REPOSITORY = "https://github.com/Pierre-VF/oss4climate/"
+URL_FEEDBACK_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSeei-0V5CobVNX-qOX3lI11FuvTBv1JV77fcUZOideeDtcEhA/viewform?usp=sf_link"
 
 
 @asynccontextmanager
@@ -111,7 +112,11 @@ def _unique_languages() -> list[str]:
 
 
 def _render_template(request: Request, template_file: str, content: dict | None = None):
-    resp = {"request": request, "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY}
+    resp = {
+        "request": request,
+        "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
+        "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
+    }
     if content is not None:
         resp = resp | content
     return templates.TemplateResponse(template_file, resp)
