@@ -38,6 +38,8 @@ def _cached_web_get(
             url=url,
             headers=headers,
         )
+        if r.status_code == 403 and raise_rate_limit_error_on_403:
+            raise RateLimitError("Rate limit hit (url={url} // {r.text})")
         if is_json:
             r.raise_for_status()
             out = r.json()
@@ -45,8 +47,6 @@ def _cached_web_get(
             if r.status_code == 404:
                 log_info(f"> No resource found for: {url}")
                 out = "(None)"
-            if r.status_code == 403 and raise_rate_limit_error_on_403:
-                raise RateLimitError("Rate limit hit (url={url} // {r.text})")
             else:
                 r.raise_for_status()
                 out = r.text
