@@ -39,7 +39,7 @@ def _cached_web_get(
             headers=headers,
         )
         if r.status_code == 403 and raise_rate_limit_error_on_403:
-            raise RateLimitError("Rate limit hit (url={url} // {r.text})")
+            raise RateLimitError(f"Rate limit hit (url={url} // {r.text})")
         if is_json:
             r.raise_for_status()
             out = r.json()
