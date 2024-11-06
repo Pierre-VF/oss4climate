@@ -103,17 +103,24 @@ def _web_get(
         headers = _github_headers()
     else:
         headers = None
+
+    # Based upon 5000 requests per hour
+    #   (also taking into account the extra side computations that spend time on other things than calls)
+    rate_limiting_wait_s = 0.5
+
     if is_json:
         res = cached_web_get_json(
             url=url,
             headers=headers,
             raise_rate_limit_error_on_403=raise_rate_limit_error_on_403,
+            rate_limiting_wait_s=rate_limiting_wait_s,
         )
     else:
         res = cached_web_get_text(
             url=url,
             headers=headers,
             raise_rate_limit_error_on_403=raise_rate_limit_error_on_403,
+            rate_limiting_wait_s=rate_limiting_wait_s,
         )
     return res
 
