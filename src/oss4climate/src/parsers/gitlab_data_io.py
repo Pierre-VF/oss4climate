@@ -124,10 +124,11 @@ def fetch_repositories_in_group(organisation_name: str) -> dict[str, str]:
 
 
 def _get_from_dict_with_default(d: dict, key: str, default: Any) -> Any:
-    if key in d:
-        return d[key]
-    else:
+    out = d.get(key)
+    if out is None:
         return default
+    else:
+        return out
 
 
 def fetch_repository_details(
