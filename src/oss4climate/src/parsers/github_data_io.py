@@ -152,9 +152,10 @@ def _master_branch_name(cleaned_repo_path: str) -> str | None:
         r_branches = _web_get(
             f"https://api.github.com/repos/{cleaned_repo_path}/branches?per_page=100&page={page}"
         )
-        branches_names += [i["name"] for i in r_branches]
+        branches_i = [i["name"] for i in r_branches]
         page += 1
-        more_data_needed = len(branches_names) == 100
+        more_data_needed = len(branches_i) == 100
+        branches_names += branches_i
 
     if len(branches_names) == 1:
         # If only one branch, then the choice is clear
