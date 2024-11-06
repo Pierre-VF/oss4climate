@@ -100,6 +100,62 @@ def cached_web_get_text(
     )
 
 
+def url_qualifies(x: str) -> bool:
+    if x.startswith("https://github.com/"):
+        if (
+            x.startswith("https://github.com/settings/")
+            or x.startswith("https://github.com/user-attachments/")
+            or x.startswith("https://github.com/sponsors/")
+            or x.startswith("https://github.com/settings/")
+        ):
+            return False
+        elif (
+            x.endswith("/wiki")
+            or ("/wiki/" in x)
+            or x.endswith("/discussions")
+            or ("/discussions/" in x)
+            or x.endswith("/issues")
+            or ("/issues/" in x)
+            or x.endswith("/milestones")
+            or ("/milestone/" in x)
+            or x.endswith("/projects")
+            or ("/projects/" in x)
+            or x.endswith("/pulls")
+            or ("/pull/" in x)
+            or x.endswith("/releases")
+            or ("/releases/" in x)
+            or x.endswith("/tags")
+            or ("/tag/" in x)
+            # Specific endings
+            or ("/actions" in x)
+            or ("/security/policy" in x)
+            # Specific sub-paths
+            or ("/-/" in x)
+            or ("/assets/" in x)
+            or ("/badges/" in x)
+            or ("/blob/" in x)
+            or ("/commit/" in x)
+            or ("/labels/" in x)
+            or ("/graphs/" in x)
+            or ("/public/" in x)
+            or ("/raw/" in x)
+            or ("/workflows/" in x)
+        ):
+            return False
+        else:
+            return True
+    elif x.startswith("https://gitlab.com/"):
+        if (
+            ("/-/" in x)
+            or ("/blob/" in x)
+            or ("/badges/" in x)
+            or x.endswith("/examples")
+        ):
+            return False
+    # If hit nothing up thil here, then it's valid
+    return True
+
+
 @dataclass
 class ParsingTargets:
     """
@@ -171,7 +227,7 @@ class ParsingTargets:
         if '"LINK"' in url:
             return False
         else:
-            return True
+            return url_qualifies(url)
 
     def _check_targets_validity(self, x: list[str]) -> list[str]:
         out = []
