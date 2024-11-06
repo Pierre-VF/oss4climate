@@ -259,6 +259,14 @@ def read_about(request: Request):
     )
 
 
+@app.get("/favicon.ico")
+def _favicon():
+    # This is just a dummy favicon for now (waiting for a better logo)
+    return RedirectResponse(
+        "https://www.pierrevf.consulting/wp-content/uploads/2023/11/cropped-logo_base_png-32x32.png"
+    )
+
+
 # ----------------------------------------------------------------------------------
 # API endpoints
 # ----------------------------------------------------------------------------------
