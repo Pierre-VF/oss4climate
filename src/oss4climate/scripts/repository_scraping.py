@@ -13,10 +13,10 @@ from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
 from oss4climate.src.parsers import (
     ParsingTargets,
+    RateLimitError,
     github_data_io,
     gitlab_data_io,
 )
-from oss4climate.src.parsers.exceptions import RateLimitError
 
 
 def scrape_all(
@@ -109,16 +109,17 @@ def scrape_all(
                     )
                 )
             except Exception as e:
-                e_str = str(e).lower()
-                if "403" in e_str and "forbidden" in e_str:
+                if isinstance(e, RateLimitError):
+                    # Ensuring proper breaking on rate limits of the API
                     forbidden_for_api_limit_counter += 1
+                    if forbidden_for_api_limit_counter > 10:
+                        raise RateLimitError(
+                            f"Github rate limiting hit ({forbidden_for_api_limit_counter} errors with 403 status)"
+                        )
+
                 scrape_failures["GITHUB_REPO:" + i] = e
                 log_warning(f" > Error with repo ({e})")
                 bad_repositories.append(i)
-                if forbidden_for_api_limit_counter > 10:
-                    raise RateLimitError(
-                        f"Github rate limiting hit ({forbidden_for_api_limit_counter} 403 errors)"
-                    )
     except RateLimitError as e:
         failure_during_scraping = True
         scrape_failures["SCRAPING"] = e

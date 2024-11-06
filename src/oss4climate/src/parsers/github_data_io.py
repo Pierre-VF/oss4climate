@@ -93,15 +93,28 @@ def _github_headers() -> dict[str, str]:
     return headers
 
 
-def _web_get(url: str, with_headers: bool = True, is_json: bool = True) -> dict:
+def _web_get(
+    url: str,
+    with_headers: bool = True,
+    is_json: bool = True,
+    raise_rate_limit_error_on_403: bool = True,
+) -> dict:
     if with_headers:
         headers = _github_headers()
     else:
         headers = None
     if is_json:
-        res = cached_web_get_json(url=url, headers=headers)
+        res = cached_web_get_json(
+            url=url,
+            headers=headers,
+            raise_rate_limit_error_on_403=raise_rate_limit_error_on_403,
+        )
     else:
-        res = cached_web_get_text(url=url, headers=headers)
+        res = cached_web_get_text(
+            url=url,
+            headers=headers,
+            raise_rate_limit_error_on_403=raise_rate_limit_error_on_403,
+        )
     return res
 
 

@@ -15,6 +15,11 @@ from oss4climate.src.database import load_from_database, save_to_database
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info
 
+
+class RateLimitError(RuntimeError):
+    pass
+
+
 WEB_SESSION = requests.Session()
 
 
@@ -23,6 +28,7 @@ def _cached_web_get(
     headers: dict | None = None,
     wait_after_web_query: bool = True,
     is_json: bool = True,
+    raise_rate_limit_error_on_403: bool = True,
 ) -> dict | str:
     # Uses the cache to ensure that requests are minimised
     out = load_from_database(url, is_json=is_json)
@@ -39,6 +45,8 @@ def _cached_web_get(
             if r.status_code == 404:
                 log_info(f"> No resource found for: {url}")
                 out = "(None)"
+            if r.status_code == 403 and raise_rate_limit_error_on_403:
+                raise RateLimitError("Rate limit hit (url={url} // {r.text})")
             else:
                 r.raise_for_status()
                 out = r.text
@@ -53,24 +61,32 @@ def _cached_web_get(
 
 
 def cached_web_get_json(
-    url: str, headers: dict | None = None, wait_after_web_query: bool = True
+    url: str,
+    headers: dict | None = None,
+    wait_after_web_query: bool = True,
+    raise_rate_limit_error_on_403: bool = False,
 ) -> dict:
     return _cached_web_get(
         url=url,
         headers=headers,
         wait_after_web_query=wait_after_web_query,
         is_json=True,
+        raise_rate_limit_error_on_403=raise_rate_limit_error_on_403,
     )
 
 
 def cached_web_get_text(
-    url: str, headers: dict | None = None, wait_after_web_query: bool = True
+    url: str,
+    headers: dict | None = None,
+    wait_after_web_query: bool = True,
+    raise_rate_limit_error_on_403: bool = False,
 ) -> str:
     return _cached_web_get(
         url=url,
         headers=headers,
         wait_after_web_query=wait_after_web_query,
         is_json=False,
+        raise_rate_limit_error_on_403=raise_rate_limit_error_on_403,
     )
 
 
