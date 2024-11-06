@@ -21,6 +21,7 @@ class RateLimitError(RuntimeError):
 
 
 WEB_SESSION = requests.Session()
+ERROR_404_MARKER = "404"
 
 
 def _cached_web_get(
@@ -33,28 +34,33 @@ def _cached_web_get(
 ) -> dict | str:
     # Uses the cache to ensure that requests are minimised
     out = load_from_database(url, is_json=is_json)
+
     if out is None:
         log_info(f"Web GET: {url}")
         r = WEB_SESSION.get(
             url=url,
             headers=headers,
         )
+        if r.status_code == 404:
+            save_to_database(url, ERROR_404_MARKER, is_json=is_json)
+            raise requests.exceptions.HTTPError(
+                f"404 Client Error: Not Found for url: {url}"
+            )
         if r.status_code == 403 and raise_rate_limit_error_on_403:
             raise RateLimitError(f"Rate limit hit (url={url} // {r.text})")
+        r.raise_for_status()
         if is_json:
-            r.raise_for_status()
             out = r.json()
         else:
-            if r.status_code == 404:
-                log_info(f"> No resource found for: {url}")
-                out = "(None)"
-            else:
-                r.raise_for_status()
-                out = r.text
+            out = r.text
         save_to_database(url, out, is_json=is_json)
         if wait_after_web_query:
             # To avoid triggering rate limits on APIs and be nice to servers
             time.sleep(rate_limiting_wait_s)
+    elif out == ERROR_404_MARKER:
+        raise requests.exceptions.HTTPError(
+            f"404 Client Error: Not Found for url: {url}"
+        )
     else:
         log_info(f"Cache-loading: {url}")
     return out
