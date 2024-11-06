@@ -31,7 +31,7 @@
             </tr>
             {% for i, r in results.iterrows() %}
                 <tr>
-                    <td><a href="{{ r.url }}" target="_blank">{{ r["name"] }}</a></td>
+                    <td><a href="{{ r.url }}" target="_blank" rel="noopener noreferrer">{{ r["name"] }}</a></td>
                     <td>{{ r.description }}</td>
                     <td>{{ r.language }}</td>
                     <td>{{ r.license }}</td>
