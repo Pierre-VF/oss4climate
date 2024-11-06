@@ -16,6 +16,7 @@ from oss4climate.src.parsers import (
     github_data_io,
     gitlab_data_io,
 )
+from oss4climate.src.parsers.exceptions import RateLimitError
 
 
 def scrape_all(
@@ -37,6 +38,8 @@ def scrape_all(
     log_info("Loading organisations and repositories to be indexed")
     targets = ParsingTargets.from_toml(FILE_INPUT_INDEX)
     targets.ensure_sorted_and_unique_elements()
+
+    failure_during_scraping = False
 
     scrape_failures = dict()
 
@@ -94,22 +97,35 @@ def scrape_all(
             bad_repositories.append(i)
 
     log_info("Fetching data for all repositories in Github")
-    for i in targets.github_repositories:
-        try:
-            if i.endswith("/.github"):
-                continue
-            screening_results.append(
-                github_data_io.fetch_repository_details(i, fail_on_issue=fail_on_issue)
-            )
-        except Exception as e:
-            scrape_failures["GITHUB_REPO:" + i] = e
-            log_warning(f" > Error with repo ({e})")
-            bad_repositories.append(i)
+    try:
+        forbidden_for_api_limit_counter = 0
+        for i in targets.github_repositories:
+            try:
+                if i.endswith("/.github"):
+                    continue
+                screening_results.append(
+                    github_data_io.fetch_repository_details(
+                        i, fail_on_issue=fail_on_issue
+                    )
+                )
+            except Exception as e:
+                e_str = str(e).lower()
+                if "403" in e_str and "forbidden" in e_str:
+                    forbidden_for_api_limit_counter += 1
+                scrape_failures["GITHUB_REPO:" + i] = e
+                log_warning(f" > Error with repo ({e})")
+                bad_repositories.append(i)
+                if forbidden_for_api_limit_counter > 10:
+                    raise RateLimitError(
+                        f"Github rate limiting hit ({forbidden_for_api_limit_counter} 403 errors)"
+                    )
+    except RateLimitError as e:
+        failure_during_scraping = True
+        scrape_failures["SCRAPING"] = e
+        log_warning("Rate limit hit for Github - STOPPING Github scraping")
 
     df = pd.DataFrame([i.__dict__ for i in screening_results])
     df.set_index("id", inplace=True)
-
-    log_info("Fetching READMEs for all repositories in Github")
 
     df2export = df.drop(columns=["raw_details"])
     if target_output_file.endswith(".csv"):
@@ -178,4 +194,8 @@ def scrape_all(
     with open(file_failures_toml, "w") as fp:
         dump(doc_failures, fp, sort_keys=True)
     format_individual_file(file_failures_toml)
+
+    if failure_during_scraping:
+        log_warning("Failure(s) happened during the scraping!")
+
     log_info("Done")
