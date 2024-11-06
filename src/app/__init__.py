@@ -112,7 +112,7 @@ def _render_template(request: Request, template_file: str, content: dict | None 
     }
     if content is not None:
         resp = resp | content
-    return templates.TemplateResponse(template_file, resp)
+    return templates.TemplateResponse(request, template_file, resp)
 
 
 @lru_cache(maxsize=1)
