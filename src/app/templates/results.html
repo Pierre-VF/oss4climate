@@ -31,7 +31,7 @@
             </tr>
             {% for i, r in results.iterrows() %}
                 <tr>
-                    <td><a href="{{ r.url }}">{{ r["name"] }}</a></td>
+                    <td><a href="{{ r.url }}" target="_blank" rel="noopener noreferrer">{{ r["name"] }}</a></td>
                     <td>{{ r.description }}</td>
                     <td>{{ r.language }}</td>
                     <td>{{ r.license }}</td>
@@ -45,6 +45,8 @@
             {% if show_previous %}<a href="{{ url_previous }}">Previous << </a>{% endif %} 
             {% if show_next %}<a href="{{ url_next }}">>> Next</a>{% endif %}
         </p>
+
+        <p>Not finding what you were looking for? Please give us <b><a href="{{ URL_FEEDBACK_FORM }}">your feedback</a></b>.</p>
     {% endif %}
     
 </body>
