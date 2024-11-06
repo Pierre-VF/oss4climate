@@ -182,7 +182,12 @@ def _search_for_results(query: str) -> pd.DataFrame:
         + df_out["name"].apply(_f_score_in_name) * 10
         + df_out["organisation"].apply(_f_score_in_name) * 10
     )
-    return df_out.query("score>0").sort_values(by="score", ascending=False)
+
+    # Focus only on relevant outputs and carry out filtering and duplicate removal
+    df_out.query("score>0", inplace=True)
+    df_out.sort_values(by="score", ascending=False, inplace=True)
+    df_out.drop_duplicates(subset=["url"], inplace=True)
+    return df_out
 
 
 @app.get("/ui/results", response_class=HTMLResponse, include_in_schema=False)

@@ -93,15 +93,35 @@ def _github_headers() -> dict[str, str]:
     return headers
 
 
-def _web_get(url: str, with_headers: bool = True, is_json: bool = True) -> dict:
+def _web_get(
+    url: str,
+    with_headers: bool = True,
+    is_json: bool = True,
+    raise_rate_limit_error_on_403: bool = True,
+) -> dict:
     if with_headers:
         headers = _github_headers()
     else:
         headers = None
+
+    # Based upon 5000 requests per hour
+    #   (also taking into account the extra side computations that spend time on other things than calls)
+    rate_limiting_wait_s = 0.5
+
     if is_json:
-        res = cached_web_get_json(url=url, headers=headers)
+        res = cached_web_get_json(
+            url=url,
+            headers=headers,
+            raise_rate_limit_error_on_403=raise_rate_limit_error_on_403,
+            rate_limiting_wait_s=rate_limiting_wait_s,
+        )
     else:
-        res = cached_web_get_text(url=url, headers=headers)
+        res = cached_web_get_text(
+            url=url,
+            headers=headers,
+            raise_rate_limit_error_on_403=raise_rate_limit_error_on_403,
+            rate_limiting_wait_s=rate_limiting_wait_s,
+        )
     return res
 
 
@@ -221,10 +241,13 @@ def fetch_repository_details(
 
 def fetch_repository_readme(
     repo_name: str,
-    branch: str = "main",
+    branch: str | None = None,
     fail_on_issue: bool = True,
 ) -> str | None:
     repo_name = _extract_organisation_and_repository_as_url_block(repo_name)
+
+    if branch is None:
+        branch = _master_branch_name(repo_name)
 
     md_content = None
 

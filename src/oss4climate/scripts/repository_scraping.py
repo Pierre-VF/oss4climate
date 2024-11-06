@@ -11,8 +11,10 @@ from oss4climate.scripts import (
 )
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
+from oss4climate.src.nlp import markdown_io
 from oss4climate.src.parsers import (
     ParsingTargets,
+    RateLimitError,
     github_data_io,
     gitlab_data_io,
 )
@@ -37,6 +39,8 @@ def scrape_all(
     log_info("Loading organisations and repositories to be indexed")
     targets = ParsingTargets.from_toml(FILE_INPUT_INDEX)
     targets.ensure_sorted_and_unique_elements()
+
+    failure_during_scraping = False
 
     scrape_failures = dict()
 
@@ -94,24 +98,55 @@ def scrape_all(
             bad_repositories.append(i)
 
     log_info("Fetching data for all repositories in Github")
-    for i in targets.github_repositories:
-        try:
-            if i.endswith("/.github"):
-                continue
-            screening_results.append(
-                github_data_io.fetch_repository_details(i, fail_on_issue=fail_on_issue)
-            )
-        except Exception as e:
-            scrape_failures["GITHUB_REPO:" + i] = e
-            log_warning(f" > Error with repo ({e})")
-            bad_repositories.append(i)
+    try:
+        forbidden_for_api_limit_counter = 0
+        for i in targets.github_repositories:
+            try:
+                if i.endswith("/.github"):
+                    continue
+                screening_results.append(
+                    github_data_io.fetch_repository_details(
+                        i, fail_on_issue=fail_on_issue
+                    )
+                )
+            except Exception as e:
+                if isinstance(e, RateLimitError):
+                    # Ensuring proper breaking on rate limits of the API
+                    forbidden_for_api_limit_counter += 1
+                    if forbidden_for_api_limit_counter > 10:
+                        raise RateLimitError(
+                            f"Github rate limiting hit ({forbidden_for_api_limit_counter} errors with 403 status)"
+                        )
+
+                scrape_failures["GITHUB_REPO:" + i] = e
+                log_warning(f" > Error with repo ({e})")
+                bad_repositories.append(i)
+    except RateLimitError as e:
+        failure_during_scraping = True
+        scrape_failures["SCRAPING"] = e
+        log_warning("Rate limit hit for Github - STOPPING Github scraping")
 
     df = pd.DataFrame([i.__dict__ for i in screening_results])
-    df.set_index("id", inplace=True)
+    df2export = df.set_index("id").drop(columns=["raw_details"])
 
-    log_info("Fetching READMEs for all repositories in Github")
+    # Cleaning up markdown
+    def _f_readme_cleanup(x):
+        if x is None:
+            return "(NO DATA)"
+        try:
+            out = markdown_io.markdown_to_clean_plaintext(
+                x, remove_code=True, remove_linebreaks=True
+            )
+        except Exception:
+            # This is to avoid issues if the text is not markdown
+            out = x
+        return out
 
-    df2export = df.drop(columns=["raw_details"])
+    df2export["readme"] = df2export["readme"].apply(_f_readme_cleanup)
+
+    # Dropping duplicates, if any
+    df2export.drop_duplicates(subset=["url"], inplace=True)
+
     if target_output_file.endswith(".csv"):
         # Dropping READMEs for CSV to look reasonable
         df.drop(columns=["readme"]).to_csv(target_output_file, sep=";")
@@ -178,4 +213,8 @@ def scrape_all(
     with open(file_failures_toml, "w") as fp:
         dump(doc_failures, fp, sort_keys=True)
     format_individual_file(file_failures_toml)
+
+    if failure_during_scraping:
+        log_warning("Failure(s) happened during the scraping!")
+
     log_info("Done")
