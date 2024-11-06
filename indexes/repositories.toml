@@ -2265,6 +2265,7 @@ repositories = [
     "https://github.com/liumency/DSAMNet",
     "https://github.com/liumency/SRCDNet",
     "https://github.com/liumency/SYSU-CD",
+    "https://github.com/lkev/wt-fdd",
     "https://github.com/lkev/wtphm",
     "https://github.com/llu025/Heterogeneous_CD",
     "https://github.com/localdevices/pyorc",
