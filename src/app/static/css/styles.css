@@ -21,15 +21,34 @@ a {
     text-decoration: none;
 }
 
+
 .footer {
     font-size: 12px;
     text-align: center;
 }
 
 
-.navbar {
+header {
+    overflow: hidden;
+}
+nav.left {
+    float: left;
+}
+nav.right {
+    float: right;
+}
+nav {
     background-origin: padding-box;
 }
+a.nav_link {    
+    font-size: 25px;
+    font-weight: bold;
+    vertical-align: top;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+
 
 .center {
     display: block;

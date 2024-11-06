@@ -22,8 +22,8 @@ from oss4climate.src.parsers.opensustain_tech import (
     fetch_listing_of_listings_from_opensustain_webpage,
 )
 
-FILE_INPUT_INDEX = "repo_index.toml"
-FILE_INPUT_LISTINGS_INDEX = "listings_index.toml"
+FILE_INPUT_INDEX = "indexes/repositories.toml"
+FILE_INPUT_LISTINGS_INDEX = "indexes/listings.toml"
 FILE_OUTPUT_DIR = ".data"
 FILE_OUTPUT_LISTING_CSV = f"{FILE_OUTPUT_DIR}/listing_data.csv"
 FILE_OUTPUT_LISTING_FEATHER = f"{FILE_OUTPUT_DIR}/listing_data.feather"

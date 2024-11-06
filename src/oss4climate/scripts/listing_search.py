@@ -11,22 +11,32 @@ from oss4climate.scripts import (
 )
 from oss4climate.src.nlp.search import SearchResults
 
+URL_BASE = "https://data.pierrevf.consulting/oss4climate"
+URL_RAW_INDEX = f"{URL_BASE}/summary.toml"
+URL_LISTING_CSV = f"{URL_BASE}/listing_data.csv"
+URL_LISTING_FEATHER = f"{URL_BASE}/listing_data.feather"
+
+
+def _download_file(url: str, target: str) -> None:
+    print(f"Fetching {url}")
+    urlretrieve(url, target)
+    print(f"-> Downloaded to {target}")
+
+
+def download_listing_data_for_app():
+    os.makedirs(FILE_OUTPUT_DIR, exist_ok=True)
+    _download_file(URL_LISTING_FEATHER, FILE_OUTPUT_LISTING_FEATHER)
+    print("Download complete")
+
 
 def download_data():
-    URL_BASE = "https://data.pierrevf.consulting/oss4climate"
-    URL_RAW_INDEX = f"{URL_BASE}/summary.toml"
-    URL_LISTING_CSV = f"{URL_BASE}/listing_data.csv"
-    URL_LISTING_FEATHER = f"{URL_BASE}/listing_data.feather"
-
     os.makedirs(FILE_OUTPUT_DIR, exist_ok=True)
     for url_i, file_i in [
         (URL_RAW_INDEX, FILE_OUTPUT_SUMMARY_TOML),
         (URL_LISTING_CSV, FILE_OUTPUT_LISTING_CSV),
         (URL_LISTING_FEATHER, FILE_OUTPUT_LISTING_FEATHER),
     ]:
-        print(f"Fetching {url_i}")
-        urlretrieve(url_i, file_i)
-        print(f"-> Downloaded to {file_i}")
+        _download_file(url_i, file_i)
 
     print("Download complete")
 

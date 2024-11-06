@@ -55,4 +55,4 @@ help:
 
 .PHONY: test
 test:
-	pytest src/test/.
+	pytest src/.
