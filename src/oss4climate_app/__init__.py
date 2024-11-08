@@ -1,5 +1,6 @@
 import os
 from contextlib import asynccontextmanager
+from typing import Optional
 
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
@@ -61,8 +62,8 @@ def get_top_urls(scores_dict: dict, n: int):
 
 
 @app.get("/")
-async def base_landing(request: Request):
-    log_landing(request=request)
+async def base_landing(request: Request, channel: Optional[str] = None):
+    log_landing(request=request, channel=channel)
     return RedirectResponse("/ui/search", status_code=307)
 
 

@@ -3,6 +3,7 @@ Module for local logging and tracking of activity
 """
 
 from datetime import UTC, datetime
+from typing import Optional
 
 from fastapi import Request
 
@@ -24,12 +25,13 @@ def log_search(
         session.commit()
 
 
-def log_landing(request: Request) -> None:
+def log_landing(request: Request, channel: Optional[str] = None) -> None:
     with open_database_session() as session:
         session.add(
             RequestLog(
                 referer=request.headers.get("referer"),
                 timestamp=datetime.now(tz=UTC),
+                channel=channel,
             )
         )
         session.commit()

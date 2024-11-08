@@ -23,6 +23,7 @@ class RequestLog(SQLModel, table=True):
     id: Optional[int] = _primary_key()
     referer: Optional[str]
     timestamp: datetime
+    channel: Optional[str]
 
 
 class SearchLog(SQLModel, table=True):
