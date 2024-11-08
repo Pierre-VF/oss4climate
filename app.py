@@ -7,9 +7,10 @@ Note: heavily inspired from https://github.com/alexmolas/microsearch/
 from uvicorn import run
 
 try:
-    from src.app import app
+    from oss4climate_app import app
 except ImportError:
-    from .src.app import app
+    # For legacy usage compatibility
+    from src.oss4climate_app import app
 
 if __name__ == "__main__":
     # For local testing
