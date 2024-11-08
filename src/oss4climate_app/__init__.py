@@ -1,7 +1,7 @@
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from tqdm import tqdm
@@ -17,6 +17,7 @@ from oss4climate_app.src.data_io import (
     SEARCH_ENGINE_READMES,
     SEARCH_RESULTS,
 )
+from oss4climate_app.src.log_activity import log_landing
 from oss4climate_app.src.routers import api, ui
 
 
@@ -60,7 +61,8 @@ def get_top_urls(scores_dict: dict, n: int):
 
 
 @app.get("/")
-async def base_landing():
+async def base_landing(request: Request):
+    log_landing(request=request)
     return RedirectResponse("/ui/search", status_code=307)
 
 

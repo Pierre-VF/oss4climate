@@ -5,7 +5,7 @@ Module containing the API code
 from datetime import date
 from typing import Optional
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
@@ -20,6 +20,7 @@ from oss4climate_app.src.data_io import (
     unique_languages,
     unique_licenses,
 )
+from oss4climate_app.src.log_activity import log_search
 
 templates = Jinja2Templates(directory=str(TEMPLATES_PATH))
 
@@ -61,6 +62,7 @@ async def search(request: Request):
 @app.get("/results", response_class=HTMLResponse, include_in_schema=False)
 async def search_results(
     request: Request,
+    background_tasks: BackgroundTasks,
     query: str,
     language: Optional[str] = None,
     license: Optional[str] = None,
@@ -103,6 +105,14 @@ async def search_results(
 
     show_previous = current_offset > 0
     show_next = current_offset <= (n_total_found - n_results)
+
+    # Log results
+    background_tasks.add_task(
+        log_search,
+        search_term=query,
+        number_of_results=n_total_found,
+        view_offset=offset,
+    )
 
     return _render_template(
         request=request,
