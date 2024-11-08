@@ -4,7 +4,8 @@ version = "0.0.0"
 description = "Package to create listings of Open Source for Energy"
 authors = ["Pierre VF"]
 packages = [
-    {include = "oss4climate", from = "src"}
+    {include = "oss4climate", from = "src"},
+    {include = "oss4climate_app", from = "src"}
 ]
 package-mode = true
 
