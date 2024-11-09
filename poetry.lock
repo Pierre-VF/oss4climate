@@ -3205,6 +3205,7 @@ files = [
 
 [package.dependencies]
 certifi = "*"
+fastapi = {version = ">=0.79.0", optional = true, markers = "extra == \"fastapi\""}
 urllib3 = ">=1.26.11"
 
 [package.extras]
@@ -3748,4 +3749,4 @@ test = ["websockets"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "b16ae9163792699eef06aaffb8d622b7eace27301507ba5c34f7fcba1e52031c"
+content-hash = "f71c457242e27dd89f97088621f7c85e4695bed6eb397d98a8e1e311ed9d42e2"
