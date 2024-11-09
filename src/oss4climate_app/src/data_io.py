@@ -51,7 +51,7 @@ def search_for_results(query: str) -> pd.DataFrame:
         df_x["score"] = 1
         return df_x
 
-    print(f"Searching for {query}")
+    log_info(f"Searching for {query}")
     res_desc = SEARCH_ENGINE_DESCRIPTIONS.search(query)
     res_readme = SEARCH_ENGINE_READMES.search(query)
 

@@ -1,4 +1,5 @@
 import pathlib
+import uuid
 
 from oss4climate.scripts import listing_search
 
@@ -6,6 +7,8 @@ _script_dir = pathlib.Path(__file__).resolve().parent
 TEMPLATES_PATH = _script_dir / "templates"
 STATIC_FILES_PATH = _script_dir / "static"
 
+# To prevent caching between versions (this doesn't work too well across instances, but does the job for now)
+APP_VERSION = str(uuid.uuid4())
 
 # Configuration (for avoidance of information duplication)
 URL_CODE_REPOSITORY = "https://github.com/Pierre-VF/oss4climate"

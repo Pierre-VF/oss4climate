@@ -17,6 +17,7 @@ body {
     font-size: 19px;
     line-height: 33px;
     padding: 0;
+    min-width: 550px;
     max-width: 1400px;
     margin: 30px auto;
     padding: 0 1rem;
@@ -54,7 +55,6 @@ a.nav_link {
 }
 
 
-
 .center {
     display: block;
     margin-left: auto;
@@ -70,6 +70,7 @@ a.nav_link {
     width: 45%;
     margin-top: 30px;
     margin-bottom: 60px;
+    min-width: 500px;
   }
 
 .search_form {
@@ -106,9 +107,16 @@ a.nav_link {
 }
 
 .search_refining_form {
+  font-size: 16px;
   margin-top: 30px;
+  padding-top: 10px;
+  padding-bottom: 1cqmax;
   border: 1px solid #04a82d;
   border-radius: 10px;
+  width: 90%;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 
