@@ -22,7 +22,7 @@
             <select name="license" id="license">
                 <option value="*">(Any)</option>                
                 {% for i in licenses %}
-                <option value="{{ i }}">{{ i[:50] }}</option>
+                <option value="{{ i }}">{{ i[:42] }}</option>
                 {% endfor %}
             </select>
             <br/>
