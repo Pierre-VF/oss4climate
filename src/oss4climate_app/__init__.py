@@ -12,7 +12,7 @@ from oss4climate.scripts import (
     listing_search,
 )
 from oss4climate.src.log import log_info, log_warning
-from oss4climate_app.config import STATIC_FILES_PATH
+from oss4climate_app.config import STATIC_FILES_PATH, URL_FAVICON
 from oss4climate_app.src.data_io import (
     SEARCH_ENGINE_DESCRIPTIONS,
     SEARCH_ENGINE_READMES,
@@ -70,9 +70,7 @@ async def base_landing(request: Request, channel: Optional[str] = None):
 @app.get("/favicon.ico")
 def _favicon():
     # This is just a dummy favicon for now (waiting for a better logo)
-    return RedirectResponse(
-        "https://www.pierrevf.consulting/wp-content/uploads/2023/11/cropped-logo_base_png-32x32.png"
-    )
+    return RedirectResponse(URL_FAVICON)
 
 
 # Adding routes

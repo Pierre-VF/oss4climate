@@ -11,7 +11,7 @@ from fastapi.responses import PlainTextResponse, RedirectResponse
 
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info
-from oss4climate_app.config import URL_CODE_REPOSITORY
+from oss4climate_app.config import URL_CODE_REPOSITORY, URL_DATA_CSV, URL_DATA_FEATHER
 from oss4climate_app.src.data_io import clear_cache, refresh_data
 from oss4climate_app.src.database import (
     dump_database_request_log_as_csv,
@@ -26,11 +26,14 @@ async def api_code():
     return RedirectResponse(URL_CODE_REPOSITORY, status_code=307)
 
 
-@app.get("/data_csv")
-async def api_data():
-    return RedirectResponse(
-        "https://data.pierrevf.consulting/oss4climate/listing_data.csv", status_code=307
-    )
+@app.get("/data/csv")
+async def data_csv():
+    return RedirectResponse(URL_DATA_CSV, status_code=307)
+
+
+@app.get("/data/feather")
+async def data_feather():
+    return RedirectResponse(URL_DATA_FEATHER, status_code=307)
 
 
 def _permission_admin(key: Optional[str] = None):
