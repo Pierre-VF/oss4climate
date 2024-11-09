@@ -14,7 +14,7 @@ body {
     font-size: 19px;
     line-height: 33px;
     padding: 0;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 30px auto;
     padding: 0 1rem;
     /*
@@ -145,11 +145,14 @@ table {
 }
 table, th, td {
     border: none;
-    padding: 6px;
+    padding: 0;
+    padding-left: 15px;
+    padding-right: 15px;
     text-align: left;
+    overflow-wrap: break-word;
 }
-td {
-    /* border-radius: 5px 5px 0px 0px; */
+td.left, th.left {
+    max-width: 200px;
 }
 th {
     /*
@@ -157,7 +160,12 @@ th {
     */
     background-color: #04a82d;
     color: white;
-
+}
+th.left {
+    border-radius: 10px 0 0 0;
+}
+th.right {
+    border-radius: 0 10px 0 0;
 }
 tbody tr:nth-child(even) {
     background-color: #dfe4952a;

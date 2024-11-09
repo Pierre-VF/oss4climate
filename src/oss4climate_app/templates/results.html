@@ -23,15 +23,15 @@
         </p>
         <table>
             <tr>
-                <th>Name</th>
+                <th class="left">Name</th>
                 <th>Description</th>
                 <th>Language</th>
                 <th>License</th>
-                <th>Last commit</th>
+                <th class="right">Last commit</th>
             </tr>
             {% for i, r in results.iterrows() %}
                 <tr>
-                    <td><a href="{{ r.url }}" target="_blank" rel="noopener noreferrer">{{ r["organisation"] }}/{{ r["name"] }}</a></td>
+                    <td class="left"><a href="{{ r.url }}" target="_blank" rel="noopener noreferrer">{{ r["organisation"] }}/{{ r["name"] }}</a></td>
                     <td>{{ r.description }}</td>
                     <td>{{ r.language }}</td>
                     <td>{{ r.license }}</td>
