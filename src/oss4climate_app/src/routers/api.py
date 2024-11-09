@@ -6,7 +6,7 @@ Note: For now, only redirects
 
 from typing import Optional
 
-from fastapi import APIRouter
+from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse, RedirectResponse
 
 from oss4climate.src.config import SETTINGS
@@ -18,7 +18,7 @@ from oss4climate_app.src.database import (
     dump_database_search_log_as_csv,
 )
 
-app = APIRouter()
+app = FastAPI(title="OSS4climate API")
 
 
 @app.get("/code")
