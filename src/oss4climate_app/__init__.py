@@ -11,6 +11,7 @@ from oss4climate.scripts import (
     FILE_OUTPUT_LISTING_FEATHER,
     listing_search,
 )
+from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info, log_warning
 from oss4climate_app.config import STATIC_FILES_PATH, URL_FAVICON
 from oss4climate_app.src.data_io import (
@@ -22,8 +23,38 @@ from oss4climate_app.src.log_activity import log_landing
 from oss4climate_app.src.routers import api, ui
 
 
+def initialise_error_logging():
+    sentry_dsn = SETTINGS.SENTRY_DSN_URL
+    if sentry_dsn and len(sentry_dsn) > 1:
+        import sentry_sdk
+        from sentry_sdk.integrations.fastapi import FastApiIntegration
+        from sentry_sdk.integrations.starlette import StarletteIntegration
+
+        sentry_sdk.init(
+            sentry_dsn,
+            traces_sample_rate=0,
+            integrations=[
+                StarletteIntegration(
+                    transaction_style="endpoint",
+                    failed_request_status_codes={403, *range(500, 599)},
+                    http_methods_to_capture=("GET", "POST"),
+                ),
+                FastApiIntegration(
+                    transaction_style="endpoint",
+                    failed_request_status_codes={403, *range(500, 599)},
+                    http_methods_to_capture=("GET", "POST"),
+                ),
+            ],
+        )
+        log_info("Initialised error logging in Sentry")
+    else:
+        log_info("Skipping error logging in Sentry")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Initialising error logging at app start
+    initialise_error_logging()
     log_info("Starting app")
     if not os.path.exists(FILE_OUTPUT_LISTING_FEATHER):
         log_warning("- Listing not found, downloading again")

@@ -15,6 +15,7 @@ class Settings(pydantic_settings.BaseSettings):
     EXPORT_FTP_PASSWORD: Optional[str] = None
     # App settings
     DATA_REFRESH_KEY: Optional[str] = None
+    SENTRY_DSN_URL: Optional[str] = None
 
     model_config = pydantic_settings.SettingsConfigDict(
         env_file_encoding="utf-8",
