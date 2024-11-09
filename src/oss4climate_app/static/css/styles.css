@@ -1,30 +1,33 @@
+
+body{
+  background: #fafaf5;
+  font-family: sans-serif;
+}
+
 h1 {
     font-size: 30px;
     padding: 40px;
+    color: #04a82d;
 }
 
 body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-weight: 300;
     font-size: 19px;
     line-height: 33px;
-    margin: 7px;
     padding: 0;
     max-width: 1200px;
-    margin: 100px auto;
+    margin: 30px auto;
     padding: 0 1rem;
+    /*
+    display: flex;
+    flex-direction: column;
+    */
+    /* min-height: 100vh; */
 }
 
 
 a {
-    color: blue;
+    color: #04a82d;
     text-decoration: none;
-}
-
-
-.footer {
-    font-size: 12px;
-    text-align: center;
 }
 
 
@@ -42,7 +45,7 @@ nav {
 }
 a.nav_link {    
     font-size: 25px;
-    font-weight: bold;
+    /* font-weight: bold; */
     vertical-align: top;
     margin-right: 10px;
     margin-left: 10px;
@@ -58,6 +61,49 @@ a.nav_link {
     margin: 0 auto;
     max-width: 100%;
 }
+
+
+/* Search form styling */
+.search_form_box{
+    width: 45%;
+    margin-top: 40px;
+    margin-bottom: 60px;
+  }
+
+.search_form {
+  width: 100%;
+  position: relative;
+  display: flex;
+}
+
+.search_term {
+  width: 100%;
+  border: 3px solid #04a82d;
+  border-right: none;
+  padding: 5px;
+  height: 31px;
+  border-radius: 10px 0 0 10px;
+  outline: none;
+  color: #9DBFAF;
+}
+
+.search_term:focus{
+  color: #04a82d;
+}
+
+.search_button {
+  width: 100px;
+  height: 46px;
+  border: 1px solid #04a82d;
+  background: #04a82d;
+  text-align: center;
+  color: #fff;
+  border-radius: 0 10px 10px 0;
+  cursor: pointer;
+  font-size: 19px;
+}
+
+
 
 
 /* Style for the blockquotes, ie: when using > */
@@ -103,10 +149,15 @@ table, th, td {
     text-align: left;
 }
 td {
-    border-radius: 5px 5px 0px 0px;
+    /* border-radius: 5px 5px 0px 0px; */
 }
 th {
-    background-color: #31c40dd0;
+    /*
+    border-radius: 10px 10px 0 0;
+    */
+    background-color: #04a82d;
+    color: white;
+
 }
 tbody tr:nth-child(even) {
     background-color: #dfe4952a;
