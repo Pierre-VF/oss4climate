@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html>
-
-    {% include "_navbar.html" %}
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>
@@ -13,11 +11,14 @@
         <script async defer src="https://buttons.github.io/buttons.js"></script>
     </head>
     <body>
-        <h1 class="center">
-            {% block heading %}
-                Open-source for climate and energy
-            {% endblock %}
-        </h1>
+        {% include "_navbar.html" %}
+        <div id=""content">
+            <h1 class="center">
+                {% block heading %}
+                    Open-source for climate and energy
+                {% endblock %}
+            </h1>
+        </div>
 
         {% block content %}
         {% endblock %}

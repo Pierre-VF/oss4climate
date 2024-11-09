@@ -1,18 +1,28 @@
 {% extends "_base.html" %}
-{% block heading %} Search among <i>{{ n_repositories_indexed }}</i> open-source repositories in the climate space {% endblock %}
+{% block heading %}{% endblock %}
 {% block content %}
-<body>
-    <div class="center">
-        <form id="searchForm" method="post">
-            <label for="query">Enter your search query:</label>
-            <input type="text" id="query" name="query" value="">
-            <br/>
 
+<div class="center">
+    <h1>Open-source code search for climate applications</h1>
+</div>
+<div class="search_form_box center">
+    <form id="code_search_form" method="post">
+        <div class="search_form">
+            <input type="text" id="query" name="query" class="search_term" placeholder="What kind of climate application are you looking for?">
+            <!-- <input hidden id="license" value="*">
+            <input hidden id="language" value="*"> -->
+            <button type="submit" class="search_button"> 
+                <i class="fa fa-search">Search</i>
+            </button>
+        </div>
+
+        <div class="search_refining_form">
+            <label>Refine your search</label><br/>
             <label for="license">License:</label>
             <select name="license" id="license">
                 <option value="*">(Any)</option>                
                 {% for i in licenses %}
-                <option value="{{ i }}">{{ i }}</option>
+                <option value="{{ i }}">{{ i[:50] }}</option>
                 {% endfor %}
             </select>
             <br/>
@@ -24,23 +34,25 @@
                 <option value="{{ i }}">{{ i }}</option>
                 {% endfor %}
             </select>
-            <br/>
+        </div>
+    </form>
+</div>
 
-            <button type="submit">Search</button>
-        </form>
-    </div>
 
-    <script>
-        document.getElementById("searchForm").addEventListener("submit", function (event) {
-            event.preventDefault();
-            var queryValue = document.getElementById("query").value;
-            var licenseValue = document.getElementById("license").value;
-            var languageValue = document.getElementById("language").value;
-            window.location.href = "/ui/results?query=" + encodeURIComponent(queryValue) + "&license=" + encodeURIComponent(licenseValue) + "&language=" + encodeURIComponent(languageValue);
-        });
-    </script>
+        
+<div class="search_stats center">
+    <b>{{ n_repositories_indexed }}</b> open-source repositories in the climate space
+</div>
 
-    <p>{{ free_text }}</p>
-</body>
-</html>
+<script>
+    document.getElementById("code_search_form").addEventListener("submit", function (event) {
+        event.preventDefault();
+        var queryValue = document.getElementById("query").value;
+        var licenseValue = document.getElementById("license").value;
+        var languageValue = document.getElementById("language").value;
+        window.location.href = "/ui/results?query=" + encodeURIComponent(queryValue) + "&license=" + encodeURIComponent(licenseValue) + "&language=" + encodeURIComponent(languageValue);
+    });
+</script>
+
+<p>{{ free_text }}</p>
 {% endblock %}
