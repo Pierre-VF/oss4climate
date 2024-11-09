@@ -4,10 +4,13 @@ body{
   font-family: sans-serif;
 }
 
+h1, h2, a {
+    color: #04a82d;
+}
+
 h1 {
     font-size: 30px;
     padding: 40px;
-    color: #04a82d;
 }
 
 body {
@@ -26,7 +29,6 @@ body {
 
 
 a {
-    color: #04a82d;
     text-decoration: none;
 }
 

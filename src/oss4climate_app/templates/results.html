@@ -10,6 +10,7 @@
         </p>
 
     {% else %} 
+
         {% if n_total_found > n_found %}
             <p>{{n_total_found}} results found (showing only {{ n_found }} here):</p>
         {% else %}    
@@ -18,15 +19,19 @@
 
         <p>
             {% if show_previous %}<a href="{{ url_previous }}">Previous << </a>{% endif %} 
-            {% if show_next %}<a href="{{ url_next }}">>> Next</a>{% endif %}
+            {% if show_next %}<a href="{{ url_next }}">>> Next</a>{% endif %} 
+            (Filter current page: 
+            <input type="text" id="focusLanguage" onkeyup="filterTable()" placeholder="Language">
+            <input type="text" id="focusLicense" onkeyup="filterTable()" placeholder="License"> 
+            or reorder current page by clicking on the column to sort)
         </p>
-        <table>
+        <table id="results_table">
             <tr>
-                <th class="left">Name</th>
-                <th>Description</th>
-                <th>Language</th>
-                <th>License</th>
-                <th class="right">Last commit</th>
+                <th onclick="sortTable(0)" class="left">Name</th>
+                <th onclick="sortTable(1)">Description</th>
+                <th onclick="sortTable(2)">Language</th>
+                <th onclick="sortTable(3)">License</th>
+                <th onclick="sortTable(4)" class="right">Last commit</th>
             </tr>
             {% for i, r in results.iterrows() %}
                 <tr>
@@ -48,4 +53,94 @@
         <p>Not finding what you were looking for? Please give us <b><a href="{{ URL_FEEDBACK_FORM }}">your feedback</a></b>.</p>
     {% endif %}
     
+    <script>
+        function contentFits(td, filter) {
+            var res, txtValue;
+            if (td && filter) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    res = true
+                } else {
+                    res = false
+                }
+            }else {
+                res = true
+            }
+            return res
+        }
+
+
+        function filterTable() {
+            // Declare variables
+            var inputLanguage, inputLicense, filterLanguage, filterLicense, table, tr, tds, tdLanguage, tdLicense, i, txtValue;
+            inputLanguage = document.getElementById("focusLanguage");
+            inputLicense = document.getElementById("focusLicense");
+            if (inputLanguage){
+                filterLanguage = inputLanguage.value.toUpperCase();
+            } else {
+                filterLanguage = null
+            }            
+            if (inputLicense){
+                filterLicense = inputLicense.value.toUpperCase();
+            } else {
+                filterLicense = null
+            }
+            table = document.getElementById("results_table");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+                tds = tr[i].getElementsByTagName("td")
+                tdLanguage = tds[2];
+                tdLicense = tds[3];
+                if (contentFits(tdLanguage, filterLanguage) && contentFits(tdLicense, filterLicense)) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+
+        function sortTable(n) {
+            var table, rows, reorderingWasMade, i, x, y, reorderNeeded, sortingDirection, reorderCount = 0;
+            table = document.getElementById("results_table");
+            reorderingWasMade = true;
+            sortingDirection = "asc";
+            while (reorderingWasMade) {
+                reorderingWasMade = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    reorderNeeded = false;
+                    /* Get the two elements you want to compare,
+                    one from current row and one from the next: */
+                    x = rows[i].getElementsByTagName("td")[n];
+                    y = rows[i + 1].getElementsByTagName("td")[n];
+                    /* Check if the two rows should switch place,
+                    based on the direction, asc or desc: */
+                    if (sortingDirection == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            reorderNeeded = true;
+                            break;
+                        }
+                    } else if (sortingDirection == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            reorderNeeded = true;
+                            break;
+                        }
+                    }
+                }
+                if (reorderNeeded) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    reorderingWasMade = true;
+                    reorderCount ++;
+                } else {
+                    if (reorderCount == 0 && sortingDirection == "asc") {
+                        sortingDirection = "desc";
+                        reorderingWasMade = true;
+                    }
+                }
+            }
+        }
+    </script>
+
 {% endblock %}
