@@ -27,10 +27,24 @@ def initialise_error_logging():
     sentry_dsn = SETTINGS.SENTRY_DSN_URL
     if sentry_dsn and len(sentry_dsn) > 1:
         import sentry_sdk
+        from sentry_sdk.integrations.fastapi import FastApiIntegration
+        from sentry_sdk.integrations.starlette import StarletteIntegration
 
         sentry_sdk.init(
             sentry_dsn,
             traces_sample_rate=0,
+            integrations=[
+                StarletteIntegration(
+                    transaction_style="endpoint",
+                    failed_request_status_codes={403, *range(500, 599)},
+                    http_methods_to_capture=("GET", "POST"),
+                ),
+                FastApiIntegration(
+                    transaction_style="endpoint",
+                    failed_request_status_codes={403, *range(500, 599)},
+                    http_methods_to_capture=("GET", "POST"),
+                ),
+            ],
         )
         log_info("Initialised error logging in Sentry")
     else:
