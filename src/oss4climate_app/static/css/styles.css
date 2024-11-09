@@ -109,6 +109,10 @@ a.nav_link {
   margin-top: 30px;
   border: 1px solid #04a82d;
   border-radius: 10px;
+  width: 90%;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 
