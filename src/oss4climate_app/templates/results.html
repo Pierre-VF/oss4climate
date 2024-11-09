@@ -2,7 +2,6 @@
 {% block heading %} Search results for "{{ query }}"{% endblock %}
 
 {% block content %}
-<body>
     {% if n_total_found < 1 %}
         <p>
             No results found matching your query (this might be due to the restrictions of the methodology, 
@@ -49,5 +48,4 @@
         <p>Not finding what you were looking for? Please give us <b><a href="{{ URL_FEEDBACK_FORM }}">your feedback</a></b>.</p>
     {% endif %}
     
-</body>
 {% endblock %}
