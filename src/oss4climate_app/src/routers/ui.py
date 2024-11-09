@@ -10,6 +10,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from oss4climate_app.config import (
+    APP_VERSION,
     TEMPLATES_PATH,
     URL_CODE_REPOSITORY,
     URL_FEEDBACK_FORM,
@@ -37,6 +38,7 @@ def _f_none_to_unknown(x: str | date | None) -> str:
 def _render_template(request: Request, template_file: str, content: dict | None = None):
     resp = {
         "request": request,
+        "APP_VERSION": APP_VERSION,
         "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
         "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
     }
