@@ -34,6 +34,13 @@
                 <option value="{{ i }}">{{ i }}</option>
                 {% endfor %}
             </select>
+            <br/>
+
+            <label>Exclude:</label> 
+            <input type="checkbox" id="exclude_forks" name="exclude_forks" />
+            <label for="exclude_forks">forks</label>
+            <input type="checkbox" id="exclude_inactive" name="exclude_inactive" />
+            <label for="exclude_inactive">inactive projects</label>
         </div>
     </form>
 </div>
@@ -50,7 +57,14 @@
         var queryValue = document.getElementById("query").value;
         var licenseValue = document.getElementById("license").value;
         var languageValue = document.getElementById("language").value;
-        window.location.href = "/ui/results?query=" + encodeURIComponent(queryValue) + "&license=" + encodeURIComponent(licenseValue) + "&language=" + encodeURIComponent(languageValue);
+        var excludeForks = document.getElementById("exclude_forks").checked;
+        var excludeInactive = document.getElementById("exclude_inactive").checked;
+        window.location.href = "/ui/results?"
+            + "query=" + encodeURIComponent(queryValue) 
+            + "&license=" + encodeURIComponent(licenseValue) 
+            + "&language=" + encodeURIComponent(languageValue) 
+            + "&exclude_forks=" + encodeURIComponent(excludeForks) 
+            + "&exclude_inactive=" + encodeURIComponent(excludeInactive);
     });
 </script>
 

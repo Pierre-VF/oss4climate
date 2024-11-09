@@ -55,7 +55,6 @@ a.nav_link {
 }
 
 
-
 .center {
     display: block;
     margin-left: auto;
@@ -108,7 +107,10 @@ a.nav_link {
 }
 
 .search_refining_form {
+  font-size: 16px;
   margin-top: 30px;
+  padding-top: 10px;
+  padding-bottom: 1cqmax;
   border: 1px solid #04a82d;
   border-radius: 10px;
   width: 90%;

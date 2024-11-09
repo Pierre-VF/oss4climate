@@ -2,7 +2,7 @@
 Module containing the API code
 """
 
-from datetime import date
+from datetime import date, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, Request
@@ -70,6 +70,8 @@ async def search_results(
     license: Optional[str] = None,
     n_results: int = 100,
     offset: int | None = None,
+    exclude_forks: Optional[bool] = None,
+    exclude_inactive: Optional[bool] = None,
 ):
     df_out = search_for_results(query.strip().lower())
 
@@ -78,6 +80,12 @@ async def search_results(
         df_out = df_out[df_out["language"] == language]
     if license and (license != "*"):
         df_out = df_out[df_out["license"] == license]
+
+    if exclude_forks:
+        df_out = df_out[df_out["is_fork"] == False]
+    if exclude_inactive:
+        t_limit = date.today() - timedelta(days=365)
+        df_out = df_out[df_out["last_commit"] >= t_limit]
 
     if offset is None:
         df_shown = df_out.head(n_results)
