@@ -18,6 +18,11 @@ from oss4climate_app.src.database import (
     dump_database_search_log_as_csv,
 )
 
+
+class ForbiddenError(RuntimeError):
+    pass
+
+
 app = FastAPI(title="OSS4climate API")
 
 
@@ -38,20 +43,24 @@ async def data_feather():
 
 def _permission_admin(key: Optional[str] = None):
     if SETTINGS.DATA_REFRESH_KEY is None:
-        return PlainTextResponse(
+        raise ForbiddenError(
             "Not allowed to refresh when passkey is not set",
-            status_code=403,
         )
     if key != SETTINGS.DATA_REFRESH_KEY:
-        return PlainTextResponse(
+        raise ForbiddenError(
             "You are not allowed to refresh the data (invalid key)",
-            status_code=403,
         )
 
 
 @app.get("/refresh_data")
 async def _refresh_data(key: Optional[str] = None):
-    _permission_admin(key)
+    try:
+        _permission_admin(key)
+    except ForbiddenError:
+        return PlainTextResponse(
+            "You are not allowed to do this",
+            status_code=403,
+        )
     log_info("DATA refreshing START")
     refresh_data(force_refresh=True)
     clear_cache()
@@ -61,11 +70,23 @@ async def _refresh_data(key: Optional[str] = None):
 
 @app.get("/download_request_metrics")
 async def download_request_metrics(key: Optional[str] = None):
-    _permission_admin(key)
+    try:
+        _permission_admin(key)
+    except ForbiddenError:
+        return PlainTextResponse(
+            "You are not allowed to do this",
+            status_code=403,
+        )
     return PlainTextResponse(dump_database_request_log_as_csv())
 
 
 @app.get("/download_search_metrics")
 async def download_search_metrics(key: Optional[str] = None):
-    _permission_admin(key)
+    try:
+        _permission_admin(key)
+    except ForbiddenError:
+        return PlainTextResponse(
+            "You are not allowed to do this",
+            status_code=403,
+        )
     return PlainTextResponse(dump_database_search_log_as_csv())
