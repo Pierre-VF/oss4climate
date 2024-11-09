@@ -105,6 +105,12 @@ a.nav_link {
   font-size: 19px;
 }
 
+.search_refining_form {
+  margin-top: 30px;
+  border: 1px solid #04a82d;
+  border-radius: 10px;
+}
+
 
 
 
