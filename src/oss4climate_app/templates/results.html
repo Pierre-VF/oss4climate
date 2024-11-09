@@ -10,6 +10,7 @@
         </p>
 
     {% else %} 
+
         {% if n_total_found > n_found %}
             <p>{{n_total_found}} results found (showing only {{ n_found }} here):</p>
         {% else %}    
@@ -18,9 +19,13 @@
 
         <p>
             {% if show_previous %}<a href="{{ url_previous }}">Previous << </a>{% endif %} 
-            {% if show_next %}<a href="{{ url_next }}">>> Next</a>{% endif %}
+            {% if show_next %}<a href="{{ url_next }}">>> Next</a>{% endif %} 
+            (Filter current page: 
+            <input type="text" id="focusLanguage" onkeyup="filterTable()" placeholder="Language">
+            <input type="text" id="focusLicense" onkeyup="filterTable()" placeholder="License">
+            )
         </p>
-        <table>
+        <table id="results_table">
             <tr>
                 <th class="left">Name</th>
                 <th>Description</th>
@@ -48,4 +53,53 @@
         <p>Not finding what you were looking for? Please give us <b><a href="{{ URL_FEEDBACK_FORM }}">your feedback</a></b>.</p>
     {% endif %}
     
+    <script>
+        function contentFits(td, filter) {
+            var res, txtValue;
+            if (td && filter) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    res = true
+                } else {
+                    res = false
+                }
+            }else {
+                res = true
+            }
+            return res
+        }
+
+
+        function filterTable() {
+            // Declare variables
+            var inputLanguage, inputLicense, filterLanguage, filterLicense, table, tr, tds, tdLanguage, tdLicense, i, txtValue;
+            inputLanguage = document.getElementById("focusLanguage");
+            inputLicense = document.getElementById("focusLicense");
+            if (inputLanguage){
+                filterLanguage = inputLanguage.value.toUpperCase();
+            } else {
+                filterLanguage = null
+            }            
+            if (inputLicense){
+                filterLicense = inputLicense.value.toUpperCase();
+            } else {
+                filterLicense = null
+            }
+            table = document.getElementById("results_table");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+                tds = tr[i].getElementsByTagName("td")
+                tdLanguage = tds[2];
+                tdLicense = tds[3];
+                if (contentFits(tdLanguage, filterLanguage) && contentFits(tdLicense, filterLicense)) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+
 {% endblock %}
