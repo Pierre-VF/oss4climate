@@ -18,11 +18,11 @@
 
         <div class="search_refining_form">
             <label>Refine your search</label><br/>
-            <label for="license">License:</label>
-            <select name="license" id="license">
+            <label for="license_category">License:</label>
+            <select name="license_category" id="license_category">
                 <option value="*">(Any)</option>                
-                {% for i in licenses %}
-                <option value="{{ i }}">{{ i[:42] }}</option>
+                {% for i in unique_license_categories %}
+                <option value="{{ i.name }}">{{ i.value }}</option>
                 {% endfor %}
             </select>
             <br/>
@@ -55,13 +55,13 @@
     document.getElementById("code_search_form").addEventListener("submit", function (event) {
         event.preventDefault();
         var queryValue = document.getElementById("query").value;
-        var licenseValue = document.getElementById("license").value;
+        var licenseValue = document.getElementById("license_category").value;
         var languageValue = document.getElementById("language").value;
         var excludeForks = document.getElementById("exclude_forks").checked;
         var excludeInactive = document.getElementById("exclude_inactive").checked;
         window.location.href = "/ui/results?"
             + "query=" + encodeURIComponent(queryValue) 
-            + "&license=" + encodeURIComponent(licenseValue) 
+            + "&license_category=" + encodeURIComponent(licenseValue) 
             + "&language=" + encodeURIComponent(languageValue) 
             + "&exclude_forks=" + encodeURIComponent(excludeForks) 
             + "&exclude_inactive=" + encodeURIComponent(excludeInactive);

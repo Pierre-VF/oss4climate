@@ -16,9 +16,11 @@ from oss4climate_app.config import (
     URL_FEEDBACK_FORM,
 )
 from oss4climate_app.src.data_io import (
+    LicenseCategoriesEnum,
     n_repositories_indexed,
     search_for_results,
     unique_languages,
+    unique_license_categories,
     unique_licenses,
 )
 from oss4climate_app.src.log_activity import log_search
@@ -56,6 +58,7 @@ async def search(request: Request):
             "n_repositories_indexed": n_repositories_indexed(),
             "languages": unique_languages(),
             "licenses": unique_licenses(),
+            "unique_license_categories": unique_license_categories(),
             "free_text": " ",
         },
     )
@@ -67,7 +70,7 @@ async def search_results(
     background_tasks: BackgroundTasks,
     query: str,
     language: Optional[str] = None,
-    license: Optional[str] = None,
+    license_category: Optional[str] = None,
     n_results: int = 100,
     offset: int | None = None,
     exclude_forks: Optional[bool] = None,
@@ -78,8 +81,13 @@ async def search_results(
     # Adding a primitive refinment mechanism by language (not implemented in the most effective manner)
     if language and (language != "*"):
         df_out = df_out[df_out["language"] == language]
-    if license and (license != "*"):
-        df_out = df_out[df_out["license"] == license]
+    if license_category and (license_category != "*"):
+        try:
+            enum_license_category = LicenseCategoriesEnum[license_category]
+        except KeyError:
+            raise ValueError("Invalid license category")
+
+        df_out = df_out[df_out["license_category"] == enum_license_category]
 
     if exclude_forks:
         df_out = df_out[df_out["is_fork"] == False]
@@ -106,8 +114,8 @@ async def search_results(
     current_url = f"results?query={query}&n_results={n_results}"
     if language:
         current_url = f"{current_url}&language={language}"
-    if license:
-        current_url = f"{current_url}&license={license}"
+    if license_category:
+        current_url = f"{current_url}&license_category={license_category}"
     current_offset = 0 if offset is None else offset
 
     url_previous = f"{current_url}&offset={current_offset - n_results - 1}"

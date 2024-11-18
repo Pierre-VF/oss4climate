@@ -12,6 +12,7 @@ from oss4climate.scripts import (
 from oss4climate.src.log import log_info, log_warning
 from oss4climate.src.nlp.search import SearchResults
 from oss4climate.src.nlp.search_engine import SearchEngine
+from oss4climate_app.src.licenses import LicenseCategoriesEnum
 
 SEARCH_ENGINE_DESCRIPTIONS = SearchEngine()
 SEARCH_ENGINE_READMES = SearchEngine()
@@ -30,6 +31,11 @@ def unique_licenses() -> list[str]:
     x = SEARCH_RESULTS.documents["license"].apply(_f_none_to_unknown).unique()
     x.sort()
     return x.tolist()
+
+
+@lru_cache(maxsize=1)
+def unique_license_categories() -> list[LicenseCategoriesEnum]:
+    return [i for i in LicenseCategoriesEnum]
 
 
 @lru_cache(maxsize=1)
