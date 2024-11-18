@@ -17,7 +17,7 @@ body {
     font-size: 19px;
     line-height: 33px;
     padding: 0;
-    min-width: 550px;
+    min-width: 400px;
     max-width: 1400px;
     margin: 30px auto;
     padding: 0 1rem;
@@ -70,7 +70,7 @@ a.nav_link {
     width: 45%;
     margin-top: 30px;
     margin-bottom: 60px;
-    min-width: 500px;
+    min-width: 350px;
   }
 
 .search_form {
