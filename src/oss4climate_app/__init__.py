@@ -24,8 +24,17 @@ from oss4climate_app.src.log_activity import log_landing
 from oss4climate_app.src.routers import api, ui
 from oss4climate_app.src.templates import render_template
 
+_ENV_TEST_MODE = "OSS4CLIMATE_TEST_MODE"
+
+
+def mark_test_mode():
+    os.environ[_ENV_TEST_MODE] = "1"
+
 
 def initialise_error_logging():
+    if os.environ.get(_ENV_TEST_MODE):
+        log_info("Skipping error logging initialisation in test mode")
+        return
     sentry_dsn = SETTINGS.SENTRY_DSN_URL
     if sentry_dsn and len(sentry_dsn) > 1:
         import sentry_sdk
