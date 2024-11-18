@@ -12,8 +12,12 @@ install:
 	
 .PHONY: install_dev
 install_dev:
+	pip install pipx
+	pipx ensurepath
+	pipx install poetry==$(POETRY_VERSION) || echo "Poetry already installed"
+	poetry config virtualenvs.create true
 	poetry install --all-extras --no-cache
-	pre-commit install
+	# pre-commit install
 
 .PHONY: add
 add:
