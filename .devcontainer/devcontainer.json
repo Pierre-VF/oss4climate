@@ -73,7 +73,7 @@
 	"forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "make install && make install_dev"
+	"postCreateCommand": "make install_dev"
 
 	// Make sure that the poetry shell is used
 	//"postStartCommand": "poetry shell"

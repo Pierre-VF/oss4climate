@@ -8,7 +8,7 @@
 <div class="search_form_box center">
     <form id="code_search_form" method="post">
         <div class="search_form">
-            <input type="text" id="query" name="query" class="search_term" placeholder="What kind of climate application are you looking for?">
+            <input type="text" id="query" name="query" class="search_term" placeholder="What is your application focus?">
             <!-- <input hidden id="license" value="*">
             <input hidden id="language" value="*"> -->
             <button type="submit" class="search_button"> 
@@ -18,11 +18,11 @@
 
         <div class="search_refining_form">
             <label>Refine your search</label><br/>
-            <label for="license">License:</label>
-            <select name="license" id="license">
+            <label for="license_category">License:</label>
+            <select name="license_category" id="license_category">
                 <option value="*">(Any)</option>                
-                {% for i in licenses %}
-                <option value="{{ i }}">{{ i[:42] }}</option>
+                {% for i in unique_license_categories %}
+                <option value="{{ i.name }}">{{ i.value }}</option>
                 {% endfor %}
             </select>
             <br/>
@@ -37,8 +37,10 @@
             <br/>
 
             <label>Exclude:</label> 
+            <br/>
             <input type="checkbox" id="exclude_forks" name="exclude_forks" />
             <label for="exclude_forks">forks</label>
+            <br/>
             <input type="checkbox" id="exclude_inactive" name="exclude_inactive" />
             <label for="exclude_inactive" title="Exclude project without commits in the last year">inactive projects</label>
         </div>
@@ -55,13 +57,13 @@
     document.getElementById("code_search_form").addEventListener("submit", function (event) {
         event.preventDefault();
         var queryValue = document.getElementById("query").value;
-        var licenseValue = document.getElementById("license").value;
+        var licenseValue = document.getElementById("license_category").value;
         var languageValue = document.getElementById("language").value;
         var excludeForks = document.getElementById("exclude_forks").checked;
         var excludeInactive = document.getElementById("exclude_inactive").checked;
         window.location.href = "/ui/results?"
             + "query=" + encodeURIComponent(queryValue) 
-            + "&license=" + encodeURIComponent(licenseValue) 
+            + "&license_category=" + encodeURIComponent(licenseValue) 
             + "&language=" + encodeURIComponent(languageValue) 
             + "&exclude_forks=" + encodeURIComponent(excludeForks) 
             + "&exclude_inactive=" + encodeURIComponent(excludeInactive);

@@ -1,5 +1,6 @@
 import os
 from contextlib import asynccontextmanager
+from datetime import datetime
 from typing import Optional
 
 from fastapi import FastAPI, Request
@@ -13,7 +14,7 @@ from oss4climate.scripts import (
 )
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info, log_warning
-from oss4climate_app.config import STATIC_FILES_PATH, URL_FAVICON
+from oss4climate_app.config import STATIC_FILES_PATH, URL_APP, URL_FAVICON
 from oss4climate_app.src.data_io import (
     SEARCH_ENGINE_DESCRIPTIONS,
     SEARCH_ENGINE_READMES,
@@ -21,9 +22,19 @@ from oss4climate_app.src.data_io import (
 )
 from oss4climate_app.src.log_activity import log_landing
 from oss4climate_app.src.routers import api, ui
+from oss4climate_app.src.templates import render_template
+
+_ENV_TEST_MODE = "OSS4CLIMATE_TEST_MODE"
+
+
+def mark_test_mode():
+    os.environ[_ENV_TEST_MODE] = "1"
 
 
 def initialise_error_logging():
+    if os.environ.get(_ENV_TEST_MODE):
+        log_info("Skipping error logging initialisation in test mode")
+        return
     sentry_dsn = SETTINGS.SENTRY_DSN_URL
     if sentry_dsn and len(sentry_dsn) > 1:
         import sentry_sdk
@@ -95,13 +106,45 @@ def get_top_urls(scores_dict: dict, n: int):
 @app.get("/")
 async def base_landing(request: Request, channel: Optional[str] = None):
     log_landing(request=request, channel=channel)
-    return RedirectResponse("/ui/search", status_code=307)
+    return ui.ui_base_search_page(request=request)
 
 
 @app.get("/favicon.ico")
 def _favicon():
     # This is just a dummy favicon for now (waiting for a better logo)
     return RedirectResponse(URL_FAVICON)
+
+
+# ----------------------------------------------------------------------------------
+# For SEO of the app
+# ----------------------------------------------------------------------------------
+
+
+@app.get("/sitemap.xml")
+def _sitemap_xml(request: Request):
+    content = dict(
+        BASE_URL=URL_APP,
+        UPDATE_FREQUENCY="weekly",
+        UI_ENDPOINTS=["ui/search", "ui/about", "ui/results"],
+        LAST_UPDATE=str(datetime.now().date()),
+    )
+    return render_template(
+        request,
+        template_file="sitemap.xml",
+        content=content,
+    )
+
+
+@app.get("/robots.txt")
+def _robots_txt(request: Request):
+    content = dict(
+        BASE_URL=URL_APP,
+    )
+    return render_template(
+        request,
+        template_file="robots.txt",
+        content=content,
+    )
 
 
 # Adding routes

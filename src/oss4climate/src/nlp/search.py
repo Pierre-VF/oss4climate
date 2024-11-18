@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 from oss4climate.src.nlp.classifiers import tf_idf
+from oss4climate_app.src.licenses import license_category_from_license_name
 
 
 def _lower_str(x: str, *args, **kwargs):
@@ -54,6 +55,12 @@ class SearchResults:
         self.__documents["latest_update"] = pd.to_datetime(
             self.__documents["latest_update"]
         )
+
+        # Adding a license_category column (if missing)
+        if "license_category" not in self.__documents.keys():
+            self.__documents["license_category"] = self.__documents["license"].apply(
+                license_category_from_license_name
+            )
 
     def __reindex(self) -> None:
         self.__documents = self.__documents.reset_index(drop=True)
