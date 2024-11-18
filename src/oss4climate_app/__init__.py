@@ -14,7 +14,7 @@ from oss4climate.scripts import (
 )
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info, log_warning
-from oss4climate_app.config import STATIC_FILES_PATH, URL_FAVICON
+from oss4climate_app.config import STATIC_FILES_PATH, URL_APP, URL_FAVICON
 from oss4climate_app.src.data_io import (
     SEARCH_ENGINE_DESCRIPTIONS,
     SEARCH_ENGINE_READMES,
@@ -97,7 +97,7 @@ def get_top_urls(scores_dict: dict, n: int):
 @app.get("/")
 async def base_landing(request: Request, channel: Optional[str] = None):
     log_landing(request=request, channel=channel)
-    return RedirectResponse("/ui/search", status_code=307)
+    return ui.ui_base_search_page(request=request)
 
 
 @app.get("/favicon.ico")
@@ -106,14 +106,15 @@ def _favicon():
     return RedirectResponse(URL_FAVICON)
 
 
+# ----------------------------------------------------------------------------------
 # For SEO of the app
-_BASE_URL = "https://oss4climate.pierrevf.consulting"
+# ----------------------------------------------------------------------------------
 
 
 @app.get("/sitemap.xml")
 def _sitemap_xml(request: Request):
     content = dict(
-        BASE_URL=_BASE_URL,
+        BASE_URL=URL_APP,
         UPDATE_FREQUENCY="weekly",
         UI_ENDPOINTS=["ui/search", "ui/about", "ui/results"],
         LAST_UPDATE=str(datetime.now().date()),
@@ -128,7 +129,7 @@ def _sitemap_xml(request: Request):
 @app.get("/robots.txt")
 def _robots_txt(request: Request):
     content = dict(
-        BASE_URL=_BASE_URL,
+        BASE_URL=URL_APP,
     )
     return render_template(
         request,

@@ -45,8 +45,7 @@ def _render_ui_template(
     return render_template(request, template_file=template_file, content=resp)
 
 
-@app.get("/search", response_class=HTMLResponse, include_in_schema=False)
-async def search(request: Request):
+def ui_base_search_page(request: Request):
     return _render_ui_template(
         request=request,
         template_file="search.html",
@@ -58,6 +57,11 @@ async def search(request: Request):
             "free_text": " ",
         },
     )
+
+
+@app.get("/search", response_class=HTMLResponse, include_in_schema=False)
+async def search(request: Request):
+    return ui_base_search_page(request=request)
 
 
 @app.get("/results", response_class=HTMLResponse, include_in_schema=False)
