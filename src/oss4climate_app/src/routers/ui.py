@@ -7,11 +7,8 @@ from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 
 from oss4climate_app.config import (
-    APP_VERSION,
-    TEMPLATES_PATH,
     URL_CODE_REPOSITORY,
     URL_FEEDBACK_FORM,
 )
@@ -24,8 +21,7 @@ from oss4climate_app.src.data_io import (
     unique_licenses,
 )
 from oss4climate_app.src.log_activity import log_search
-
-templates = Jinja2Templates(directory=str(TEMPLATES_PATH))
+from oss4climate_app.src.templates import render_template
 
 app = APIRouter()
 
@@ -37,21 +33,21 @@ def _f_none_to_unknown(x: str | date | None) -> str:
         return str(x)
 
 
-def _render_template(request: Request, template_file: str, content: dict | None = None):
+def _render_ui_template(
+    request: Request, template_file: str, content: dict | None = None
+):
     resp = {
-        "request": request,
-        "APP_VERSION": APP_VERSION,
         "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
         "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
     }
     if content is not None:
         resp = resp | content
-    return templates.TemplateResponse(request, template_file, resp)
+    return render_template(request, template_file=template_file, content=resp)
 
 
 @app.get("/search", response_class=HTMLResponse, include_in_schema=False)
 async def search(request: Request):
-    return _render_template(
+    return _render_ui_template(
         request=request,
         template_file="search.html",
         content={
@@ -132,7 +128,7 @@ async def search_results(
         view_offset=offset,
     )
 
-    return _render_template(
+    return _render_ui_template(
         request=request,
         template_file="results.html",
         content={
@@ -151,7 +147,7 @@ async def search_results(
 
 @app.get("/about", include_in_schema=False)
 def read_about(request: Request):
-    return _render_template(
+    return _render_ui_template(
         request=request,
         template_file="about.html",
     )

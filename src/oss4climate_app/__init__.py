@@ -1,5 +1,6 @@
 import os
 from contextlib import asynccontextmanager
+from datetime import datetime
 from typing import Optional
 
 from fastapi import FastAPI, Request
@@ -21,6 +22,7 @@ from oss4climate_app.src.data_io import (
 )
 from oss4climate_app.src.log_activity import log_landing
 from oss4climate_app.src.routers import api, ui
+from oss4climate_app.src.templates import render_template
 
 
 def initialise_error_logging():
@@ -102,6 +104,37 @@ async def base_landing(request: Request, channel: Optional[str] = None):
 def _favicon():
     # This is just a dummy favicon for now (waiting for a better logo)
     return RedirectResponse(URL_FAVICON)
+
+
+# For SEO of the app
+_BASE_URL = "https://oss4climate.pierrevf.consulting"
+
+
+@app.get("/sitemap.xml")
+def _sitemap_xml(request: Request):
+    content = dict(
+        BASE_URL=_BASE_URL,
+        UPDATE_FREQUENCY="weekly",
+        UI_ENDPOINTS=["ui/search", "ui/about", "ui/results"],
+        LAST_UPDATE=str(datetime.now().date()),
+    )
+    return render_template(
+        request,
+        template_file="sitemap.xml",
+        content=content,
+    )
+
+
+@app.get("/robots.txt")
+def _robots_txt(request: Request):
+    content = dict(
+        BASE_URL=_BASE_URL,
+    )
+    return render_template(
+        request,
+        template_file="robots.txt",
+        content=content,
+    )
 
 
 # Adding routes
