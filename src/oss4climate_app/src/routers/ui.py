@@ -155,3 +155,28 @@ def read_about(request: Request):
         request=request,
         template_file="about.html",
     )
+
+
+# Corresponding HEAD endpoints ( https://fastapi.tiangolo.com/reference/fastapi/#fastapi.FastAPI.head )
+def _default_head_behaviour(request: Request):
+    pass
+
+
+@app.head("/", include_in_schema=False, status_code=204)
+def _head_base(request: Request):
+    _default_head_behaviour()
+
+
+@app.head("/search", include_in_schema=False, status_code=204)
+def _head_search(request: Request):
+    _default_head_behaviour()
+
+
+@app.head("/results", include_in_schema=False, status_code=204)
+def _head_results(request: Request):
+    _default_head_behaviour()
+
+
+@app.head("/about", include_in_schema=False, status_code=204)
+def _head_about(request: Request):
+    _default_head_behaviour()
