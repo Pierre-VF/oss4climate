@@ -8,12 +8,12 @@ from typing import Optional
 from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import HTMLResponse
 
+from oss4climate.src.parsers.licenses import LicenseCategoriesEnum
 from oss4climate_app.config import (
     URL_CODE_REPOSITORY,
     URL_FEEDBACK_FORM,
 )
 from oss4climate_app.src.data_io import (
-    LicenseCategoriesEnum,
     n_repositories_indexed,
     search_for_results,
     unique_languages,

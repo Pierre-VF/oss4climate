@@ -12,7 +12,7 @@ from oss4climate.scripts import (
 from oss4climate.src.log import log_info, log_warning
 from oss4climate.src.nlp.search import SearchResults
 from oss4climate.src.nlp.search_engine import SearchEngine
-from oss4climate_app.src.licenses import LicenseCategoriesEnum
+from oss4climate.src.parsers.licenses import LicenseCategoriesEnum
 
 SEARCH_ENGINE_DESCRIPTIONS = SearchEngine()
 SEARCH_ENGINE_READMES = SearchEngine()
