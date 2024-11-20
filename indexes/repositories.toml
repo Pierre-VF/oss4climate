@@ -88,6 +88,7 @@ repositories = [
     "https://github.com/ADGEfficiency/energy-py",
     "https://github.com/ADGEfficiency/energy-py-linear",
     "https://github.com/AER-RC/LBLRTM",
+    "https://github.com/AI4RS/UCD",
     "https://github.com/AI4S2S/s2spy",
     "https://github.com/AICyberTeam/UBC-dataset",
     "https://github.com/ANBA4/anba4",
@@ -2336,6 +2337,7 @@ repositories = [
     "https://github.com/mapnificent/mapnificent",
     "https://github.com/marcelo-soares-souza/Agroecology-Map",
     "https://github.com/marceloprates/prettymaps",
+    "https://github.com/marimo-team/marimo",
     "https://github.com/marine-debris/marine-debris.github.io",
     "https://github.com/marlinarnz/quetzal_germany",
     "https://github.com/marmelab/argos",
@@ -2859,6 +2861,7 @@ repositories = [
     "https://github.com/rl-institut/spice_ev",
     "https://github.com/rlogiacco/BatterySense",
     "https://github.com/rmendels/rerddapXtracto",
+    "https://github.com/rmendels/xtractoMatlab",
     "https://github.com/rnuske/vegperiod",
     "https://github.com/robinhenry/gym-anm",
     "https://github.com/robinthibaut/pysgems",
@@ -3474,6 +3477,7 @@ urls = [
     "https://www.earthdata.nasa.gov/",
 ]
 invalid_urls = [
+    "https://energy.acm.org/resources/",
     'https://github.com/KKulma/intensegRid "LINK"',
     'https://github.com/bluegreen-labs/ecmwfr "LINK"',
     "https://github.com/energy-modelling-ireland/wiki",
@@ -3492,4 +3496,5 @@ invalid_urls = [
     'https://github.com/ropensci/rnoaa "LINK"',
     'https://github.com/ropensci/ropenaq "LINK"',
     "https://github.com/settings/codespaces",
+    "https://gitlab.com/geoharmonizer_inea/eumap/blob/master/LICENSE",
 ]
