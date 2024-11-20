@@ -6,9 +6,10 @@ import json
 import os
 from datetime import UTC, datetime, timedelta
 
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Field, Session, SQLModel, create_engine, delete, select
 
 from oss4climate.src.config import SETTINGS
+from oss4climate.src.log import log_info
 
 
 # -------------------------------------------------------------------------------------
@@ -53,18 +54,21 @@ def load_from_database(
 ) -> dict | None:
     with Session(_ENGINE) as session:
         res = session.exec(select(Cache).where(Cache.id == key)).first()
-    if res is None:
-        return None
-    else:
-        if cache_lifetime is not None:
-            # Shortcircuit in case cache is too old
-            if res.fetched_at <= __now() - cache_lifetime:
-                return None
-
-        if is_json:
-            return json.loads(res.value)
+        if res is None:
+            return None
         else:
-            return res.value
+            if cache_lifetime is not None:
+                # Shortcircuit in case cache is too old
+                if res.fetched_at.astimezone(UTC) <= __now() - cache_lifetime:
+                    session.exec(delete(Cache).where(Cache.id == key))
+                    session.commit()
+                    log_info(f"Dropped expired cache for {key}")
+                    return None
+
+            if is_json:
+                return json.loads(res.value)
+            else:
+                return res.value
 
 
 def save_to_database(key: str, value: dict, is_json: bool) -> None:
