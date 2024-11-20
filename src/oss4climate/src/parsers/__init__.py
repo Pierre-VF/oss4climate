@@ -35,7 +35,7 @@ def _cached_web_get(
     cache_lifetime: timedelta | None = None,
 ) -> dict | str:
     # Uses the cache to ensure that requests are minimised
-    out = load_from_database(url, is_json=is_json)
+    out = load_from_database(url, is_json=is_json, cache_lifetime=cache_lifetime)
 
     if out is None:
         log_info(f"Web GET: {url}")
