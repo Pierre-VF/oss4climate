@@ -4,11 +4,12 @@ Module to manage a database input
 
 import json
 import os
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Field, Session, SQLModel, create_engine, delete, select
 
 from oss4climate.src.config import SETTINGS
+from oss4climate.src.log import log_info
 
 
 # -------------------------------------------------------------------------------------
@@ -42,16 +43,32 @@ _ENGINE = _open_engine_and_create_database_if_missing()
 # -------------------------------------------------------------------------------------
 # Actual methods
 # -------------------------------------------------------------------------------------
-def load_from_database(key: str, is_json: bool) -> dict | None:
+def __now() -> datetime:
+    return datetime.now(tz=UTC)
+
+
+def load_from_database(
+    key: str,
+    is_json: bool,
+    cache_lifetime: timedelta | None = None,
+) -> dict | None:
     with Session(_ENGINE) as session:
         res = session.exec(select(Cache).where(Cache.id == key)).first()
-    if res is None:
-        return None
-    else:
-        if is_json:
-            return json.loads(res.value)
+        if res is None:
+            return None
         else:
-            return res.value
+            if cache_lifetime is not None:
+                # Shortcircuit in case cache is too old
+                if res.fetched_at.astimezone(UTC) <= __now() - cache_lifetime:
+                    session.exec(delete(Cache).where(Cache.id == key))
+                    session.commit()
+                    log_info(f"Dropped expired cache for {key}")
+                    return None
+
+            if is_json:
+                return json.loads(res.value)
+            else:
+                return res.value
 
 
 def save_to_database(key: str, value: dict, is_json: bool) -> None:
@@ -61,7 +78,5 @@ def save_to_database(key: str, value: dict, is_json: bool) -> None:
         value_to_write = value
 
     with Session(_ENGINE) as session:
-        session.add(
-            Cache(id=key, value=value_to_write, fetched_at=datetime.now(tz=UTC))
-        )
+        session.add(Cache(id=key, value=value_to_write, fetched_at=__now()))
         session.commit()

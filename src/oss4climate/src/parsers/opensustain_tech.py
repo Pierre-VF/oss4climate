@@ -2,6 +2,8 @@
 Module parsing https://opensustain.tech/
 """
 
+from datetime import timedelta
+
 from bs4 import BeautifulSoup
 
 from oss4climate.src.parsers import (
@@ -17,8 +19,10 @@ from oss4climate.src.parsers import (
 )
 
 
-def fetch_all_project_urls_from_opensustain_webpage() -> ParsingTargets:
-    return __fetch_from_html("https://opensustain.tech/")
+def fetch_all_project_urls_from_opensustain_webpage(
+    cache_lifetime: timedelta | None = None,
+) -> ParsingTargets:
+    return __fetch_from_html("https://opensustain.tech/", cache_lifetime=cache_lifetime)
 
 
 def _f_clean_key(x):

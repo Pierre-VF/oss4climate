@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 from oss4climate.src.nlp.classifiers import tf_idf
-from oss4climate_app.src.licenses import license_category_from_license_name
+from oss4climate.src.parsers.licenses import license_category_from_license_name
 
 
 def _lower_str(x: str, *args, **kwargs):

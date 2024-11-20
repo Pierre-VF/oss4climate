@@ -12,6 +12,7 @@ install:
 	
 .PHONY: install_dev
 install_dev:
+	pip install --upgrade pip
 	pip install pipx
 	pipx ensurepath
 	pipx install poetry==$(POETRY_VERSION) || echo "Poetry already installed"

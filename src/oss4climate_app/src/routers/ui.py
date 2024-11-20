@@ -8,12 +8,12 @@ from typing import Optional
 from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import HTMLResponse
 
+from oss4climate.src.parsers.licenses import LicenseCategoriesEnum
 from oss4climate_app.config import (
     URL_CODE_REPOSITORY,
     URL_FEEDBACK_FORM,
 )
 from oss4climate_app.src.data_io import (
-    LicenseCategoriesEnum,
     n_repositories_indexed,
     search_for_results,
     unique_languages,
@@ -129,7 +129,7 @@ async def search_results(
         log_search,
         search_term=query,
         number_of_results=n_total_found,
-        view_offset=offset,
+        view_offset=current_offset,
     )
 
     return _render_ui_template(
@@ -155,3 +155,28 @@ def read_about(request: Request):
         request=request,
         template_file="about.html",
     )
+
+
+# Corresponding HEAD endpoints ( https://fastapi.tiangolo.com/reference/fastapi/#fastapi.FastAPI.head )
+def _default_head_behaviour(request: Request):
+    pass
+
+
+@app.head("/", include_in_schema=False, status_code=204)
+def _head_base(request: Request):
+    _default_head_behaviour()
+
+
+@app.head("/search", include_in_schema=False, status_code=204)
+def _head_search(request: Request):
+    _default_head_behaviour()
+
+
+@app.head("/results", include_in_schema=False, status_code=204)
+def _head_results(request: Request):
+    _default_head_behaviour()
+
+
+@app.head("/about", include_in_schema=False, status_code=204)
+def _head_about(request: Request):
+    _default_head_behaviour()

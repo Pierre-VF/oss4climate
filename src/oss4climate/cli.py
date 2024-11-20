@@ -2,6 +2,8 @@
 CLI module
 """
 
+from datetime import timedelta
+
 import typer
 
 from oss4climate import scripts
@@ -37,8 +39,9 @@ def format():
 @app.command()
 def discover():
     """Generates an index"""
+    ttl_cache = timedelta(days=7)
     scripts.update_listing_of_listings()
-    scripts.discover_projects()
+    scripts.discover_projects(cache_lifetime=ttl_cache)
     scripts.format_all_files()
 
 
