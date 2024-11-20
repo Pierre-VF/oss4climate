@@ -7,7 +7,7 @@ This implements:
 - Github URL identification and management (cleanup, type classification, ...)
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 from functools import lru_cache
 
@@ -98,6 +98,7 @@ def _web_get(
     with_headers: bool = True,
     is_json: bool = True,
     raise_rate_limit_error_on_403: bool = True,
+    cache_lifetime: timedelta | None = None,
 ) -> dict:
     if with_headers:
         headers = _github_headers()
@@ -114,6 +115,7 @@ def _web_get(
             headers=headers,
             raise_rate_limit_error_on_403=raise_rate_limit_error_on_403,
             rate_limiting_wait_s=rate_limiting_wait_s,
+            cache_lifetime=cache_lifetime,
         )
     else:
         res = cached_web_get_text(
@@ -121,11 +123,15 @@ def _web_get(
             headers=headers,
             raise_rate_limit_error_on_403=raise_rate_limit_error_on_403,
             rate_limiting_wait_s=rate_limiting_wait_s,
+            cache_lifetime=cache_lifetime,
         )
     return res
 
 
-def fetch_repositories_in_organisation(organisation_name: str) -> dict[str, str]:
+def fetch_repositories_in_organisation(
+    organisation_name: str,
+    cache_lifetime: timedelta | None = None,
+) -> dict[str, str]:
     organisation_name = _extract_organisation_and_repository_as_url_block(
         organisation_name
     )
@@ -133,24 +139,30 @@ def fetch_repositories_in_organisation(organisation_name: str) -> dict[str, str]
     try:
         res = _web_get(
             f"https://api.github.com/orgs/{organisation_name}/repos",
+            cache_lifetime=cache_lifetime,
         )
     except requests.exceptions.HTTPError:
         # Where orgs do not work, one is potentially looking at a user instead
         res = _web_get(
             f"https://api.github.com/users/{organisation_name}/repos",
+            cache_lifetime=cache_lifetime,
         )
 
     return {r["name"]: r["html_url"] for r in res}
 
 
-def _master_branch_name(cleaned_repo_path: str) -> str | None:
+def _master_branch_name(
+    cleaned_repo_path: str,
+    cache_lifetime: timedelta | None = None,
+) -> str | None:
     # Gather extra metadata
     more_data_needed = True
     branches_names = []
     page = 1
     while more_data_needed:
         r_branches = _web_get(
-            f"https://api.github.com/repos/{cleaned_repo_path}/branches?per_page=100&page={page}"
+            f"https://api.github.com/repos/{cleaned_repo_path}/branches?per_page=100&page={page}",
+            cache_lifetime=cache_lifetime,
         )
         branches_i = [i["name"] for i in r_branches]
         page += 1
@@ -181,10 +193,14 @@ def extract_repository_organisation(repo_path: str) -> str:
 def fetch_repository_details(
     repo_path: str,
     fail_on_issue: bool = True,
+    cache_lifetime: timedelta | None = None,
 ) -> ProjectDetails:
     repo_path = _extract_organisation_and_repository_as_url_block(repo_path)
 
-    r = _web_get(f"https://api.github.com/repos/{repo_path}")
+    r = _web_get(
+        f"https://api.github.com/repos/{repo_path}",
+        cache_lifetime=cache_lifetime,
+    )
     branch2use = _master_branch_name(repo_path)
 
     if branch2use is None:
@@ -197,7 +213,8 @@ def fetch_repository_details(
         # If ever getting issues with the size here, "?per_page=10" can be added to the URL
         #  (just need to ensure that all latest commits are included)
         r_last_commit_to_master = _web_get(
-            f"https://api.github.com/repos/{repo_path}/commits/{branch2use}"
+            f"https://api.github.com/repos/{repo_path}/commits/{branch2use}",
+            cache_lifetime=cache_lifetime,
         )
         last_commit = datetime.fromisoformat(
             r_last_commit_to_master["commit"]["author"]["date"]
@@ -216,7 +233,10 @@ def fetch_repository_details(
         forked_from = None
 
     # Note: this does not work well as the limit is set to 30
-    r_pull_requests = _web_get(f"https://api.github.com/repos/{repo_path}/pulls")
+    r_pull_requests = _web_get(
+        f"https://api.github.com/repos/{repo_path}/pulls",
+        cache_lifetime=cache_lifetime,
+    )
     n_open_pull_requests = len([i for i in r_pull_requests if i["state"] == "open"])
     # TODO: fix this better
     if n_open_pull_requests == 30:
@@ -253,15 +273,18 @@ def fetch_repository_readme(
     repo_name: str,
     branch: str | None = None,
     fail_on_issue: bool = True,
+    cache_lifetime: timedelta | None = None,
 ) -> str | None:
     repo_name = _extract_organisation_and_repository_as_url_block(repo_name)
 
     if branch is None:
-        branch = _master_branch_name(repo_name)
+        branch = _master_branch_name(repo_name, cache_lifetime=cache_lifetime)
 
     md_content = None
 
-    file_tree = fetch_repository_file_tree(repo_name, fail_on_issue=fail_on_issue)
+    file_tree = fetch_repository_file_tree(
+        repo_name, fail_on_issue=fail_on_issue, cache_lifetime=cache_lifetime
+    )
     for i in file_tree:
         if i.lower().startswith("readme."):
             try:
@@ -276,6 +299,7 @@ def fetch_repository_readme(
                     readme_url,
                     with_headers=None,
                     is_json=False,
+                    cache_lifetime=cache_lifetime,
                 )
             except Exception as e:
                 md_content = f"ERROR with {i} ({e})"
@@ -297,6 +321,7 @@ def fetch_repository_readme(
 def fetch_repository_file_tree(
     repository_url: str,
     fail_on_issue: bool = True,
+    cache_lifetime: timedelta | None = None,
 ) -> list[str] | str:
     repo_name = _extract_organisation_and_repository_as_url_block(repository_url)
     branch = _master_branch_name(repo_name)
@@ -307,6 +332,7 @@ def fetch_repository_file_tree(
             url=f"https://api.github.com/repos/{repo_name}/git/trees/{branch}?recursive=1",
             with_headers=True,
             is_json=True,
+            cache_lifetime=cache_lifetime,
         )
         file_tree = [i["path"] for i in r["tree"]]
     except Exception as e:

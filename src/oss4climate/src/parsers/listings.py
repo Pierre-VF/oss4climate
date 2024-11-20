@@ -34,7 +34,9 @@ def fetch_all(
     failed_webpage_listings = []
     for i in listing.github_readme_listings:
         try:
-            res += __fetch_from_markdown_str(github_data_io.fetch_repository_readme(i))
+            res += __fetch_from_markdown_str(
+                github_data_io.fetch_repository_readme(i, cache_lifetime=cache_lifetime)
+            )
         except Exception:
             log_warning(f"Failed fetching listing README from {i}")
             failed_github_readme_listings.append(i)
