@@ -6,7 +6,7 @@ Note:
 - Personal access token: https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 from functools import lru_cache
 from typing import Any
@@ -101,26 +101,62 @@ def _gitlab_headers() -> dict[str, str]:
     return headers
 
 
-def _web_get(url: str, with_headers: bool = True, is_json: bool = True) -> dict:
+def _web_get(
+    url: str,
+    with_headers: bool = True,
+    is_json: bool = True,
+    cache_lifetime: timedelta | None = None,
+) -> dict:
     if with_headers and url.startswith(GITLAB_URL_BASE):
         # Only using the headers with the actual gitlab.com calls
         headers = _gitlab_headers()
     else:
         headers = None
     if is_json:
-        res = cached_web_get_json(url=url, headers=headers)
+        res = cached_web_get_json(
+            url=url, headers=headers, cache_lifetime=cache_lifetime
+        )
     else:
-        res = cached_web_get_text(url=url, headers=headers)
+        res = cached_web_get_text(
+            url=url, headers=headers, cache_lifetime=cache_lifetime
+        )
     return res
 
 
-def fetch_repositories_in_group(organisation_name: str) -> dict[str, str]:
+def fetch_repositories_in_group(
+    organisation_name: str,
+    cache_lifetime: timedelta | None = None,
+) -> dict[str, str]:
     gitlab_host = _extract_gitlab_host(url=organisation_name)
     group_id = _extract_organisation_and_repository_as_url_block(organisation_name)
     res = _web_get(
         f"https://{gitlab_host}/api/v4/groups/{group_id}/projects",
+        cache_lifetime=cache_lifetime,
     )
     return {r["name"]: r["web_url"] for r in res}
+
+
+def fetch_repository_readme(
+    repo_name: str,
+    fail_on_issue: bool = True,
+    cache_lifetime: timedelta | None = None,
+) -> str | None:
+    gitlab_host = _extract_gitlab_host(url=repo_name)
+    repo_id = _extract_organisation_and_repository_as_url_block(repo_name)
+    r = _web_get(
+        f"https://{gitlab_host}/api/v4/projects/{quote_plus(repo_id)}?license=yes",
+        is_json=True,
+        cache_lifetime=cache_lifetime,
+    )
+    try:
+        url_readme_file = r["readme_url"].replace("/blob/", "/raw/") + "?inline=false"
+        readme = _web_get(url_readme_file, with_headers=False, is_json=False)
+    except Exception as e:
+        if fail_on_issue:
+            raise e
+        else:
+            readme = "(NO README)"
+    return readme
 
 
 def _get_from_dict_with_default(d: dict, key: str, default: Any) -> Any:
@@ -134,25 +170,23 @@ def _get_from_dict_with_default(d: dict, key: str, default: Any) -> Any:
 def fetch_repository_details(
     repo_path: str,
     fail_on_issue: bool = True,
+    cache_lifetime: timedelta | None = None,
 ) -> ProjectDetails:
     gitlab_host = _extract_gitlab_host(url=repo_path)
     repo_id = _extract_organisation_and_repository_as_url_block(repo_path)
     r = _web_get(
         f"https://{gitlab_host}/api/v4/projects/{quote_plus(repo_id)}?license=yes",
         is_json=True,
+        cache_lifetime=cache_lifetime,
     )
     # organisation_url = f"https://{gitlab_host}/{repo_id.split('/')[0]}"
     organisation = repo_id.split("/")[0]
     license = _get_from_dict_with_default(r, "license", {}).get("name")
-
-    try:
-        url_readme_file = r["readme_url"].replace("/blob/", "/raw/") + "?inline=false"
-        readme = _web_get(url_readme_file, with_headers=False, is_json=False)
-    except Exception as e:
-        if fail_on_issue:
-            raise e
-        else:
-            readme = "(NO README)"
+    readme = fetch_repository_readme(
+        repo_path,
+        fail_on_issue=fail_on_issue,
+        cache_lifetime=cache_lifetime,
+    )
 
     # Fields treated as optional or unstable across non-"gitlab.com" instances
     fork_details = _get_from_dict_with_default(r, "forked_from_project", {})
@@ -177,7 +211,9 @@ def fetch_repository_details(
     if url_open_pr_raw:
         url_open_pr = url_open_pr_raw.get("merge_requests")
         if url_open_pr:
-            r_open_pr = _web_get(url_open_pr, is_json=True)
+            r_open_pr = _web_get(
+                url_open_pr, is_json=True, cache_lifetime=cache_lifetime
+            )
             n_open_prs = len([i for i in r_open_pr if i.get("state") == "open"])
 
     details = ProjectDetails(
