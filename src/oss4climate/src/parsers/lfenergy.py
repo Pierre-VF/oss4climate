@@ -2,6 +2,8 @@
 Parser for LF Energy projects
 """
 
+from datetime import timedelta
+
 import yaml
 from bs4 import BeautifulSoup
 
@@ -16,8 +18,12 @@ from oss4climate.src.parsers.gitlab_data_io import GITLAB_ANY_URL_PREFIX
 _PROJECT_PAGE_URL_BASE = "https://lfenergy.org/projects/"
 
 
-def fetch_all_project_urls_from_lfe_webpage() -> list[str]:
-    r_text = cached_web_get_text("https://lfenergy.org/our-projects/")
+def fetch_all_project_urls_from_lfe_webpage(
+    cache_lifetime: timedelta | None = None,
+) -> list[str]:
+    r_text = cached_web_get_text(
+        "https://lfenergy.org/our-projects/", cache_lifetime=cache_lifetime
+    )
     b = BeautifulSoup(r_text, features="html.parser")
 
     rs = b.findAll(name="a")
@@ -30,10 +36,11 @@ def fetch_all_project_urls_from_lfe_webpage() -> list[str]:
 
 def fetch_project_github_urls_from_lfe_energy_project_webpage(
     project_url: str,
+    cache_lifetime: timedelta | None = None,
 ) -> ParsingTargets:
     if not project_url.startswith(_PROJECT_PAGE_URL_BASE):
         raise ValueError(f"Unsupported page URL ({project_url})")
-    r_text = cached_web_get_text(project_url)
+    r_text = cached_web_get_text(project_url, cache_lifetime=cache_lifetime)
     b = BeautifulSoup(r_text, features="html.parser")
 
     rs = b.findAll(name="a", attrs={"class": "projects-icon"})
@@ -52,9 +59,12 @@ def fetch_project_github_urls_from_lfe_energy_project_webpage(
     return identify_parsing_targets(github_urls + gitlab_urls)
 
 
-def get_open_source_energy_projects_from_landscape() -> ParsingTargets:
+def get_open_source_energy_projects_from_landscape(
+    cache_lifetime: timedelta | None = None,
+) -> ParsingTargets:
     r = cached_web_get_text(
-        "https://raw.githubusercontent.com/lf-energy/lfenergy-landscape/main/landscape.yml"
+        "https://raw.githubusercontent.com/lf-energy/lfenergy-landscape/main/landscape.yml",
+        cache_lifetime=cache_lifetime,
     )
     out = yaml.load(r, Loader=yaml.CLoader)
 

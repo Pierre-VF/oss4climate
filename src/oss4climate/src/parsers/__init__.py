@@ -5,6 +5,7 @@ Module for parsers and web I/O
 import re
 import time
 from dataclasses import dataclass, field
+from datetime import timedelta
 
 import requests
 import tomllib
@@ -31,6 +32,7 @@ def _cached_web_get(
     is_json: bool = True,
     raise_rate_limit_error_on_403: bool = True,
     rate_limiting_wait_s: float = 0.1,
+    cache_lifetime: timedelta | None = None,
 ) -> dict | str:
     # Uses the cache to ensure that requests are minimised
     out = load_from_database(url, is_json=is_json)
@@ -72,6 +74,7 @@ def cached_web_get_json(
     wait_after_web_query: bool = True,
     raise_rate_limit_error_on_403: bool = False,
     rate_limiting_wait_s: float = 0.1,
+    cache_lifetime: timedelta | None = None,
 ) -> dict:
     return _cached_web_get(
         url=url,
@@ -80,6 +83,7 @@ def cached_web_get_json(
         is_json=True,
         raise_rate_limit_error_on_403=raise_rate_limit_error_on_403,
         rate_limiting_wait_s=rate_limiting_wait_s,
+        cache_lifetime=cache_lifetime,
     )
 
 
@@ -89,6 +93,7 @@ def cached_web_get_text(
     wait_after_web_query: bool = True,
     raise_rate_limit_error_on_403: bool = False,
     rate_limiting_wait_s: float = 0.1,
+    cache_lifetime: timedelta | None = None,
 ) -> str:
     return _cached_web_get(
         url=url,
@@ -97,6 +102,7 @@ def cached_web_get_text(
         is_json=False,
         raise_rate_limit_error_on_403=raise_rate_limit_error_on_403,
         rate_limiting_wait_s=rate_limiting_wait_s,
+        cache_lifetime=cache_lifetime,
     )
 
 
@@ -450,8 +456,11 @@ class ResourceListing:
             dump(doc, fp, sort_keys=True)
 
 
-def fetch_all_project_urls_from_html_webpage(url: str) -> ParsingTargets:
-    r_text = cached_web_get_text(url)
+def fetch_all_project_urls_from_html_webpage(
+    url: str,
+    cache_lifetime: timedelta | None = None,
+) -> ParsingTargets:
+    r_text = cached_web_get_text(url, cache_lifetime=cache_lifetime)
     b = BeautifulSoup(r_text, features="html.parser")
 
     rs = b.findAll(name="a")
