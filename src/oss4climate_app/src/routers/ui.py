@@ -129,7 +129,7 @@ async def search_results(
         log_search,
         search_term=query,
         number_of_results=n_total_found,
-        view_offset=offset,
+        view_offset=current_offset,
     )
 
     return _render_ui_template(
