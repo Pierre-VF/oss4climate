@@ -1,0 +1,1 @@
+These are readmes for experiments, which require Jupyter that has been removed from standard and dev dependencies to keep the system lightweight.
