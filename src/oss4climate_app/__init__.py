@@ -109,6 +109,11 @@ async def base_landing(request: Request, channel: Optional[str] = None):
     return ui.ui_base_search_page(request=request)
 
 
+@app.head("/", include_in_schema=False, status_code=204)
+def _head_base(request: Request):
+    pass
+
+
 @app.get("/favicon.ico")
 def _favicon():
     # This is just a dummy favicon for now (waiting for a better logo)

@@ -23,7 +23,7 @@ from oss4climate_app.src.data_io import (
 from oss4climate_app.src.log_activity import log_search
 from oss4climate_app.src.templates import render_template
 
-app = APIRouter()
+app = APIRouter(include_in_schema=False)
 
 
 def _f_none_to_unknown(x: str | date | None) -> str:
@@ -118,8 +118,8 @@ async def search_results(
         current_url = f"{current_url}&license_category={license_category}"
     current_offset = 0 if offset is None else offset
 
-    url_previous = f"{current_url}&offset={current_offset - n_results - 1}"
-    url_next = f"{current_url}&offset={current_offset + n_results + 1}"
+    url_previous = f"{current_url}&offset={current_offset - n_results}"
+    url_next = f"{current_url}&offset={current_offset + n_results}"
 
     show_previous = current_offset > 0
     show_next = current_offset <= (n_total_found - n_results)
@@ -164,19 +164,19 @@ def _default_head_behaviour(request: Request):
 
 @app.head("/", include_in_schema=False, status_code=204)
 def _head_base(request: Request):
-    _default_head_behaviour()
+    _default_head_behaviour(request)
 
 
 @app.head("/search", include_in_schema=False, status_code=204)
 def _head_search(request: Request):
-    _default_head_behaviour()
+    _default_head_behaviour(request)
 
 
 @app.head("/results", include_in_schema=False, status_code=204)
 def _head_results(request: Request):
-    _default_head_behaviour()
+    _default_head_behaviour(request)
 
 
 @app.head("/about", include_in_schema=False, status_code=204)
 def _head_about(request: Request):
-    _default_head_behaviour()
+    _default_head_behaviour(request)
