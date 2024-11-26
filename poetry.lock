@@ -2058,20 +2058,20 @@ files = [
 
 [[package]]
 name = "tqdm"
-version = "4.67.0"
+version = "4.67.1"
 description = "Fast, Extensible Progress Meter"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "tqdm-4.67.0-py3-none-any.whl", hash = "sha256:0cd8af9d56911acab92182e88d763100d4788bdf421d251616040cc4d44863be"},
-    {file = "tqdm-4.67.0.tar.gz", hash = "sha256:fe5a6f95e6fe0b9755e9469b77b9c3cf850048224ecaa8293d7d2d31f97d869a"},
+    {file = "tqdm-4.67.1-py3-none-any.whl", hash = "sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2"},
+    {file = "tqdm-4.67.1.tar.gz", hash = "sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2"},
 ]
 
 [package.dependencies]
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [package.extras]
-dev = ["pytest (>=6)", "pytest-cov", "pytest-timeout", "pytest-xdist"]
+dev = ["nbval", "pytest (>=6)", "pytest-asyncio (>=0.24)", "pytest-cov", "pytest-timeout"]
 discord = ["requests"]
 notebook = ["ipywidgets (>=6)"]
 slack = ["slack-sdk"]
@@ -2177,6 +2177,7 @@ python-versions = "^3.12"
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 content-hash = "87f6defd7ddd68a2ac29d08e9e8558659aa8ba0c29b90bbcadec5e1a7ed56277"
 =======
 content-hash = "2b70bb800854586c8668e5ab02ca757e390f4420962690df8d1d7bb34532df63"
@@ -2187,3 +2188,6 @@ content-hash = "89794bfc91fbf52dfea7e0115aef7af2154ab1481c70edb702590a70d5e2e6e2
 =======
 content-hash = "dcb42b8fcc68269551ecc7ce2d9e16608fc6a70a0ef7b0f4b210f6e0a42e3f36"
 >>>>>>> origin/dependabot/pip/uvicorn-0.32.1
+=======
+content-hash = "54ca39cc52f2233c02f8bcc3984c02d712dc44a873550abef43edc9cdcec246a"
+>>>>>>> origin/dependabot/pip/tqdm-4.67.1
