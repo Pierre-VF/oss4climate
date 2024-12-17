@@ -3,9 +3,25 @@ Module containing the models and enums for the mapping
 """
 
 from datetime import date
+from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel
+
+
+class EnumDocumentationFileType(Enum):
+    MARKDOWN = "md"
+    RESTRUCTURED_TEXT = "rst"
+    UNKNOWN = "?"
+
+    def from_filename(f: str) -> "EnumDocumentationFileType":
+        f_lower = f.lower()
+        if f_lower.endswith(".md"):
+            return EnumDocumentationFileType.MARKDOWN
+        elif f_lower.endswith(".rst"):
+            return EnumDocumentationFileType.RESTRUCTURED_TEXT
+        else:
+            return EnumDocumentationFileType.UNKNOWN
 
 
 class ProjectDetails(BaseModel):
@@ -25,3 +41,4 @@ class ProjectDetails(BaseModel):
     readme: Optional[str]
     is_fork: Optional[bool]
     forked_from: Optional[str]
+    readme_type: EnumDocumentationFileType = EnumDocumentationFileType.UNKNOWN

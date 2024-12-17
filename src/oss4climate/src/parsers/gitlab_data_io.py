@@ -15,7 +15,7 @@ from urllib.parse import quote_plus, urlparse
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.helpers import url_base_matches_domain
 from oss4climate.src.log import log_info
-from oss4climate.src.model import ProjectDetails
+from oss4climate.src.model import EnumDocumentationFileType, ProjectDetails
 from oss4climate.src.parsers import (
     ParsingTargets,
     cached_web_get_json,
@@ -149,7 +149,7 @@ def fetch_repository_readme(
     repo_name: str,
     fail_on_issue: bool = True,
     cache_lifetime: timedelta | None = None,
-) -> str | None:
+) -> tuple[str | None, EnumDocumentationFileType]:
     gitlab_host = _extract_gitlab_host(url=repo_name)
     repo_id = _extract_organisation_and_repository_as_url_block(repo_name)
     r = _web_get(
@@ -158,14 +158,18 @@ def fetch_repository_readme(
         cache_lifetime=cache_lifetime,
     )
     try:
-        url_readme_file = r["readme_url"].replace("/blob/", "/raw/") + "?inline=false"
-        readme = _web_get(url_readme_file, with_headers=False, is_json=False)
+        url_readme_file = r["readme_url"].replace("/blob/", "/raw/")
+        readme = _web_get(
+            url_readme_file + "?inline=false", with_headers=False, is_json=False
+        )
+        readme_type = EnumDocumentationFileType.from_filename(url_readme_file)
     except Exception as e:
         if fail_on_issue:
             raise e
         else:
             readme = "(NO README)"
-    return readme
+            readme_type = EnumDocumentationFileType.UNKNOWN
+    return readme, readme_type
 
 
 def _get_from_dict_with_default(d: dict, key: str, default: Any) -> Any:
@@ -191,7 +195,10 @@ def fetch_repository_details(
     # organisation_url = f"https://{gitlab_host}/{repo_id.split('/')[0]}"
     organisation = repo_id.split("/")[0]
     license = _get_from_dict_with_default(r, "license", {}).get("name")
-    readme = fetch_repository_readme(
+    (
+        readme,
+        readme_type,
+    ) = fetch_repository_readme(
         repo_path,
         fail_on_issue=fail_on_issue,
         cache_lifetime=cache_lifetime,
@@ -240,6 +247,7 @@ def fetch_repository_details(
         raw_details=r,
         master_branch=r["default_branch"],  # Using default branch as master branch
         readme=readme,
+        readme_type=readme_type,
         is_fork=(forked_from is not None),
         forked_from=forked_from,
     )

@@ -5,6 +5,7 @@ Module parsing https://github.com/github/GreenSoftwareDirectory
 from datetime import timedelta
 
 from oss4climate.src.log import log_warning
+from oss4climate.src.model import EnumDocumentationFileType
 from oss4climate.src.parsers import (
     ParsingTargets,
     ResourceListing,
@@ -16,6 +17,9 @@ from oss4climate.src.parsers import (
 )
 from oss4climate.src.parsers import (
     fetch_all_project_urls_from_markdown_str as __fetch_from_markdown_str,
+)
+from oss4climate.src.parsers import (
+    fetch_all_project_urls_from_rst_str as __fetch_from_rst_str,
 )
 
 
@@ -36,18 +40,26 @@ def fetch_all(
     failed_webpage_listings = []
     for i in listing.github_readme_listings:
         try:
-            res += __fetch_from_markdown_str(
-                github_data_io.fetch_repository_readme(i, cache_lifetime=cache_lifetime)
+            readme_i, readme_type_i = github_data_io.fetch_repository_readme(
+                i, cache_lifetime=cache_lifetime
             )
+            if readme_type_i == EnumDocumentationFileType.MARKDOWN:
+                res += __fetch_from_markdown_str(readme_i)
+            elif readme_type_i == EnumDocumentationFileType.RESTRUCTURED_TEXT:
+                res += __fetch_from_rst_str(readme_i)
         except Exception:
             log_warning(f"Failed fetching listing README from {i}")
             failed_github_readme_listings.append(i)
 
     for i in listing.gitlab_readme_listings:
         try:
-            res += __fetch_from_markdown_str(
-                gitlab_data_io.fetch_repository_readme(i, cache_lifetime=cache_lifetime)
+            readme_i, readme_type_i = gitlab_data_io.fetch_repository_readme(
+                i, cache_lifetime=cache_lifetime
             )
+            if readme_type_i == EnumDocumentationFileType.MARKDOWN:
+                res += __fetch_from_markdown_str(readme_i)
+            elif readme_type_i == EnumDocumentationFileType.RESTRUCTURED_TEXT:
+                res += __fetch_from_rst_str(readme_i)
         except Exception:
             log_warning(f"Failed fetching listing README from {i}")
             failed_gitlab_readme_listings.append(i)
