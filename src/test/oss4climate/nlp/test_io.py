@@ -4,23 +4,45 @@ from oss4climate.src.nlp.rst_io import find_all_links_in_rst
 
 
 def test_find_all_links(github_organisation_url, github_repo_url):
-    assert find_all_links_in_rst(
-        """
-Python_ is `my favourite programming language`__.
+    res = [github_organisation_url, github_repo_url]
+    assert (
+        find_all_links_in_rst(
+            f"""
+x0_ is `my favourite programming language`__.
 
-.. _Python: http://www.python.org/
-.. _Python2: http://www.pythonx.org/
+.. _x0: {github_organisation_url}
+.. _x1: {github_repo_url}
 
-__ Python2_
+__ x1_
     """
-    ) == ["http://www.python.org/", "http://www.pythonx.org/"]
+        )
+        == res
+    )
 
-    assert find_all_links_in_markdown(
-        f"""
+    assert (
+        find_all_links_in_markdown(
+            f"""
     [repo]({github_organisation_url}) 
     and 
     [org]({github_repo_url})
             """
-    ) == [github_organisation_url, github_repo_url]
+        )
+        == res
+    )
 
-    assert find_all_links_in_html("""""") == []
+    assert (
+        find_all_links_in_html(
+            f"""
+<html>
+    <body>
+        <p>
+            <a href="{github_organisation_url}">A</a> 
+            and 
+            <a href="{github_repo_url}">B</a>
+        </p>
+    </body>
+</html>                              
+            """
+        )
+        == res
+    )
