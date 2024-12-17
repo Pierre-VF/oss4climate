@@ -9,6 +9,7 @@ def test_f(github_repo_url):
     assert url_base_matches_domain(github_repo_url, "github.com")
 
     assert cleaned_url(github_repo_url + "#content") == github_repo_url
+    assert cleaned_url(github_repo_url + "?id=1") == github_repo_url
 
     # Ensuring robustness against spaces
     assert cleaned_url(github_repo_url + " abc#content") == github_repo_url
