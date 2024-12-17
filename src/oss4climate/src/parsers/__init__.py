@@ -2,14 +2,12 @@
 Module for parsers and web I/O
 """
 
-import re
 import time
 from dataclasses import dataclass, field
 from datetime import timedelta
 
 import requests
 import tomllib
-from bs4 import BeautifulSoup
 from tomlkit import document, dump
 
 from oss4climate.src.database import load_from_database, save_to_database
@@ -18,6 +16,9 @@ from oss4climate.src.helpers import (
     url_base_matches_domain,
 )
 from oss4climate.src.log import log_info
+from oss4climate.src.nlp.html_io import find_all_links_in_html
+from oss4climate.src.nlp.markdown_io import find_all_links_in_markdown
+from oss4climate.src.nlp.rst_io import find_all_links_in_rst
 
 
 class RateLimitError(RuntimeError):
@@ -460,20 +461,18 @@ def fetch_all_project_urls_from_html_webpage(
     cache_lifetime: timedelta | None = None,
 ) -> ParsingTargets:
     r_text = cached_web_get_text(url, cache_lifetime=cache_lifetime)
-    b = BeautifulSoup(r_text, features="html.parser")
-
-    rs = b.findAll(name="a")
-    shortlisted_urls = isolate_relevant_urls([x.get("href") for x in rs])
+    rs = find_all_links_in_html(r_text)
+    shortlisted_urls = isolate_relevant_urls(rs)
     return identify_parsing_targets(shortlisted_urls)
 
 
-def find_links_in_markdown(markdown_text: str) -> list[str]:
-    pattern = r"\[([^\]]+)\]\(([^\)]+)\)|\[([^\]]+)\]\s*\[([^\]]*)\]"
-    out = re.findall(pattern, markdown_text)
-    return [i[1] for i in out]
-
-
 def fetch_all_project_urls_from_markdown_str(markdown_text: str) -> ParsingTargets:
-    r = find_links_in_markdown(markdown_text)
+    r = find_all_links_in_markdown(markdown_text)
+    shortlisted_urls = isolate_relevant_urls(r)
+    return identify_parsing_targets(shortlisted_urls)
+
+
+def fetch_all_project_urls_from_rst_str(rst_text: str) -> ParsingTargets:
+    r = find_all_links_in_rst(rst_text)
     shortlisted_urls = isolate_relevant_urls(r)
     return identify_parsing_targets(shortlisted_urls)
