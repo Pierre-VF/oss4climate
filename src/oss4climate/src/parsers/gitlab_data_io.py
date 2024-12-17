@@ -13,6 +13,7 @@ from typing import Any
 from urllib.parse import quote_plus, urlparse
 
 from oss4climate.src.config import SETTINGS
+from oss4climate.src.helpers import url_base_matches_domain
 from oss4climate.src.log import log_info
 from oss4climate.src.model import ProjectDetails
 from oss4climate.src.parsers import (
@@ -24,7 +25,8 @@ from oss4climate.src.parsers import (
 GITLAB_ANY_URL_PREFIX = (
     "https://gitlab."  # Since Gitlabs can be self-hosted on another domain
 )
-GITLAB_URL_BASE = "https://gitlab.com/"
+GITLAB_DOMAIN = "gitlab.com"
+GITLAB_URL_BASE = f"https://{GITLAB_DOMAIN}/"
 
 
 class GitlabTargetType(Enum):
@@ -73,7 +75,7 @@ def _extract_gitlab_host(url: str) -> str:
 
 def _extract_organisation_and_repository_as_url_block(x: str) -> str:
     # Cleaning up Gitlab prefix
-    if x.startswith(GITLAB_URL_BASE):
+    if url_base_matches_domain(x, GITLAB_DOMAIN):
         x = x.replace(GITLAB_URL_BASE, "")
     else:
         h = _extract_gitlab_host(url=x)
@@ -107,7 +109,7 @@ def _web_get(
     is_json: bool = True,
     cache_lifetime: timedelta | None = None,
 ) -> dict:
-    if with_headers and url.startswith(GITLAB_URL_BASE):
+    if with_headers and url_base_matches_domain(url, GITLAB_DOMAIN):
         # Only using the headers with the actual gitlab.com calls
         headers = _gitlab_headers()
     else:

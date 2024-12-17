@@ -14,6 +14,7 @@ from functools import lru_cache
 import requests
 
 from oss4climate.src.config import SETTINGS
+from oss4climate.src.helpers import url_base_matches_domain
 from oss4climate.src.log import log_info
 from oss4climate.src.model import ProjectDetails
 from oss4climate.src.parsers import (
@@ -22,12 +23,13 @@ from oss4climate.src.parsers import (
     cached_web_get_text,
 )
 
-GITHUB_URL_BASE = "https://github.com/"
+GITHUB_DOMAIN = "github.com"
+GITHUB_URL_BASE = f"https://{GITHUB_DOMAIN}/"
 
 
 def _extract_organisation_and_repository_as_url_block(x: str) -> str:
     # Cleaning up Github prefix
-    if x.startswith(GITHUB_URL_BASE):
+    if url_base_matches_domain(x, GITHUB_DOMAIN):
         x = x.replace(GITHUB_URL_BASE, "")
     # Removing eventual extra information in URL
     for i in ["#", "&"]:

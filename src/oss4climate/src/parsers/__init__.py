@@ -13,7 +13,10 @@ from bs4 import BeautifulSoup
 from tomlkit import document, dump
 
 from oss4climate.src.database import load_from_database, save_to_database
-from oss4climate.src.helpers import sorted_list_of_unique_elements
+from oss4climate.src.helpers import (
+    sorted_list_of_unique_elements,
+    url_base_matches_domain,
+)
 from oss4climate.src.log import log_info
 
 
@@ -107,7 +110,7 @@ def cached_web_get_text(
 
 
 def url_qualifies(x: str) -> bool:
-    if x.startswith("https://github.com/"):
+    if url_base_matches_domain(x, "github.com"):
         if (
             x.startswith("https://github.com/settings/")
             or x.startswith("https://github.com/user-attachments/")
