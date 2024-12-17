@@ -1,13 +1,14 @@
-from docutils import frontend, utils
-from docutils.parsers.rst import Parser
+from docutils.core import publish_string
 
-from .html_io import find_all_links_in_html
+from oss4climate.src.nlp.html_io import find_all_links_in_html
 
 
 def find_all_links_in_rst(rst_str: str) -> str | None:
-    settings = frontend.get_default_settings(Parser)
-    document = utils.new_document("out.rst", settings)
-    Parser().parse(rst_str, document)
+    x = publish_string(
+        rst_str,
+        parser_name="restructuredtext",
+        writer_name="html",
+    )
 
-    links = find_all_links_in_html(document.pformat())
+    links = find_all_links_in_html(x)
     return links
