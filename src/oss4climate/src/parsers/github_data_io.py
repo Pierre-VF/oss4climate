@@ -292,7 +292,8 @@ def fetch_repository_readme(
         repo_name, fail_on_issue=fail_on_issue, cache_lifetime=cache_lifetime
     )
     for i in file_tree:
-        if i.lower().startswith("readme."):
+        lower_i = i.lower()
+        if lower_i.startswith("readme.") or lower_i.startswith("docs/readme."):
             try:
                 if branch == "main":
                     # Keeping what worked well so far
