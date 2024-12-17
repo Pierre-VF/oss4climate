@@ -7,6 +7,8 @@ import re
 from bs4 import BeautifulSoup
 from markdown import markdown
 
+from oss4climate.src.nlp.html_io import html_to_search_plaintext
+
 
 def _replace_markdown_links(text):
     # Regex pattern to match markdown links
@@ -35,7 +37,7 @@ def find_all_links_in_markdown(markdown_text: str) -> list[str]:
     return [i[1] for i in out]
 
 
-def markdown_to_clean_plaintext(
+def markdown_to_search_plaintext(
     x: str | None, remove_code: bool = True, remove_linebreaks: bool = False
 ) -> str | None:
     """This method converts a markdown string to plaintext
@@ -50,6 +52,9 @@ def markdown_to_clean_plaintext(
     if remove_code:
         html = re.sub(r"<code>(.*?)</code >", " ", html)
         html = re.sub(r"<pre>(.*?)</pre>", " ", html)
+
+    x = html_to_search_plaintext(html)
+    return x
 
     x = BeautifulSoup(html, features="html.parser")
     text = "".join(x.find_all(string=True))

@@ -2,7 +2,7 @@ import warnings
 
 from docutils.core import publish_string
 
-from oss4climate.src.nlp.html_io import find_all_links_in_html, html_to_clean_plaintext
+from oss4climate.src.nlp.html_io import find_all_links_in_html, html_to_search_plaintext
 
 
 class RstParsingError(ValueError):
@@ -29,6 +29,6 @@ def find_all_links_in_rst(rst_str: str) -> list[str]:
     return links
 
 
-def rst_to_clean_plaintext(rst_str: str, *args, **kwargs) -> str:
+def rst_to_search_plaintext(rst_str: str, *args, **kwargs) -> str:
     x = __rst_to_html(rst_str)
-    return html_to_clean_plaintext(x)
+    return html_to_search_plaintext(x)
