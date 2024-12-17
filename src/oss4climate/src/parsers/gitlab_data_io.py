@@ -29,6 +29,13 @@ GITLAB_DOMAIN = "gitlab.com"
 GITLAB_URL_BASE = f"https://{GITLAB_DOMAIN}/"
 
 
+def is_gitlab_url(url: str, include_self_hosted: bool = True) -> bool:
+    if include_self_hosted:
+        return url.startswith(GITLAB_ANY_URL_PREFIX)
+    else:
+        return url_base_matches_domain(url, GITLAB_DOMAIN)
+
+
 class GitlabTargetType(Enum):
     GROUP = "GROUP"
     PROJECT = "PROJECT"
@@ -75,7 +82,7 @@ def _extract_gitlab_host(url: str) -> str:
 
 def _extract_organisation_and_repository_as_url_block(x: str) -> str:
     # Cleaning up Gitlab prefix
-    if url_base_matches_domain(x, GITLAB_DOMAIN):
+    if is_gitlab_url(x, include_self_hosted=False):
         x = x.replace(GITLAB_URL_BASE, "")
     else:
         h = _extract_gitlab_host(url=x)
@@ -109,7 +116,7 @@ def _web_get(
     is_json: bool = True,
     cache_lifetime: timedelta | None = None,
 ) -> dict:
-    if with_headers and url_base_matches_domain(url, GITLAB_DOMAIN):
+    if with_headers and is_gitlab_url(url, include_self_hosted=False):
         # Only using the headers with the actual gitlab.com calls
         headers = _gitlab_headers()
     else:

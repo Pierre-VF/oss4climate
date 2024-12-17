@@ -6,7 +6,6 @@ from datetime import timedelta
 
 from bs4 import BeautifulSoup
 
-from oss4climate.src.helpers import url_base_matches_domain
 from oss4climate.src.parsers import (
     ParsingTargets,
     ResourceListing,
@@ -89,11 +88,7 @@ def fetch_listing_of_listings_from_opensustain_webpage() -> ResourceListing:
     gits = isolate_relevant_urls(listing_urls)
     others = [i for i in listing_urls if i not in gits]
     return ResourceListing(
-        github_readme_listings=[
-            i for i in gits if url_base_matches_domain(i, github_data_io.GITHUB_DOMAIN)
-        ],
-        gitlab_readme_listings=[
-            i for i in gits if url_base_matches_domain(i, gitlab_data_io.GITLAB_DOMAIN)
-        ],
+        github_readme_listings=[i for i in gits if github_data_io.is_github_url(i)],
+        gitlab_readme_listings=[i for i in gits if gitlab_data_io.is_gitlab_url(i)],
         fault_urls=others,
     )

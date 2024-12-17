@@ -27,9 +27,13 @@ GITHUB_DOMAIN = "github.com"
 GITHUB_URL_BASE = f"https://{GITHUB_DOMAIN}/"
 
 
+def is_github_url(url: str) -> bool:
+    return url_base_matches_domain(url, GITHUB_DOMAIN)
+
+
 def _extract_organisation_and_repository_as_url_block(x: str) -> str:
     # Cleaning up Github prefix
-    if url_base_matches_domain(x, GITHUB_DOMAIN):
+    if is_github_url(x):
         x = x.replace(GITHUB_URL_BASE, "")
     # Removing eventual extra information in URL
     for i in ["#", "&"]:
