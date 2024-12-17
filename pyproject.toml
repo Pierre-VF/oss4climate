@@ -33,6 +33,7 @@ gunicorn = "^23.0.0"
 tqdm = "^4.67.1"
 sentry-sdk = {extras = ["fastapi"], version = "^2.19.2"}
 httpx = "^0.28.1"
+docutils = "^0.21.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
