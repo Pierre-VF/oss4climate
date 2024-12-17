@@ -270,13 +270,13 @@ files = [
 
 [[package]]
 name = "fastapi"
-version = "0.115.5"
+version = "0.115.6"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "fastapi-0.115.5-py3-none-any.whl", hash = "sha256:596b95adbe1474da47049e802f9a65ab2ffa9c2b07e7efee70eb8a66c9f2f796"},
-    {file = "fastapi-0.115.5.tar.gz", hash = "sha256:0e7a4d0dc0d01c68df21887cce0945e72d3c48b9f4f79dfe7a7d53aa08fbb289"},
+    {file = "fastapi-0.115.6-py3-none-any.whl", hash = "sha256:e9240b29e36fa8f4bb7290316988e90c381e5092e0cbe84e7818cc3713bcf305"},
+    {file = "fastapi-0.115.6.tar.gz", hash = "sha256:9ec46f7addc14ea472958a96aae5b5de65f39721a46aaf5705c480d9a8b76654"},
 ]
 
 [package.dependencies]
@@ -1773,6 +1773,7 @@ python-versions = "^3.12"
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 content-hash = "b9ffa3a7dcbcc6f587342f3e01dea41e6d651aaba0b811bd872fc792c7b7ce30"
 =======
 content-hash = "dd71dbc7e4ba488c5f568a87cd191acf6e60cb767737172c87ed157dc7f28d69"
@@ -1783,3 +1784,6 @@ content-hash = "404428919592eb7f0f7336b738ac6caaf763465808f0157b25832626198023c7
 =======
 content-hash = "b6e88543e77a0e209ec8f06e6940af7d69e76ff4821eecd29116f78fb91ac014"
 >>>>>>> origin/dependabot/pip/sentry-sdk-2.19.2
+=======
+content-hash = "0a41f3c1d57d130f6e34937f692955fdda08057b97f7c0593cc343c1093433b8"
+>>>>>>> origin/dependabot/pip/fastapi-0.115.6
