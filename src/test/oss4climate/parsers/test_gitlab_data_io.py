@@ -36,7 +36,7 @@ def test_parsing_target_set():
         unknown=["6", "5"],
     )
     x += x
-    x.ensure_sorted_and_unique_elements()
+    x.ensure_sorted_cleaned_and_unique_elements()
     assert x.github_organisations == ["1", "2"]
     assert x.github_repositories == ["3", "4"]
     assert x.unknown == ["5", "6"]

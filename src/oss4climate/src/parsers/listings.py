@@ -68,5 +68,5 @@ def fetch_all(
         + failed_webpage_listings,
     )
 
-    res.ensure_sorted_and_unique_elements()
+    res.ensure_sorted_cleaned_and_unique_elements()
     return res

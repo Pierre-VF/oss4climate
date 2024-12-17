@@ -29,3 +29,7 @@ def cleaned_url(url: str) -> str:
     if " " in out:
         out = out.split(" ")[0]
     return out
+
+
+def sorted_list_of_cleaned_urls(urls: list[str]) -> list[str]:
+    return sorted_list_of_unique_elements([cleaned_url(i) for i in urls])

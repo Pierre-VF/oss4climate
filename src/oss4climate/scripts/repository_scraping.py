@@ -38,7 +38,7 @@ def scrape_all(
 
     log_info("Loading organisations and repositories to be indexed")
     targets = ParsingTargets.from_toml(FILE_INPUT_INDEX)
-    targets.ensure_sorted_and_unique_elements()
+    targets.ensure_sorted_cleaned_and_unique_elements()
 
     failure_during_scraping = False
 
@@ -83,7 +83,7 @@ def scrape_all(
             log_warning(f" > Error with organisation ({e})")
             bad_organisations.append(org_url)
 
-    targets.ensure_sorted_and_unique_elements()  # since elements were added
+    targets.ensure_sorted_cleaned_and_unique_elements()  # since elements were added
     screening_results = []
 
     log_info("Fetching data for all repositories in Gitlab")

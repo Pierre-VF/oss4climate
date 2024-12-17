@@ -14,7 +14,7 @@ from tomlkit import document, dump
 
 from oss4climate.src.database import load_from_database, save_to_database
 from oss4climate.src.helpers import (
-    sorted_list_of_unique_elements,
+    sorted_list_of_cleaned_urls,
     url_base_matches_domain,
 )
 from oss4climate.src.log import log_info
@@ -208,20 +208,18 @@ class ParsingTargets:
             )
         return out
 
-    def ensure_sorted_and_unique_elements(self) -> None:
+    def ensure_sorted_cleaned_and_unique_elements(self) -> None:
         """
         Sorts all fields alphabetically and ensures that there is no redundancies in them
         """
-        self.github_repositories = sorted_list_of_unique_elements(
-            self.github_repositories
-        )
-        self.github_organisations = sorted_list_of_unique_elements(
+        self.github_repositories = sorted_list_of_cleaned_urls(self.github_repositories)
+        self.github_organisations = sorted_list_of_cleaned_urls(
             self.github_organisations
         )
-        self.gitlab_groups = sorted_list_of_unique_elements(self.gitlab_groups)
-        self.gitlab_projects = sorted_list_of_unique_elements(self.gitlab_projects)
-        self.unknown = sorted_list_of_unique_elements(self.unknown)
-        self.invalid = sorted_list_of_unique_elements(self.invalid)
+        self.gitlab_groups = sorted_list_of_cleaned_urls(self.gitlab_groups)
+        self.gitlab_projects = sorted_list_of_cleaned_urls(self.gitlab_projects)
+        self.unknown = sorted_list_of_cleaned_urls(self.unknown)
+        self.invalid = sorted_list_of_cleaned_urls(self.invalid)
 
     def __included_in_valid_targets(self, url: str) -> bool:
         return (
@@ -261,7 +259,7 @@ class ParsingTargets:
         """
         Method to cleanup the object (removing obsolete entries and redundancies)
         """
-        self.ensure_sorted_and_unique_elements()
+        self.ensure_sorted_cleaned_and_unique_elements()
         # Ensuring that only valid targets are used
         self.ensure_targets_validity()
         # Removing all repos that are listed in organisations/groups
@@ -398,21 +396,19 @@ class ResourceListing:
         self.fault_invalid_urls += other.fault_invalid_urls
         return self
 
-    def ensure_sorted_and_unique_elements(self) -> None:
+    def ensure_sorted_cleaned_and_unique_elements(self) -> None:
         """
         Sorts all fields alphabetically and ensures that there is no redundancies in them
         """
-        self.github_readme_listings = sorted_list_of_unique_elements(
+        self.github_readme_listings = sorted_list_of_cleaned_urls(
             self.github_readme_listings
         )
-        self.gitlab_readme_listings = sorted_list_of_unique_elements(
+        self.gitlab_readme_listings = sorted_list_of_cleaned_urls(
             self.gitlab_readme_listings
         )
-        self.webpage_html = sorted_list_of_unique_elements(self.webpage_html)
-        self.fault_urls = sorted_list_of_unique_elements(self.fault_urls)
-        self.fault_invalid_urls = sorted_list_of_unique_elements(
-            self.fault_invalid_urls
-        )
+        self.webpage_html = sorted_list_of_cleaned_urls(self.webpage_html)
+        self.fault_urls = sorted_list_of_cleaned_urls(self.fault_urls)
+        self.fault_invalid_urls = sorted_list_of_cleaned_urls(self.fault_invalid_urls)
 
     @staticmethod
     def from_toml(toml_file_path: str) -> "ResourceListing":
