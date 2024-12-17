@@ -18,7 +18,7 @@ from oss4climate.src.helpers import (
 from oss4climate.src.log import log_info
 from oss4climate.src.nlp.html_io import find_all_links_in_html
 from oss4climate.src.nlp.markdown_io import find_all_links_in_markdown
-from oss4climate.src.nlp.rst_io import find_all_links_in_rst
+from oss4climate.src.nlp.rst_io import RstParsingError, find_all_links_in_rst
 
 
 class RateLimitError(RuntimeError):
@@ -473,6 +473,9 @@ def fetch_all_project_urls_from_markdown_str(markdown_text: str) -> ParsingTarge
 
 
 def fetch_all_project_urls_from_rst_str(rst_text: str) -> ParsingTargets:
-    r = find_all_links_in_rst(rst_text)
+    try:
+        r = find_all_links_in_rst(rst_text)
+    except RstParsingError:
+        r = []
     shortlisted_urls = isolate_relevant_urls(r)
     return identify_parsing_targets(shortlisted_urls)
