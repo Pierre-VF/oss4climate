@@ -147,15 +147,17 @@ def scrape_all(
         x_type = r["readme_type"]
         if x_type == EnumDocumentationFileType.MARKDOWN.value:
             out = markdown_io.markdown_to_search_plaintext(
-                x, remove_code=True, remove_linebreaks=True
+                x,
+                remove_code=True,
             )
         elif x_type == EnumDocumentationFileType.RESTRUCTURED_TEXT.value:
             try:
                 out = rst_io.rst_to_search_plaintext(
-                    x, remove_code=True, remove_linebreaks=True
+                    x,
+                    remove_code=True,
                 )
             except rst_io.RstParsingError as e:
-                scrape_failures["RST_PARSING"] = e
+                scrape_failures[f"RST_PARSING:{r['url']}"] = e
                 # This is to avoid issues if the text is not markdown
                 out = x
         else:

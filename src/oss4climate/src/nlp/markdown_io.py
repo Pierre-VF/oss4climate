@@ -4,7 +4,6 @@ Module to manage markdown text
 
 import re
 
-from bs4 import BeautifulSoup
 from markdown import markdown
 
 from oss4climate.src.nlp.html_io import html_to_search_plaintext
@@ -38,28 +37,20 @@ def find_all_links_in_markdown(markdown_text: str) -> list[str]:
 
 
 def markdown_to_search_plaintext(
-    x: str | None, remove_code: bool = True, remove_linebreaks: bool = False
+    md_str: str | None,
+    remove_code: bool = True,
 ) -> str | None:
     """This method converts a markdown string to plaintext
 
-    :param x: _description_
-    :return: _description_
+    :param md_str: Markdown as str
+    :return: plaintext str (or None is input if None)
     """
-    if x is None:
+    if md_str is None:
         return None
-    html = markdown(x)
+    html = markdown(md_str)
 
     if remove_code:
         html = re.sub(r"<code>(.*?)</code >", " ", html)
         html = re.sub(r"<pre>(.*?)</pre>", " ", html)
 
-    x = html_to_search_plaintext(html)
-    return x
-
-    x = BeautifulSoup(html, features="html.parser")
-    text = "".join(x.find_all(string=True))
-    if remove_linebreaks:
-        text = text.replace("\n", " ")
-    # Collapse multiple spaces to a single
-    text = re.sub(r"\s+", " ", text)
-    return text.strip()
+    return html_to_search_plaintext(html)
