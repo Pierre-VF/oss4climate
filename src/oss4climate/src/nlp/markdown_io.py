@@ -29,6 +29,12 @@ def _fix_titles_and_multiple_spaces(text: str) -> str:
     return result
 
 
+def find_all_links_in_markdown(markdown_text: str) -> list[str]:
+    pattern = r"\[([^\]]+)\]\(([^\)]+)\)|\[([^\]]+)\]\s*\[([^\]]*)\]"
+    out = re.findall(pattern, markdown_text)
+    return [i[1] for i in out]
+
+
 def markdown_to_clean_plaintext(
     x: str | None, remove_code: bool = True, remove_linebreaks: bool = False
 ) -> str | None:

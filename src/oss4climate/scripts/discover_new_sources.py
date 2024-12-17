@@ -11,10 +11,12 @@ from oss4climate.scripts import (
     FILE_OUTPUT_LISTING_FEATHER,
     log_info,
 )
+from oss4climate.src.model import EnumDocumentationFileType
 from oss4climate.src.nlp.search import SearchResults
 from oss4climate.src.parsers import (
     ParsingTargets,
     fetch_all_project_urls_from_markdown_str,
+    fetch_all_project_urls_from_rst_str,
     github_data_io,
     url_qualifies,
 )
@@ -54,7 +56,13 @@ def discover_repositories_in_existing_readmes(output_file: str) -> None:
     for i, r in tqdm(dfs.iterrows()):
         try:
             if isinstance(r["readme"], str):
-                full_targets += fetch_all_project_urls_from_markdown_str(r["readme"])
+                readme_type = r["readme_type"]
+                if readme_type == EnumDocumentationFileType.MARKDOWN:
+                    full_targets += fetch_all_project_urls_from_markdown_str(
+                        r["readme"]
+                    )
+                elif readme_type == EnumDocumentationFileType.RESTRUCTURED_TEXT:
+                    full_targets += fetch_all_project_urls_from_rst_str(r["readme"])
         except Exception as e:
             print(f"Error with {r} // e={e}")
 
