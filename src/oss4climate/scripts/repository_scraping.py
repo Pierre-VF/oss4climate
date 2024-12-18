@@ -12,7 +12,7 @@ from oss4climate.scripts import (
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
 from oss4climate.src.model import EnumDocumentationFileType
-from oss4climate.src.nlp import markdown_io, rst_io
+from oss4climate.src.nlp import html_io, markdown_io, rst_io
 from oss4climate.src.parsers import (
     ParsingTargets,
     RateLimitError,
@@ -147,6 +147,11 @@ def scrape_all(
         x_type = r["readme_type"]
         if x_type == EnumDocumentationFileType.MARKDOWN.value:
             out = markdown_io.markdown_to_search_plaintext(
+                x,
+                remove_code=True,
+            )
+        elif x_type == EnumDocumentationFileType.HTML.value:
+            out = html_io.html_to_search_plaintext(
                 x,
                 remove_code=True,
             )

@@ -23,6 +23,17 @@ from oss4climate.src.parsers import (
 )
 
 
+def _parse_readme(readme: str, readme_type: EnumDocumentationFileType) -> str | None:
+    if readme_type == EnumDocumentationFileType.MARKDOWN:
+        return __fetch_from_markdown_str(readme)
+    elif readme_type == EnumDocumentationFileType.RESTRUCTURED_TEXT:
+        return __fetch_from_rst_str(readme)
+    elif readme_type == EnumDocumentationFileType.HTML:
+        return __fetch_from_webpage(readme)
+    else:
+        return None
+
+
 def fetch_all(
     listings_toml_file: str,
     cache_lifetime: timedelta | None = None,
@@ -43,10 +54,9 @@ def fetch_all(
             readme_i, readme_type_i = github_data_io.fetch_repository_readme(
                 i, cache_lifetime=cache_lifetime
             )
-            if readme_type_i == EnumDocumentationFileType.MARKDOWN:
-                res += __fetch_from_markdown_str(readme_i)
-            elif readme_type_i == EnumDocumentationFileType.RESTRUCTURED_TEXT:
-                res += __fetch_from_rst_str(readme_i)
+            r_i = _parse_readme(readme_i, readme_type_i)
+            if r_i is not None:
+                res += r_i
         except Exception:
             log_warning(f"Failed fetching listing README from {i}")
             failed_github_readme_listings.append(i)
@@ -56,10 +66,9 @@ def fetch_all(
             readme_i, readme_type_i = gitlab_data_io.fetch_repository_readme(
                 i, cache_lifetime=cache_lifetime
             )
-            if readme_type_i == EnumDocumentationFileType.MARKDOWN:
-                res += __fetch_from_markdown_str(readme_i)
-            elif readme_type_i == EnumDocumentationFileType.RESTRUCTURED_TEXT:
-                res += __fetch_from_rst_str(readme_i)
+            r_i = _parse_readme(readme_i, readme_type_i)
+            if r_i is not None:
+                res += r_i
         except Exception:
             log_warning(f"Failed fetching listing README from {i}")
             failed_gitlab_readme_listings.append(i)
