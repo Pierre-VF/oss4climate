@@ -116,8 +116,7 @@ def refresh_data(force_refresh: bool = False):
         log_warning("- Listing not found, downloading again")
         listing_search.download_listing_data_for_app()
     log_info("- Loading documents")
-    SEARCH_RESULTS.load_documents(FILE_OUTPUT_LISTING_FEATHER)
-    for __, r in tqdm(SEARCH_RESULTS.documents.iterrows()):
+    for r in tqdm(SEARCH_RESULTS.iter_documents(FILE_OUTPUT_LISTING_FEATHER)):
         # Skip repos with missing info
         for k in ["readme", "description"]:
             if r[k] is None:

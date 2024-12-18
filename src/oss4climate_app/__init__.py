@@ -71,11 +71,8 @@ async def lifespan(app: FastAPI):
         log_warning("- Listing not found, downloading again")
         listing_search.download_listing_data_for_app()
     log_info("- Loading documents")
-    SEARCH_RESULTS.load_documents(
-        FILE_OUTPUT_LISTING_FEATHER,
-    )
     log_info(" -- Feather file loaded")
-    for __, r in tqdm(SEARCH_RESULTS.documents.iterrows()):
+    for r in tqdm(SEARCH_RESULTS.iter_documents(FILE_OUTPUT_LISTING_FEATHER)):
         # Skip repos with missing info
         for k in ["readme", "description"]:
             if r[k] is None:
