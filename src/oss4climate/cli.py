@@ -92,7 +92,7 @@ def optimise():
         if x is None:
             return None
         try:
-            out = reduce_to_informative_lemmas(x, nlp_model=nlp_model)
+            out = " ".join(reduce_to_informative_lemmas(x, nlp_model=nlp_model))
         except Exception as e:
             log_warning(f"Lemmatisation error: {e}")
             out = "(OPTIMISATION ERROR)"
