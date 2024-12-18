@@ -88,11 +88,7 @@ def fetch_listing_of_listings_from_opensustain_webpage() -> ResourceListing:
     gits = isolate_relevant_urls(listing_urls)
     others = [i for i in listing_urls if i not in gits]
     return ResourceListing(
-        github_readme_listings=[
-            i for i in gits if i.startswith(github_data_io.GITHUB_URL_BASE)
-        ],
-        gitlab_readme_listings=[
-            i for i in gits if i.startswith(gitlab_data_io.GITLAB_URL_BASE)
-        ],
+        github_readme_listings=[i for i in gits if github_data_io.is_github_url(i)],
+        gitlab_readme_listings=[i for i in gits if gitlab_data_io.is_gitlab_url(i)],
         fault_urls=others,
     )

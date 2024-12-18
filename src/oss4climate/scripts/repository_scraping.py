@@ -11,7 +11,8 @@ from oss4climate.scripts import (
 )
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
-from oss4climate.src.nlp import markdown_io
+from oss4climate.src.model import EnumDocumentationFileType
+from oss4climate.src.nlp import markdown_io, rst_io
 from oss4climate.src.parsers import (
     ParsingTargets,
     RateLimitError,
@@ -38,7 +39,7 @@ def scrape_all(
 
     log_info("Loading organisations and repositories to be indexed")
     targets = ParsingTargets.from_toml(FILE_INPUT_INDEX)
-    targets.ensure_sorted_and_unique_elements()
+    targets.ensure_sorted_cleaned_and_unique_elements()
 
     failure_during_scraping = False
 
@@ -83,7 +84,7 @@ def scrape_all(
             log_warning(f" > Error with organisation ({e})")
             bad_organisations.append(org_url)
 
-    targets.ensure_sorted_and_unique_elements()  # since elements were added
+    targets.ensure_sorted_cleaned_and_unique_elements()  # since elements were added
     screening_results = []
 
     log_info("Fetching data for all repositories in Gitlab")
@@ -126,23 +127,45 @@ def scrape_all(
         scrape_failures["SCRAPING"] = e
         log_warning("Rate limit hit for Github - STOPPING Github scraping")
 
-    df = pd.DataFrame([i.__dict__ for i in screening_results])
+    def _f_fix(x):
+        out = x.__dict__
+        if isinstance(out["readme_type"], EnumDocumentationFileType):
+            out["readme_type"] = out["readme_type"].value
+        else:
+            out["readme_type"] = str(out["readme_type"])
+
+        return out
+
+    df = pd.DataFrame([_f_fix(i) for i in screening_results])
     df2export = df.set_index("id").drop(columns=["raw_details"])
 
     # Cleaning up markdown
-    def _f_readme_cleanup(x):
+    def _f_readme_cleanup(r):
+        x = r["readme"]
         if x is None:
             return "(NO DATA)"
-        try:
-            out = markdown_io.markdown_to_clean_plaintext(
-                x, remove_code=True, remove_linebreaks=True
+        x_type = r["readme_type"]
+        if x_type == EnumDocumentationFileType.MARKDOWN.value:
+            out = markdown_io.markdown_to_search_plaintext(
+                x,
+                remove_code=True,
             )
-        except Exception:
+        elif x_type == EnumDocumentationFileType.RESTRUCTURED_TEXT.value:
+            try:
+                out = rst_io.rst_to_search_plaintext(
+                    x,
+                    remove_code=True,
+                )
+            except rst_io.RstParsingError as e:
+                scrape_failures[f"RST_PARSING:{r['url']}"] = e
+                # This is to avoid issues if the text is not markdown
+                out = x
+        else:
             # This is to avoid issues if the text is not markdown
             out = x
         return out
 
-    df2export["readme"] = df2export["readme"].apply(_f_readme_cleanup)
+    df2export["readme"] = df2export.apply(_f_readme_cleanup, axis=1)
 
     # Dropping duplicates, if any
     df2export.drop_duplicates(subset=["url"], inplace=True)
@@ -218,3 +241,7 @@ def scrape_all(
         log_warning("Failure(s) happened during the scraping!")
 
     log_info("Done")
+
+
+if __name__ == "__main__":
+    scrape_all()

@@ -132,5 +132,5 @@ def update_listing_of_listings(
     listings_open_sustain = fetch_listing_of_listings_from_opensustain_webpage()
 
     list_of_listings += listings_open_sustain
-    list_of_listings.ensure_sorted_and_unique_elements()
+    list_of_listings.ensure_sorted_cleaned_and_unique_elements()
     list_of_listings.to_toml(target_output_file)

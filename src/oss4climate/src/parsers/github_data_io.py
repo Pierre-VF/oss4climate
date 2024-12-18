@@ -14,20 +14,26 @@ from functools import lru_cache
 import requests
 
 from oss4climate.src.config import SETTINGS
+from oss4climate.src.helpers import url_base_matches_domain
 from oss4climate.src.log import log_info
-from oss4climate.src.model import ProjectDetails
+from oss4climate.src.model import EnumDocumentationFileType, ProjectDetails
 from oss4climate.src.parsers import (
     ParsingTargets,
     cached_web_get_json,
     cached_web_get_text,
 )
 
-GITHUB_URL_BASE = "https://github.com/"
+GITHUB_DOMAIN = "github.com"
+GITHUB_URL_BASE = f"https://{GITHUB_DOMAIN}/"
+
+
+def is_github_url(url: str) -> bool:
+    return url_base_matches_domain(url, GITHUB_DOMAIN)
 
 
 def _extract_organisation_and_repository_as_url_block(x: str) -> str:
     # Cleaning up Github prefix
-    if x.startswith(GITHUB_URL_BASE):
+    if is_github_url(x):
         x = x.replace(GITHUB_URL_BASE, "")
     # Removing eventual extra information in URL
     for i in ["#", "&"]:
@@ -246,6 +252,10 @@ def fetch_repository_details(
     if license is not None:
         license = license["name"]
 
+    readme, readme_type = fetch_repository_readme(
+        repo_path, branch=branch2use, fail_on_issue=fail_on_issue
+    )
+
     details = ProjectDetails(
         id=repo_path,
         name=r["name"],
@@ -260,9 +270,8 @@ def fetch_repository_details(
         open_pull_requests=n_open_pull_requests,
         raw_details=r,
         master_branch=branch2use,
-        readme=fetch_repository_readme(
-            repo_path, branch=branch2use, fail_on_issue=fail_on_issue
-        ),
+        readme=readme,
+        readme_type=readme_type,
         is_fork=is_fork,
         forked_from=forked_from,
     )
@@ -274,19 +283,21 @@ def fetch_repository_readme(
     branch: str | None = None,
     fail_on_issue: bool = True,
     cache_lifetime: timedelta | None = None,
-) -> str | None:
+) -> tuple[str | None, EnumDocumentationFileType]:
     repo_name = _extract_organisation_and_repository_as_url_block(repo_name)
 
     if branch is None:
         branch = _master_branch_name(repo_name, cache_lifetime=cache_lifetime)
 
     md_content = None
+    readme_type = EnumDocumentationFileType.UNKNOWN
 
     file_tree = fetch_repository_file_tree(
         repo_name, fail_on_issue=fail_on_issue, cache_lifetime=cache_lifetime
     )
     for i in file_tree:
-        if i.lower().startswith("readme."):
+        lower_i = i.lower()
+        if lower_i.startswith("readme.") or lower_i.startswith("docs/readme."):
             try:
                 if branch == "main":
                     # Keeping what worked well so far
@@ -301,6 +312,7 @@ def fetch_repository_readme(
                     is_json=False,
                     cache_lifetime=cache_lifetime,
                 )
+                readme_type = EnumDocumentationFileType.from_filename(lower_i)
             except Exception as e:
                 md_content = f"ERROR with {i} ({e})"
 
@@ -315,7 +327,7 @@ def fetch_repository_readme(
         else:
             md_content = "(NO README)"
 
-    return md_content
+    return md_content, readme_type
 
 
 def fetch_repository_file_tree(
