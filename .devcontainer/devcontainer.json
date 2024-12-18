@@ -22,6 +22,9 @@
 				// https://github.com/DavidAnson/vscode-markdownlint
 				"davidanson.vscode-markdownlint",
 
+				// Resource monitor (memory and CPU profiling)
+				"kaih2o.python-resource-monitor",
+
 				// Python linting
 				"ms-python.vscode-pylance"
 			],
