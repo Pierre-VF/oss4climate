@@ -24,7 +24,8 @@ def _documents_loader(documents: pd.DataFrame | str | None, limit: int | None = 
         assert documents.endswith(
             ".feather"
         ), f"Only accepting .feather files (not {documents})"
-        new_docs = pd.read_feather(documents)
+        # dropping the readme column as it is too heavy and mot actually useful
+        new_docs = pd.read_feather(documents).drop(columns=["readme"])
         if limit is not None:
             new_docs = new_docs.head(int(limit))
     else:
@@ -54,7 +55,14 @@ class SearchResults:
     ) -> Iterable[dict[str, Any]]:
         new_docs = _documents_loader(documents=documents, limit=None)
         if load_in_object_without_readme:
-            self.__documents = new_docs.drop(columns=["readme"])
+            cols_to_drop = [
+                i
+                for i in ["readme", "optimised_readme", "optimised_description"]
+                if i in new_docs.columns
+            ]
+            self.__documents = new_docs.drop(
+                columns=cols_to_drop,
+            )
 
         for __, r in new_docs.iterrows():
             yield r

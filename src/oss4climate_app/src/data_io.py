@@ -7,7 +7,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from oss4climate.scripts import (
-    FILE_OUTPUT_LISTING_FEATHER,
+    FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
     listing_search,
 )
 from oss4climate.src.helpers import sorted_list_of_unique_elements
@@ -146,14 +146,16 @@ def clear_cache():
 
 
 def refresh_data(force_refresh: bool = False):
-    if force_refresh or not os.path.exists(FILE_OUTPUT_LISTING_FEATHER):
+    if force_refresh or not os.path.exists(FILE_OUTPUT_OPTIMISED_LISTING_FEATHER):
         log_warning("- Listing not found, downloading again")
         listing_search.download_listing_data_for_app()
     log_info("- Loading documents")
-    for r in tqdm(SEARCH_RESULTS.iter_documents(FILE_OUTPUT_LISTING_FEATHER)):
+    for r in tqdm(SEARCH_RESULTS.iter_documents(FILE_OUTPUT_OPTIMISED_LISTING_FEATHER)):
         # Skip repos with missing info
-        for k in ["readme", "description"]:
+        for k in ["optimised_readme", "optimised_description"]:
             if r[k] is None:
                 r[k] = ""
-        SEARCH_ENGINE_DESCRIPTIONS.index(url=r["url"], content=r["description"])
-        SEARCH_ENGINE_READMES.index(r["url"], content=r["readme"])
+        SEARCH_ENGINE_DESCRIPTIONS.index(
+            url=r["url"], content=r["optimised_description"]
+        )
+        SEARCH_ENGINE_READMES.index(r["url"], content=r["optimised_readme"])
