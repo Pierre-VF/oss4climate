@@ -47,8 +47,15 @@ class SearchResults:
         if load_documents and documents:
             self.load_documents(documents)
 
-    def iter_documents(self, documents: pd.DataFrame | str) -> Iterable[dict[str, Any]]:
+    def iter_documents(
+        self,
+        documents: pd.DataFrame | str,
+        load_in_object_without_readme: bool = False,
+    ) -> Iterable[dict[str, Any]]:
         new_docs = _documents_loader(documents=documents, limit=None)
+        if load_in_object_without_readme:
+            self.__documents = new_docs.drop(columns=["readme"])
+
         for __, r in new_docs.iterrows():
             yield r
 
@@ -129,10 +136,23 @@ class SearchResults:
 
     @property
     def documents(self) -> pd.DataFrame:
+        if self.__documents is None:
+            raise ValueError("Documents are not loaded")
         return self.__documents
 
     @property
+    def documents_without_readme(self) -> pd.DataFrame:
+        if self.__documents is None:
+            raise ValueError("Documents are not loaded")
+        if "readme" in self.__documents.columns:
+            return self.__documents.drop(columns=["readme"])
+        else:
+            return self.__documents
+
+    @property
     def n_documents(self) -> int:
+        if self.__documents is None:
+            return 0
         return len(self.__documents)
 
     @property

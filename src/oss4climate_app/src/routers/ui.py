@@ -14,11 +14,9 @@ from oss4climate_app.config import (
     URL_FEEDBACK_FORM,
 )
 from oss4climate_app.src.data_io import (
-    n_repositories_indexed,
+    repository_index_characteristics_from_documents,
     search_for_results,
-    unique_languages,
     unique_license_categories,
-    unique_licenses,
 )
 from oss4climate_app.src.log_activity import log_search
 from oss4climate_app.src.templates import render_template
@@ -46,13 +44,14 @@ def _render_ui_template(
 
 
 def ui_base_search_page(request: Request):
+    characteristics = repository_index_characteristics_from_documents()
     return _render_ui_template(
         request=request,
         template_file="search.html",
         content={
-            "n_repositories_indexed": n_repositories_indexed(),
-            "languages": unique_languages(),
-            "licenses": unique_licenses(),
+            "n_repositories_indexed": characteristics.n_repositories_indexed,
+            "languages": characteristics.unique_languages,
+            "licenses": characteristics.unique_licenses,
             "unique_license_categories": unique_license_categories(),
             "free_text": " ",
         },

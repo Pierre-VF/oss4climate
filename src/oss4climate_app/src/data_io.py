@@ -1,4 +1,5 @@
 import os
+from dataclasses import dataclass
 from datetime import date
 from functools import lru_cache
 
@@ -9,6 +10,7 @@ from oss4climate.scripts import (
     FILE_OUTPUT_LISTING_FEATHER,
     listing_search,
 )
+from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
 from oss4climate.src.nlp.search import SearchResults
 from oss4climate.src.nlp.search_engine import SearchEngine
@@ -26,23 +28,45 @@ def _f_none_to_unknown(x: str | date | None) -> str:
         return str(x)
 
 
+@dataclass
+class _RepositoryIndexCharacteristics:
+    unique_licenses: list[str]
+    unique_languages: list[str]
+    n_repositories_indexed: int
+
+
 @lru_cache(maxsize=1)
-def unique_licenses() -> list[str]:
-    x = SEARCH_RESULTS.documents["license"].apply(_f_none_to_unknown).unique()
-    x.sort()
-    return x.tolist()
+def repository_index_characteristics_from_documents(
+    documents: pd.DataFrame | str | None = None,
+):
+    if documents is None:
+        df_docs = SEARCH_RESULTS.documents_without_readme
+        if df_docs is None:
+            raise RuntimeError(
+                "Documents must be loaded when no input for 'documents' is provided"
+            )
+        n = len(df_docs)
+        licenses = df_docs["license"].unique().tolist()
+        languages = df_docs["language"].unique().tolist()
+    else:
+        licenses = []
+        languages = []
+        n = 0
+        for r in SEARCH_RESULTS.iter_documents(documents):
+            n += 1
+            licenses.append(_f_none_to_unknown(r["license"]))
+            languages.append(_f_none_to_unknown(r["language"]))
+
+    return _RepositoryIndexCharacteristics(
+        unique_licenses=sorted_list_of_unique_elements(licenses),
+        unique_languages=sorted_list_of_unique_elements(languages),
+        n_repositories_indexed=n,
+    )
 
 
 @lru_cache(maxsize=1)
 def unique_license_categories() -> list[LicenseCategoriesEnum]:
     return [i for i in LicenseCategoriesEnum]
-
-
-@lru_cache(maxsize=1)
-def unique_languages() -> list[str]:
-    x = SEARCH_RESULTS.documents["language"].apply(_f_none_to_unknown).unique()
-    x.sort()
-    return x.tolist()
 
 
 @lru_cache(maxsize=1)
@@ -53,7 +77,7 @@ def n_repositories_indexed():
 @lru_cache(maxsize=10)
 def search_for_results(query: str) -> pd.DataFrame:
     if len(query) < 1:
-        df_x = SEARCH_RESULTS.documents.drop(columns=["readme"])
+        df_x = SEARCH_RESULTS.documents_without_readme
         df_x["score"] = 1
         return df_x
 
@@ -70,6 +94,7 @@ def search_for_results(query: str) -> pd.DataFrame:
             right_index=True,
         )
         .fillna(0)
+        .infer_objects(copy=False)  # to avoid warning on downcasting
     )
 
     # Also checking for keywords in name
@@ -84,7 +109,7 @@ def search_for_results(query: str) -> pd.DataFrame:
         return res
 
     df_combined["score"] = df_combined["description"] * 10 + df_combined["readme"]
-    df_out = SEARCH_RESULTS.documents.drop(columns=["readme"]).merge(
+    df_out = SEARCH_RESULTS.documents_without_readme.merge(
         df_combined[["score"]],
         how="outer",
         left_on="url",
@@ -105,9 +130,7 @@ def search_for_results(query: str) -> pd.DataFrame:
 
 
 def clear_cache():
-    unique_licenses.cache_clear()
-    unique_languages.cache_clear()
-    n_repositories_indexed.cache_clear()
+    repository_index_characteristics_from_documents.cache_clear()
     search_for_results.cache_clear()
 
 
