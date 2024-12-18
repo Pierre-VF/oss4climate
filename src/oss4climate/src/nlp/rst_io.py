@@ -1,7 +1,5 @@
 import warnings
 
-from docutils.core import publish_string
-
 from oss4climate.src.nlp.html_io import find_all_links_in_html, html_to_search_plaintext
 
 
@@ -10,6 +8,8 @@ class RstParsingError(ValueError):
 
 
 def __rst_to_html(rst_str: str) -> str:
+    from docutils.core import publish_string
+
     try:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
