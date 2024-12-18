@@ -71,7 +71,7 @@ class SearchEngine:
             result[url] = idf_score * numerator / denominator
         return result
 
-    def search(self, query: str) -> dict[str, float]:
+    def search(self, query: str) -> pd.Series:
         keywords = normalize_string(query).split(" ")
         url_scores: dict[str, float] = {}
         for kw in keywords:
