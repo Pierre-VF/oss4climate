@@ -12,6 +12,10 @@ from oss4climate.scripts import (
 )
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
+from oss4climate.src.nlp.plaintext import (
+    get_spacy_english_model,
+    reduce_to_informative_lemmas,
+)
 from oss4climate.src.nlp.search import SearchResults
 from oss4climate.src.nlp.search_engine import SearchEngine
 from oss4climate.src.parsers.licenses import LicenseCategoriesEnum
@@ -74,6 +78,9 @@ def n_repositories_indexed():
     return SEARCH_RESULTS.n_documents
 
 
+NLP_MODEL = get_spacy_english_model()
+
+
 @lru_cache(maxsize=10)
 def search_for_results(query: str) -> pd.DataFrame:
     if len(query) < 1:
@@ -81,9 +88,13 @@ def search_for_results(query: str) -> pd.DataFrame:
         df_x["score"] = 1
         return df_x
 
-    log_info(f"Searching for {query}")
-    res_desc = SEARCH_ENGINE_DESCRIPTIONS.search(query)
-    res_readme = SEARCH_ENGINE_READMES.search(query)
+    lemmatized_query = " ".join(
+        reduce_to_informative_lemmas(query, nlp_model=NLP_MODEL)
+    )
+    log_info(f"Searching for {query} / lemmatized to {lemmatized_query}")
+
+    res_desc = SEARCH_ENGINE_DESCRIPTIONS.search(lemmatized_query)
+    res_readme = SEARCH_ENGINE_READMES.search(lemmatized_query)
 
     df_combined = (
         res_desc.to_frame("description")
