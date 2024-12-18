@@ -86,7 +86,7 @@ def optimise():
     df = pd.read_feather(scripts.FILE_OUTPUT_LISTING_FEATHER)
     log_info("- Loaded")
 
-    df_opt = df.drop(columns=["description", "readme"])
+    df_opt = df.copy()
 
     def _f_opt(x: str | None) -> str | None:
         if x is None:
@@ -99,9 +99,9 @@ def optimise():
         return out
 
     log_info("Optimising descriptions")
-    df_opt["description"] = df["description"].apply(_f_opt)
+    df_opt["optimised_description"] = df_opt["description"].apply(_f_opt)
     log_info("Optimising readmes")
-    df_opt["readme"] = df["readme"].apply(_f_opt)
+    df_opt["optimised_readme"] = df_opt["readme"].apply(_f_opt)
 
     log_info("Exporting input listing")
     df_opt.to_feather(scripts.FILE_OUTPUT_OPTIMISED_LISTING_FEATHER)

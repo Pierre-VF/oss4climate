@@ -4,6 +4,7 @@ from ftplib import FTP
 from oss4climate.scripts import (
     FILE_OUTPUT_LISTING_CSV,
     FILE_OUTPUT_LISTING_FEATHER,
+    FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
     FILE_OUTPUT_SUMMARY_TOML,
 )
 from oss4climate.src.config import SETTINGS
@@ -32,6 +33,7 @@ def publish_to_ftp() -> None:
         FILE_OUTPUT_SUMMARY_TOML,
         FILE_OUTPUT_LISTING_CSV,
         FILE_OUTPUT_LISTING_FEATHER,
+        FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
     ]
 
     with FTP(
