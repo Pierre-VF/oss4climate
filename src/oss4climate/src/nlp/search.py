@@ -3,6 +3,7 @@ Module to perform basic search
 """
 
 from datetime import UTC, datetime, timedelta
+from typing import Any, Iterable
 
 import numpy as np
 import pandas as pd
@@ -18,29 +19,48 @@ def _lower_str(x: str, *args, **kwargs):
         return ""
 
 
+def _documents_loader(documents: pd.DataFrame | str | None, limit: int | None = None):
+    if isinstance(documents, str):
+        assert documents.endswith(
+            ".feather"
+        ), f"Only accepting .feather files (not {documents})"
+        new_docs = pd.read_feather(documents)
+        if limit is not None:
+            new_docs = new_docs.head(int(limit))
+    else:
+        if limit is not None:
+            new_docs = documents.head(int(limit))
+        else:
+            new_docs = documents.copy()
+    return new_docs
+
+
 class SearchResults:
-    def __init__(self, documents: pd.DataFrame | str | None = None):
+    def __init__(
+        self, documents: pd.DataFrame | str | None = None, load_documents: bool = True
+    ):
         """Instantiates a result search object
 
         :param documents: dataframe(language,description,readme,latest_update) or filename (.feather)
         """
         self.__documents = None
-        if documents:
+        if load_documents and documents:
             self.load_documents(documents)
 
+    def iter_documents(
+        self,
+        documents: pd.DataFrame | str,
+        load_in_object_without_readme: bool = False,
+    ) -> Iterable[dict[str, Any]]:
+        new_docs = _documents_loader(documents=documents, limit=None)
+        if load_in_object_without_readme:
+            self.__documents = new_docs.drop(columns=["readme"])
+
+        for __, r in new_docs.iterrows():
+            yield r
+
     def load_documents(self, documents: pd.DataFrame | str, limit: int | None = None):
-        if isinstance(documents, str):
-            assert documents.endswith(
-                ".feather"
-            ), f"Only accepting .feather files (not {documents})"
-            new_docs = pd.read_feather(documents)
-            if limit is not None:
-                new_docs = new_docs.head(int(limit))
-        else:
-            if limit is not None:
-                new_docs = documents.head(int(limit))
-            else:
-                new_docs = documents.copy()
+        new_docs = _documents_loader(documents=documents, limit=limit)
         if self.__documents:
             self.__documents += new_docs
         else:
@@ -116,10 +136,23 @@ class SearchResults:
 
     @property
     def documents(self) -> pd.DataFrame:
+        if self.__documents is None:
+            raise ValueError("Documents are not loaded")
         return self.__documents
 
     @property
+    def documents_without_readme(self) -> pd.DataFrame:
+        if self.__documents is None:
+            raise ValueError("Documents are not loaded")
+        if "readme" in self.__documents.columns:
+            return self.__documents.drop(columns=["readme"])
+        else:
+            return self.__documents
+
+    @property
     def n_documents(self) -> int:
+        if self.__documents is None:
+            return 0
         return len(self.__documents)
 
     @property

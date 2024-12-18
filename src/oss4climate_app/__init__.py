@@ -71,11 +71,13 @@ async def lifespan(app: FastAPI):
         log_warning("- Listing not found, downloading again")
         listing_search.download_listing_data_for_app()
     log_info("- Loading documents")
-    SEARCH_RESULTS.load_documents(
-        FILE_OUTPUT_LISTING_FEATHER,
-    )
     log_info(" -- Feather file loaded")
-    for __, r in tqdm(SEARCH_RESULTS.documents.iterrows()):
+    for r in tqdm(
+        SEARCH_RESULTS.iter_documents(
+            FILE_OUTPUT_LISTING_FEATHER,
+            load_in_object_without_readme=True,  # As documents are used later for display
+        )
+    ):
         # Skip repos with missing info
         for k in ["readme", "description"]:
             if r[k] is None:
@@ -83,6 +85,8 @@ async def lifespan(app: FastAPI):
         SEARCH_ENGINE_DESCRIPTIONS.index(url=r["url"], content=r["description"])
         SEARCH_ENGINE_READMES.index(r["url"], content=r["readme"])
     log_info(" -- All repos loaded")
+    ui.repository_index_characteristics_from_documents()
+    log_info(" -- All metrics loaded")
     yield
     log_info("Exiting app")
 
@@ -106,7 +110,9 @@ def get_top_urls(scores_dict: dict, n: int):
 @app.get("/")
 async def base_landing(request: Request, channel: Optional[str] = None):
     log_landing(request=request, channel=channel)
-    return ui.ui_base_search_page(request=request)
+    return ui.ui_base_search_page(
+        request=request,
+    )
 
 
 @app.head("/", include_in_schema=False, status_code=204)

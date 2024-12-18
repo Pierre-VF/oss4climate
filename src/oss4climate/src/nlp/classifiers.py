@@ -3,10 +3,11 @@ Module for text classification
 """
 
 import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def tf_idf(documents: list[str]) -> pd.DataFrame:
+    from sklearn.feature_extraction.text import TfidfVectorizer
+
     # Initialize TfidfVectorizer
     vectorizer = TfidfVectorizer()
 
