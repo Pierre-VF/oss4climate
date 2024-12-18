@@ -25,6 +25,7 @@ def update_url_scores(old: dict[str, float], new: dict[str, float]):
 
 
 def normalize_string(input_string: str) -> str:
+    # Note : this currently does stuff beyond the lemmatizer optimisation (hence required to keep for well functioning)
     translation_table = str.maketrans(string.punctuation, " " * len(string.punctuation))
     string_without_punc = input_string.translate(translation_table)
     string_without_double_spaces = " ".join(string_without_punc.split())

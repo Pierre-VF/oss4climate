@@ -24,8 +24,30 @@ def _documents_loader(documents: pd.DataFrame | str | None, limit: int | None = 
         assert documents.endswith(
             ".feather"
         ), f"Only accepting .feather files (not {documents})"
-        # dropping the readme column as it is too heavy and mot actually useful
-        new_docs = pd.read_feather(documents).drop(columns=["readme"])
+        # This line and the usage of pandas is part of an explicit optimisation scheme (for <512 MB in operations)
+        new_docs = pd.read_feather(
+            documents,
+            columns=[
+                "id",
+                "name",
+                "organisation",
+                "url",
+                "website",
+                "optimised_description",
+                "license",
+                "latest_update",
+                "language",
+                "last_commit",
+                "open_pull_requests",
+                "master_branch",
+                "optimised_readme",
+                "is_fork",
+                "forked_from",
+                "readme_type",
+                "description",
+            ],
+            # dtype_backend="pyarrow",
+        )
         if limit is not None:
             new_docs = new_docs.head(int(limit))
     else:
