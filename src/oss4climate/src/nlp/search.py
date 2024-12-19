@@ -2,11 +2,13 @@
 Module to perform basic search
 """
 
+import sys
 from datetime import UTC, datetime, timedelta
 from typing import Any, Iterable
 
 import pandas as pd
 
+from oss4climate.src.log import log_warning
 from oss4climate.src.nlp.classifiers import tf_idf
 from oss4climate.src.parsers.licenses import license_category_from_license_name
 
@@ -82,11 +84,32 @@ class SearchResults:
         self,
         documents: pd.DataFrame | str,
         load_in_object_without_readme: bool = False,
+        memory_safe: bool = True,
+        bytes_limit: int = 2e5,
     ) -> Iterable[dict[str, Any]]:
         new_docs = _documents_loader(documents=documents, limit=None)
 
-        for __, r in new_docs.iterrows():
-            yield r
+        if memory_safe:
+            # Using a protection against wild readmes (with an assumption that only the readmes do run wild)
+            for k, r in new_docs.iterrows():
+                n_size = sys.getsizeof(r)
+                if n_size < bytes_limit:
+                    yield r
+                else:
+                    log_warning(
+                        f"Truncating readme of {r['url']} as it would occupy {n_size/1e6} MB in memory"
+                    )
+                    # TODO : this is a quickfix
+                    # Cutting the readme as it's likely to overflow memory
+                    readme_opt = r["optimised_readme"][
+                        : int(bytes_limit)
+                    ]  # heuristic that every char takes a byte
+                    new_docs.loc[k, "optimised_readme"] = readme_opt
+                    r["optimised_readme"] = readme_opt
+                    yield r
+            else:
+                for __, r in new_docs.iterrows():
+                    yield r
 
         # Loading after iterating as a way to preserve RAM
         if load_in_object_without_readme:
