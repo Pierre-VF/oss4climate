@@ -9,6 +9,7 @@ import sys
 from collections import defaultdict
 from functools import cached_property
 from math import log
+from typing import Any
 
 import pandas as pd
 
@@ -24,7 +25,9 @@ def update_url_scores(old: dict[str, float], new: dict[str, float]):
     return old
 
 
-def normalize_string(input_string: str) -> str:
+def normalize_string(input_string: str | Any) -> str:
+    if not isinstance(input_string, str):
+        return ""
     # Note : this currently does stuff beyond the lemmatizer optimisation (hence required to keep for well functioning)
     translation_table = str.maketrans(string.punctuation, " " * len(string.punctuation))
     string_without_punc = input_string.translate(translation_table)
@@ -95,7 +98,16 @@ class SearchEngine:
             more than 'bytes_limit' - this is useful for avoiding errors with tricky READMEs), defaults to True
         :param bytes_limit: limit of number of bytes of index extension (used wnen 'memory_safe' is True), defaults to 5e5
         """
-        self._documents_length[url] = len(content)
+        if isinstance(content, str):
+            self._documents_length[url] = len(content)
+        else:
+            if pd.isna(content):
+                self._documents_length[url] = 0
+            else:
+                log_warning(
+                    f"Uncovered indexing type ({content.__class__.__name__} - skipping indexing of {url})"
+                )
+                self._documents_length[url] = 0
         words = normalize_string(content).split(" ")
         if memory_safe:
             new_words_indexed = dict()
