@@ -26,3 +26,15 @@ class Settings(pydantic_settings.BaseSettings):
 load_dotenv(override=True)
 
 SETTINGS = Settings()
+
+
+# Link to all documents
+FILE_INPUT_INDEX = "indexes/repositories.toml"
+FILE_INPUT_LISTINGS_INDEX = "indexes/listings.toml"
+FILE_OUTPUT_DIR = ".data"
+FILE_OUTPUT_LISTING_CSV = f"{FILE_OUTPUT_DIR}/listing_data.csv"
+FILE_OUTPUT_LISTING_FEATHER = f"{FILE_OUTPUT_DIR}/listing_data.feather"
+FILE_OUTPUT_OPTIMISED_LISTING_FEATHER = (
+    f"{FILE_OUTPUT_DIR}/optimised_listing_data.feather"
+)
+FILE_OUTPUT_SUMMARY_TOML = f"{FILE_OUTPUT_DIR}/summary.toml"

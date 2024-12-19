@@ -46,8 +46,19 @@ def _documents_loader(documents: pd.DataFrame | str | None, limit: int | None = 
                 "readme_type",
                 "description",
             ],
-            # dtype_backend="pyarrow",
+            dtype_backend="pyarrow",
         )
+        new_docs.loc[
+            :,
+            [
+                "description",
+                "language",
+                "license",
+                "optimised_readme",
+                "optimised_description",
+            ],
+        ].fillna(value="", inplace=True)
+
         if limit is not None:
             new_docs = new_docs.head(int(limit))
     else:

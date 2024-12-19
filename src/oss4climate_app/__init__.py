@@ -8,11 +8,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from tqdm import tqdm
 
-from oss4climate.scripts import (
-    FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
-    listing_search,
-)
-from oss4climate.src.config import SETTINGS
+from oss4climate.src.config import FILE_OUTPUT_OPTIMISED_LISTING_FEATHER, SETTINGS
 from oss4climate.src.log import log_info, log_warning
 from oss4climate_app.config import STATIC_FILES_PATH, URL_APP, URL_FAVICON
 from oss4climate_app.src.data_io import (
@@ -68,6 +64,9 @@ async def lifespan(app: FastAPI):
     initialise_error_logging()
     log_info("Starting app")
     if not os.path.exists(FILE_OUTPUT_OPTIMISED_LISTING_FEATHER):
+        # Only importing this heavier part if needed
+        from oss4climate.scripts import listing_search
+
         log_warning("- Listing not found, downloading again")
         listing_search.download_listing_data_for_app()
     log_info("- Loading documents")

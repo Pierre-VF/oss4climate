@@ -3,7 +3,7 @@ from urllib.request import urlretrieve
 
 import pandas as pd
 
-from oss4climate.scripts import (
+from oss4climate.src.config import (
     FILE_OUTPUT_DIR,
     FILE_OUTPUT_LISTING_CSV,
     FILE_OUTPUT_LISTING_FEATHER,

@@ -2,13 +2,13 @@ import pandas as pd
 from tomlkit import document, dump
 
 from oss4climate import scripts
-from oss4climate.scripts import (
+from oss4climate.src.config import (
     FILE_INPUT_INDEX,
     FILE_OUTPUT_DIR,
     FILE_OUTPUT_LISTING_CSV,
+    FILE_OUTPUT_LISTING_FEATHER,
+    FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
     FILE_OUTPUT_SUMMARY_TOML,
-    format_all_files,
-    format_individual_file,
 )
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
@@ -234,7 +234,7 @@ def scrape_all(
         
     """
     )
-    format_all_files()
+    scripts.format_all_files()
 
     file_failures_toml = f"{FILE_OUTPUT_DIR}/failures_scraping.toml"
     scrape_failures_as_jsonable_dict = {
@@ -245,7 +245,7 @@ def scrape_all(
     log_info(f"Exporting failures to {file_failures_toml}")
     with open(file_failures_toml, "w") as fp:
         dump(doc_failures, fp, sort_keys=True)
-    format_individual_file(file_failures_toml)
+    scripts.format_individual_file(file_failures_toml)
 
     if failure_during_scraping:
         log_warning("Failure(s) happened during the scraping!")
@@ -259,7 +259,7 @@ def optimise_scraped_data_for_search():
     log_info("- Loaded")
 
     log_info("Loading input listing")
-    df = pd.read_feather(scripts.FILE_OUTPUT_LISTING_FEATHER)
+    df = pd.read_feather(FILE_OUTPUT_LISTING_FEATHER)
     log_info("- Loaded")
 
     df_opt = df.copy()
@@ -280,7 +280,7 @@ def optimise_scraped_data_for_search():
     df_opt["optimised_readme"] = df_opt["readme"].apply(_f_opt)
 
     log_info("Exporting input listing")
-    df_opt.to_feather(scripts.FILE_OUTPUT_OPTIMISED_LISTING_FEATHER)
+    df_opt.to_feather(FILE_OUTPUT_OPTIMISED_LISTING_FEATHER)
     log_info("- Exported")
 
 

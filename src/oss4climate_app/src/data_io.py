@@ -6,9 +6,8 @@ from functools import lru_cache
 import pandas as pd
 from tqdm import tqdm
 
-from oss4climate.scripts import (
+from oss4climate.src.config import (
     FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
-    listing_search,
 )
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
@@ -147,6 +146,8 @@ def clear_cache():
 
 def refresh_data(force_refresh: bool = False):
     if force_refresh or not os.path.exists(FILE_OUTPUT_OPTIMISED_LISTING_FEATHER):
+        from oss4climate.scripts import listing_search
+
         log_warning("- Listing not found, downloading again")
         listing_search.download_listing_data_for_app()
     log_info("- Loading documents")

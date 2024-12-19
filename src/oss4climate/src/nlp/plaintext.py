@@ -36,8 +36,9 @@ def _f_token_is_url(token) -> bool:
     return token.like_url and ("://" in token.text)
 
 
-def extract_urls(txt: str) -> list[str]:
-    nlp_model = get_spacy_english_model()
+def extract_urls(txt: str, nlp_model=None) -> list[str]:
+    if nlp_model is None:
+        nlp_model = get_spacy_english_model()
     urls = [token.text for token in nlp_model(txt) if _f_token_is_url(token)]
     return urls
 
