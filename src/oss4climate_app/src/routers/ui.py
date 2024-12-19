@@ -5,6 +5,7 @@ Module containing the API code
 from datetime import date, timedelta
 from typing import Optional
 
+import pandas as pd
 from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import HTMLResponse
 
@@ -122,6 +123,18 @@ async def search_results(
 
     show_previous = current_offset > 0
     show_next = current_offset <= (n_total_found - n_results)
+
+    # Filling the gaps for clean display
+    cols_to_clean = ["description", "language", "license"]
+    df_shown.loc[:, cols_to_clean] = (
+        df_shown[cols_to_clean]
+        .replace(
+            {
+                None: pd.NA,
+            }
+        )
+        .fillna(value="(no data)")
+    )
 
     # Log results
     background_tasks.add_task(

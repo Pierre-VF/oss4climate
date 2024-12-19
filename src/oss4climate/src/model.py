@@ -12,6 +12,7 @@ from pydantic import BaseModel
 class EnumDocumentationFileType(Enum):
     MARKDOWN = "md"
     RESTRUCTURED_TEXT = "rst"
+    HTML = "html"
     UNKNOWN = "?"
 
     def from_filename(f: str) -> "EnumDocumentationFileType":
@@ -20,6 +21,8 @@ class EnumDocumentationFileType(Enum):
             return EnumDocumentationFileType.MARKDOWN
         elif f_lower.endswith(".rst"):
             return EnumDocumentationFileType.RESTRUCTURED_TEXT
+        elif f_lower.endswith(".html"):
+            return EnumDocumentationFileType.HTML
         else:
             return EnumDocumentationFileType.UNKNOWN
 

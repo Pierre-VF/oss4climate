@@ -6,9 +6,11 @@ import os
 
 from tqdm import tqdm
 
-from oss4climate.scripts import (
+from oss4climate.src.config import (
     FILE_INPUT_INDEX,
     FILE_OUTPUT_LISTING_FEATHER,
+)
+from oss4climate.src.log import (
     log_info,
 )
 from oss4climate.src.model import EnumDocumentationFileType

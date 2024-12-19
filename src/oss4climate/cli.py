@@ -55,6 +55,7 @@ def publish():
 def generate_listing():
     """Generates the updated listing"""
     repository_scraping.scrape_all()
+    repository_scraping.optimise_scraped_data_for_search()
 
 
 @app.command()
@@ -67,6 +68,11 @@ def search():
 def download_data():
     """Downloads the latest listing"""
     listing_search.download_data()
+
+
+@app.command()
+def optimise():
+    repository_scraping.optimise_scraped_data_for_search()
 
 
 if __name__ == "__main__":

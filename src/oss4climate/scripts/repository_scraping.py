@@ -1,18 +1,23 @@
 import pandas as pd
 from tomlkit import document, dump
 
-from oss4climate.scripts import (
+from oss4climate import scripts
+from oss4climate.src.config import (
     FILE_INPUT_INDEX,
     FILE_OUTPUT_DIR,
     FILE_OUTPUT_LISTING_CSV,
+    FILE_OUTPUT_LISTING_FEATHER,
+    FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
     FILE_OUTPUT_SUMMARY_TOML,
-    format_all_files,
-    format_individual_file,
 )
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
 from oss4climate.src.model import EnumDocumentationFileType
-from oss4climate.src.nlp import markdown_io, rst_io
+from oss4climate.src.nlp import html_io, markdown_io, rst_io
+from oss4climate.src.nlp.plaintext import (
+    get_spacy_english_model,
+    reduce_to_informative_lemmas,
+)
 from oss4climate.src.parsers import (
     ParsingTargets,
     RateLimitError,
@@ -150,6 +155,11 @@ def scrape_all(
                 x,
                 remove_code=True,
             )
+        elif x_type == EnumDocumentationFileType.HTML.value:
+            out = html_io.html_to_search_plaintext(
+                x,
+                remove_code=True,
+            )
         elif x_type == EnumDocumentationFileType.RESTRUCTURED_TEXT.value:
             try:
                 out = rst_io.rst_to_search_plaintext(
@@ -224,7 +234,7 @@ def scrape_all(
         
     """
     )
-    format_all_files()
+    scripts.format_all_files()
 
     file_failures_toml = f"{FILE_OUTPUT_DIR}/failures_scraping.toml"
     scrape_failures_as_jsonable_dict = {
@@ -235,12 +245,43 @@ def scrape_all(
     log_info(f"Exporting failures to {file_failures_toml}")
     with open(file_failures_toml, "w") as fp:
         dump(doc_failures, fp, sort_keys=True)
-    format_individual_file(file_failures_toml)
+    scripts.format_individual_file(file_failures_toml)
 
     if failure_during_scraping:
         log_warning("Failure(s) happened during the scraping!")
 
     log_info("Done")
+
+
+def optimise_scraped_data_for_search():
+    log_info("Loading spaCy english model")
+    nlp_model = get_spacy_english_model()
+    log_info("- Loaded")
+
+    log_info("Loading input listing")
+    df = pd.read_feather(FILE_OUTPUT_LISTING_FEATHER)
+    log_info("- Loaded")
+
+    df_opt = df.copy()
+
+    def _f_opt(x: str | None) -> str | None:
+        if x is None:
+            return None
+        try:
+            out = " ".join(reduce_to_informative_lemmas(x, nlp_model=nlp_model))
+        except Exception as e:
+            log_warning(f"Lemmatisation error: {e}")
+            out = "(OPTIMISATION ERROR)"
+        return out
+
+    log_info("Optimising descriptions")
+    df_opt["optimised_description"] = df_opt["description"].apply(_f_opt)
+    log_info("Optimising readmes")
+    df_opt["optimised_readme"] = df_opt["readme"].apply(_f_opt)
+
+    log_info("Exporting input listing")
+    df_opt.to_feather(FILE_OUTPUT_OPTIMISED_LISTING_FEATHER)
+    log_info("- Exported")
 
 
 if __name__ == "__main__":

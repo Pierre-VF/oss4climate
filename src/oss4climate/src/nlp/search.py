@@ -2,12 +2,14 @@
 Module to perform basic search
 """
 
+import sys
 from datetime import UTC, datetime, timedelta
 from typing import Any, Iterable
 
-import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
+from oss4climate.src.log import log_warning
 from oss4climate.src.nlp.classifiers import tf_idf
 from oss4climate.src.parsers.licenses import license_category_from_license_name
 
@@ -24,7 +26,39 @@ def _documents_loader(documents: pd.DataFrame | str | None, limit: int | None = 
         assert documents.endswith(
             ".feather"
         ), f"Only accepting .feather files (not {documents})"
-        new_docs = pd.read_feather(documents)
+        # This line and the usage of pandas is part of an explicit optimisation scheme (for <512 MB in operations)
+        new_docs = pd.read_feather(
+            documents,
+            columns=[
+                "id",
+                "name",
+                "organisation",
+                "url",
+                "website",
+                "optimised_description",
+                "license",
+                "latest_update",
+                "language",
+                "last_commit",
+                "open_pull_requests",
+                "master_branch",
+                "optimised_readme",
+                "is_fork",
+                "forked_from",
+                "readme_type",
+                "description",
+            ],
+            # dtype_backend="pyarrow",
+        )
+        sparse_cols = [
+            "description",
+            "language",
+            "license",
+            "optimised_readme",
+            "optimised_description",
+        ]
+        new_docs.loc[:, sparse_cols] = new_docs[sparse_cols].astype("Sparse[str]")
+
         if limit is not None:
             new_docs = new_docs.head(int(limit))
     else:
@@ -51,13 +85,49 @@ class SearchResults:
         self,
         documents: pd.DataFrame | str,
         load_in_object_without_readme: bool = False,
+        memory_safe: bool = True,
+        bytes_limit: int = 2e5,
+        display_tqdm: bool = False,
     ) -> Iterable[dict[str, Any]]:
         new_docs = _documents_loader(documents=documents, limit=None)
-        if load_in_object_without_readme:
-            self.__documents = new_docs.drop(columns=["readme"])
 
-        for __, r in new_docs.iterrows():
-            yield r
+        if display_tqdm:
+            iterator_to_run = tqdm(new_docs.iterrows())
+        else:
+            iterator_to_run = new_docs.iterrows()
+
+        if memory_safe:
+            # Using a protection against wild readmes (with an assumption that only the readmes do run wild)
+            for k, r in iterator_to_run:
+                n_size = sys.getsizeof(r)
+                if n_size < bytes_limit:
+                    yield r
+                else:
+                    log_warning(
+                        f"Truncating readme of {r['url']} as it would occupy {n_size/1e6} MB in memory"
+                    )
+                    # TODO : this is a quickfix
+                    # Cutting the readme as it's likely to overflow memory
+                    readme_opt = r["optimised_readme"][
+                        : int(bytes_limit)
+                    ]  # heuristic that every char takes a byte
+                    new_docs.loc[k, "optimised_readme"] = readme_opt
+                    r["optimised_readme"] = readme_opt
+                    yield r
+        else:
+            for __, r in iterator_to_run:
+                yield r
+
+        # Loading after iterating as a way to preserve RAM
+        if load_in_object_without_readme:
+            cols_to_drop = [
+                i
+                for i in ["readme", "optimised_readme", "optimised_description"]
+                if i in new_docs.columns
+            ]
+            self.__documents = new_docs.drop(
+                columns=cols_to_drop,
+            )
 
     def load_documents(self, documents: pd.DataFrame | str, limit: int | None = None):
         new_docs = _documents_loader(documents=documents, limit=limit)
@@ -93,9 +163,7 @@ class SearchResults:
         )
         if include_none:
             df_none = self.__documents[
-                self.__documents["language"].apply(
-                    lambda x: (x is None) or (np.isreal(x) and np.isnan(x))
-                )
+                self.__documents["language"].apply(lambda x: (x is None) or pd.isna(x))
             ]
             df_i = pd.concat([df_i, df_none])
 
