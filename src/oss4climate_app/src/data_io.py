@@ -43,14 +43,15 @@ def repository_index_characteristics_from_documents(
     documents: pd.DataFrame | str | None = None,
 ):
     if documents is None:
-        df_docs = SEARCH_RESULTS.documents_without_readme
-        if df_docs is None:
+        n = SEARCH_RESULTS.n_documents
+        if n == 0:
             raise RuntimeError(
                 "Documents must be loaded when no input for 'documents' is provided"
             )
-        n = len(df_docs)
-        licenses = df_docs["license"].unique().tolist()
-        languages = df_docs["language"].unique().tolist()
+        licenses = SEARCH_RESULTS.documents_without_readme["license"].unique().tolist()
+        languages = (
+            SEARCH_RESULTS.documents_without_readme["language"].unique().tolist()
+        )
     else:
         licenses = []
         languages = []

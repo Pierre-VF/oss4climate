@@ -85,6 +85,11 @@ class SearchResults:
         load_in_object_without_readme: bool = False,
     ) -> Iterable[dict[str, Any]]:
         new_docs = _documents_loader(documents=documents, limit=None)
+
+        for __, r in new_docs.iterrows():
+            yield r
+
+        # Loading after iterating as a way to preserve RAM
         if load_in_object_without_readme:
             cols_to_drop = [
                 i
@@ -94,9 +99,6 @@ class SearchResults:
             self.__documents = new_docs.drop(
                 columns=cols_to_drop,
             )
-
-        for __, r in new_docs.iterrows():
-            yield r
 
     def load_documents(self, documents: pd.DataFrame | str, limit: int | None = None):
         new_docs = _documents_loader(documents=documents, limit=limit)
