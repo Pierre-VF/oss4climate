@@ -12,7 +12,7 @@ def __rst_to_html(rst_str: str) -> str:
 
     try:
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+            # warnings.simplefilter("ignore")
             x = publish_string(
                 rst_str,
                 parser_name="restructuredtext",
