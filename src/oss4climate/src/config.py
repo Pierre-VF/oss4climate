@@ -26,6 +26,13 @@ class Settings(pydantic_settings.BaseSettings):
     def path_scraping_sqlite_db(self) -> str:
         return f"{self.LOCAL_FOLDER}/{self.SCRAPING_SQLITE_DB}"
 
+    @property
+    def path_app_sqlite_db(self) -> str:
+        if self.APP_SQLITE_DB.startswith(self.LOCAL_FOLDER):
+            # for backwards compatibility
+            return self.APP_SQLITE_DB
+        return f"{self.LOCAL_FOLDER}/{self.APP_SQLITE_DB}"
+
 
 # Loading settings
 load_dotenv(override=True)
