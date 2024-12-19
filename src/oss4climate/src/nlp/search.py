@@ -46,18 +46,16 @@ def _documents_loader(documents: pd.DataFrame | str | None, limit: int | None = 
                 "readme_type",
                 "description",
             ],
-            dtype_backend="pyarrow",
+            # dtype_backend="pyarrow",
         )
-        new_docs.loc[
-            :,
-            [
-                "description",
-                "language",
-                "license",
-                "optimised_readme",
-                "optimised_description",
-            ],
-        ].fillna(value="", inplace=True)
+        sparse_cols = [
+            "description",
+            "language",
+            "license",
+            "optimised_readme",
+            "optimised_description",
+        ]
+        new_docs.loc[:, sparse_cols] = new_docs[sparse_cols].astype("Sparse[str]")
 
         if limit is not None:
             new_docs = new_docs.head(int(limit))
