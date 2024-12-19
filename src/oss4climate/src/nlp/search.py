@@ -7,6 +7,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any, Iterable
 
 import pandas as pd
+from tqdm import tqdm
 
 from oss4climate.src.log import log_warning
 from oss4climate.src.nlp.classifiers import tf_idf
@@ -86,12 +87,18 @@ class SearchResults:
         load_in_object_without_readme: bool = False,
         memory_safe: bool = True,
         bytes_limit: int = 2e5,
+        display_tqdm: bool = False,
     ) -> Iterable[dict[str, Any]]:
         new_docs = _documents_loader(documents=documents, limit=None)
 
+        if display_tqdm:
+            iterator_to_run = tqdm(new_docs.iterrows())
+        else:
+            iterator_to_run = new_docs.iterrows()
+
         if memory_safe:
             # Using a protection against wild readmes (with an assumption that only the readmes do run wild)
-            for k, r in new_docs.iterrows():
+            for k, r in iterator_to_run:
                 n_size = sys.getsizeof(r)
                 if n_size < bytes_limit:
                     yield r
@@ -107,9 +114,9 @@ class SearchResults:
                     new_docs.loc[k, "optimised_readme"] = readme_opt
                     r["optimised_readme"] = readme_opt
                     yield r
-            else:
-                for __, r in new_docs.iterrows():
-                    yield r
+        else:
+            for __, r in iterator_to_run:
+                yield r
 
         # Loading after iterating as a way to preserve RAM
         if load_in_object_without_readme:

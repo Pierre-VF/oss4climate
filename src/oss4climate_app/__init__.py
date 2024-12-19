@@ -6,7 +6,6 @@ from typing import Optional
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from tqdm import tqdm
 
 from oss4climate.src.config import FILE_OUTPUT_OPTIMISED_LISTING_FEATHER, SETTINGS
 from oss4climate.src.log import log_info, log_warning
@@ -71,11 +70,11 @@ async def lifespan(app: FastAPI):
         listing_search.download_listing_data_for_app()
     log_info("- Loading documents")
     log_info(" -- Feather file loaded")
-    for r in tqdm(
-        SEARCH_RESULTS.iter_documents(
-            FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
-            load_in_object_without_readme=True,  # As documents are used later for display
-        )
+    for r in SEARCH_RESULTS.iter_documents(
+        FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
+        load_in_object_without_readme=True,  # As documents are used later for display
+        display_tqdm=True,
+        memory_safe=True,  # essential in environments with little memory
     ):
         # Skip repos with missing info
         for k in ["optimised_readme", "optimised_description"]:

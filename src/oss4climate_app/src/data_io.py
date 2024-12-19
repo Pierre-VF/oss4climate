@@ -4,7 +4,6 @@ from datetime import date
 from functools import lru_cache
 
 import pandas as pd
-from tqdm import tqdm
 
 from oss4climate.src.config import (
     FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
@@ -152,7 +151,13 @@ def refresh_data(force_refresh: bool = False):
         log_warning("- Listing not found, downloading again")
         listing_search.download_listing_data_for_app()
     log_info("- Loading documents")
-    for r in tqdm(SEARCH_RESULTS.iter_documents(FILE_OUTPUT_OPTIMISED_LISTING_FEATHER)):
+    # Make sure to coordinate the below with the app start procedure
+    for r in SEARCH_RESULTS.iter_documents(
+        FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
+        load_in_object_without_readme=True,
+        display_tqdm=True,
+        memory_safe=True,
+    ):
         # Skip repos with missing info
         for k in ["optimised_readme", "optimised_description"]:
             if r[k] is None:
