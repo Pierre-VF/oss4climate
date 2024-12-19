@@ -5,7 +5,6 @@ Module to perform basic search
 from datetime import UTC, datetime, timedelta
 from typing import Any, Iterable
 
-import numpy as np
 import pandas as pd
 
 from oss4climate.src.nlp.classifiers import tf_idf
@@ -134,9 +133,7 @@ class SearchResults:
         )
         if include_none:
             df_none = self.__documents[
-                self.__documents["language"].apply(
-                    lambda x: (x is None) or (np.isreal(x) and np.isnan(x))
-                )
+                self.__documents["language"].apply(lambda x: (x is None) or pd.isna(x))
             ]
             df_i = pd.concat([df_i, df_none])
 
