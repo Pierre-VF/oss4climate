@@ -27,10 +27,11 @@ class Cache(SQLModel, table=True):
 
 
 def _open_engine_and_create_database_if_missing():
-    db_folder, __ = os.path.split(SETTINGS.SQLITE_DB)
+    db_path = SETTINGS.path_scraping_sqlite_db
+    db_folder, __ = os.path.split(db_path)
     os.makedirs(db_folder, exist_ok=True)
     x = create_engine(
-        f"sqlite:///{SETTINGS.SQLITE_DB}",
+        f"sqlite:///{db_path}",
         echo=False,
     )
     SQLModel.metadata.create_all(x)
