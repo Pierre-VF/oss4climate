@@ -9,7 +9,7 @@ class Settings(pydantic_settings.BaseSettings):
     GITLAB_ACCESS_TOKEN: Optional[str] = None
     LOCAL_FOLDER: str = ".data"
     SCRAPING_SQLITE_DB: str = "db.sqlite"
-    APP_SQLITE_DB: str = ".data/app_db.sqlite"
+    APP_SQLITE_DB: str = "app_db.sqlite"
     # Identifiants du FTP pour l'export
     EXPORT_FTP_URL: Optional[str] = None
     EXPORT_FTP_USER: Optional[str] = None
