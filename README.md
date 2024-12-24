@@ -21,24 +21,27 @@ However, in the current stage it is indeed not providing all of these features y
 
 To carry out a search without installing anything, you can just use the **web-app** here: https://oss4climate.pierrevf.consulting/ 
 
+## What is the license of the code and the data?
+
+The **code is licensed under an MIT license**, as the aim is to make it reusable by anyone.
+
+The underlying listing data comes from a variety of repositories, some of which have a creative common licence. **That means that while you are free to reuse and adapt the software, there are restrictions on the usage of the listings data below.** Having noted this, the listing data can be downloaded as [TOML](https://data.pierrevf.consulting/oss4climate/summary.toml), [CSV](https://data.pierrevf.consulting/oss4climate/listing_data.csv) or [Feather (for Python pandas)](https://data.pierrevf.consulting/oss4climate/listing_data.feather).
+
+
 ## Where is the data coming from?
 
 Input to the discovery process are given in the files in the **indexes** folder (you are welcome to add your own contribution):
 
-- the listings scraped are listed in **listings.toml** (if you are interested in project listings, you should check all URLs in this file)
-- repositories found in the listings and added manually are found in **repositories.toml**  
+- the listings scraped are listed in **[listings.toml](indexes/listings.toml)** (if you are interested in project listings, you should check all URLs in this file)
+- repositories found in the listings and added manually are found in **[repositories.toml](indexes/repositories.toml)**  
 - the associated scrapers in the folder **"src/oss4climate/src/parsers"**
 
 
-## Do you just want to get access to the listing data?
+The following projects are credited as major contributors to the underlying dataset:
 
-If you just want to access the raw datasets, you can just download them from there (nice layout has not been made yet):
+- [OpenSustain.tech](https://opensustain.tech/) (who kindly licensed their dataset under *Creative Commons Attribution 4.0 International*)
 
-- [Raw index as TOML](https://data.pierrevf.consulting/oss4climate/summary.toml)
-- [Listing as CSV](https://data.pierrevf.consulting/oss4climate/listing_data.csv)
-- [Full listing as FEATHER (for pandas)](https://data.pierrevf.consulting/oss4climate/listing_data.feather)
-
-Note that re-running the listing scraping is resource-intensive (with the associated carbon footprint), so unless you have to do it, you should favour downloading the files instead.
+- (... list in progress ...)
 
 
 ## Development and contribution
@@ -96,7 +99,7 @@ Typical use-cases:
     > make search
 
 
-Advanced use-cases (to regenerate listings)
+Advanced use-cases (to regenerate listings - avoid unless necessary, as this very resource intensive)
 
 - To generate an output dataset:
     > make generate_listing
