@@ -149,6 +149,8 @@ def scrape_all(
         x = r["readme"]
         if x is None:
             return "(NO DATA)"
+        elif not isinstance(x, str):
+            return "(INVALID)"
         x_type = r["readme_type"]
         if x_type == EnumDocumentationFileType.MARKDOWN.value:
             out = markdown_io.markdown_to_search_plaintext(

@@ -97,6 +97,8 @@ app = FastAPI(
 A search engine for open-source code for climate applications
 """,
     lifespan=lifespan,
+    openapi_url=None,
+    redoc_url=None,
 )
 
 

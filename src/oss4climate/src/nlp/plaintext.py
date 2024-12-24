@@ -15,8 +15,8 @@ def get_spacy_english_model(minimal: bool = True):
     nlp_model = en_core_web_sm.load()
 
     if minimal:
-        nlp_model.disable_pipes(
-            [
+        nlp_model.select_pipes(
+            disable=[
                 "parser",  # Disable dependency parsing
                 "ner",  # Disable named entity recognition
                 # 'lemmatizer'  # Disable lemmatization if not needed
