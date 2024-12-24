@@ -128,6 +128,18 @@ class SearchResults:
             self.__documents = new_docs.drop(
                 columns=cols_to_drop,
             )
+            self._fix_documents()
+
+    def _fix_documents(self):
+        # Ensuring that given columns are in datetime format
+        self.__documents["latest_update"] = pd.to_datetime(
+            self.__documents["latest_update"]
+        )
+        # Adding a license_category column (if missing)
+        if "license_category" not in self.__documents.keys():
+            self.__documents["license_category"] = self.__documents["license"].apply(
+                license_category_from_license_name
+            )
 
     def load_documents(self, documents: pd.DataFrame | str, limit: int | None = None):
         new_docs = _documents_loader(documents=documents, limit=limit)
@@ -141,16 +153,7 @@ class SearchResults:
         for i in ["language", "description", "readme", "latest_update"]:
             assert i in available_columns
 
-        # Ensuring that given columns are in datetime format
-        self.__documents["latest_update"] = pd.to_datetime(
-            self.__documents["latest_update"]
-        )
-
-        # Adding a license_category column (if missing)
-        if "license_category" not in self.__documents.keys():
-            self.__documents["license_category"] = self.__documents["license"].apply(
-                license_category_from_license_name
-            )
+        self._fix_documents()
 
     def __reindex(self) -> None:
         self.__documents = self.__documents.reset_index(drop=True)
