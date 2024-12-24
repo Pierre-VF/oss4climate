@@ -131,6 +131,7 @@ async def search_results(
         .replace(
             {
                 None: pd.NA,
+                "nan": pd.NA,
             }
         )
         .fillna(value="(no data)")
