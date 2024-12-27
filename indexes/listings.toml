@@ -1,30 +1,30 @@
 [[github_hosted.readme_listings]]
 url = "https://github.com/16EAGLE/getSpatialData"
-license = "?"
+license = "GNU General Public License v3.0"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/APA-Technology-Division/urban-and-regional-planning-resources"
-license = "?"
+license = "Creative Commons Zero v1.0 Universal"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/Agri-Hub/Callisto-Dataset-Collection"
-license = "?"
+license = "Apache License 2.0"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/CS-SI/eodag"
-license = "?"
+license = "Apache License 2.0"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/CUTR-at-USF/awesome-transit"
-license = "?"
+license = "Creative Commons Zero v1.0 Universal"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/Clay-foundation/model"
-license = "?"
+license = "Apache License 2.0"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/DataONEorg/d1_python"
-license = "?"
+license = "Apache License 2.0"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/DataONEorg/rdataone"
@@ -32,23 +32,23 @@ license = "?"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/ECCC-MSC/msc-pygeoapi"
-license = "?"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/EDIorg/ecocomDP"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/ESIPFed/Awesome-Earth-Artificial-Intelligence"
-license = "?"
+license = "Creative Commons Zero v1.0 Universal"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/Greater-Wellington-Regional-Council/Environmental-Outcomes-Platform"
-license = "?"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/Green-Software-Foundation/awesome-green-software"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/IndEcol/Dashboard"
@@ -56,11 +56,11 @@ license = "?"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/IrishMarineInstitute/awesome-erddap"
-license = "?"
+license = "Creative Commons Zero v1.0 Universal"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/JuliaDataCubes/EarthDataLab.jl"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/KKulma/climate-change-data"
@@ -68,43 +68,43 @@ license = "?"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/NASA-IMPACT/veda-ui"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/NEONScience/NEON-utilities"
-license = "?"
+license = "GNU Affero General Public License v3.0"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/Pierre-VF/OpenClimateResources"
-license = "MIT"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/RolnickLab/OpenForest"
-license = "?"
+license = "Apache License 2.0"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/USGCRP/gcis"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/Unidata/siphon"
-license = "?"
+license = 'BSD 3-Clause "New" or "Revised" License'
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/adarsh-singh01/PrithWe"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/alan-turing-institute/environmental-ds-book"
-license = "?"
+license = "Creative Commons Attribution 4.0 International"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/allenai/satlas"
-license = "?"
+license = "Apache License 2.0"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/arctic-risk/awesome-arctic-data"
-license = "?"
+license = "Creative Commons Zero v1.0 Universal"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/awesome-cryosphere/cryosphere-links"
@@ -112,23 +112,23 @@ license = "?"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/awesome-spectral-indices/awesome-spectral-indices"
-license = "?"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/blaylockbk/SynopticPy"
-license = "?"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/blutjens/awesome-forests/"
-license = "?"
+license = "Creative Commons Zero v1.0 Universal"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/brycejohnston/awesome-agriculture"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/chrisleaman/awesome-coastal"
-license = "?"
+license = "Creative Commons Zero v1.0 Universal"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/daviddao/code-against-climate-change"
@@ -136,15 +136,15 @@ license = "?"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/digitalearthafrica/deafrica-sandbox-notebooks"
-license = "?"
+license = "Apache License 2.0"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/edgi-govdata-archiving/ECHO-Cross-Program"
-license = "?"
+license = "GNU General Public License v3.0"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/eea/geonetwork-eea"
-license = "?"
+license = "GNU General Public License v2.0"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/geco-bern/ingestr/"
@@ -152,55 +152,55 @@ license = "?"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/github/GreenSoftwareDirectory"
-license = "?"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/jaychempan/Awesome-LWMs"
-license = "?"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/kapadia/usgs"
-license = "?"
+license = "ISC License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/kr-stn/awesome-sentinel"
-license = "?"
+license = "Creative Commons Attribution 4.0 International"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/lf-energy/lfenergy-landscape"
-license = "?"
+license = "Apache License 2.0"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/michaeldavie/env_canada"
-license = "?"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/microsoft/AIforEarthDataSets"
-license = "?"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/microsoft/PlanetaryComputerDataCatalog"
-license = "?"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/mysociety/caps"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/nasa/cmr-stac"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/nasa/earthdata-search"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/nglgzz/awesome-clean-tech"
-license = "?"
+license = "Creative Commons Zero v1.0 Universal"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/nsidc/earthaccess"
-license = "?"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/nychealth/EH-dataportal"
@@ -208,19 +208,19 @@ license = "?"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/opengeos/geospatial-data-catalogs"
-license = "?"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/opengeos/leafmap"
-license = "?"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/pangeo-data/awesome-open-climate-science"
-license = "?"
+license = "Creative Commons Zero v1.0 Universal"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/philippgaertner/awesome-earth-engine-apps"
-license = "?"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/philsturgeon/awesome-earth"
@@ -228,11 +228,11 @@ license = "?"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/piersyork/owidR"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/pogopaule/awesome-sustainability-jobs"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/px39n/Awesome-Vegetation-Index"
@@ -240,23 +240,23 @@ license = "?"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/pydap/pydap"
-license = "?"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/r-earthengine/ee_extra"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/r-spatial/rgee"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/rOpenGov/eurostat"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/rOpenGov/giscoR"
-license = "?"
+license = "GNU General Public License v3.0"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/radiantearth/radiant-mlhub"
@@ -268,39 +268,39 @@ license = "?"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/resource-watch/resource-watch"
-license = "?"
+license = "MIT License"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/ropensci/FedData"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/ropensci/epair"
-license = "?"
+license = "GNU General Public License v3.0"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/samapriya/awesome-gee-community-datasets/"
-license = "?"
+license = "Creative Commons Attribution 4.0 International"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/samuelrince/awesome-green-ai"
-license = "?"
+license = "Creative Commons Zero v1.0 Universal"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/sentinel-hub/custom-scripts"
-license = "?"
+license = "Creative Commons Attribution Share Alike 4.0 International"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/smart-data-models/dataModel.Environment"
-license = "?"
+license = "Other"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/softwareunderground/awesome-open-geoscience"
-license = "?"
+license = "Creative Commons Zero v1.0 Universal"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/stac-utils/stac-index"
-license = "?"
+license = "Apache License 2.0"
 
 [[github_hosted.readme_listings]]
 url = "https://github.com/wenhwu/awesome-remote-sensing-change-detection"
