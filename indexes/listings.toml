@@ -1,108 +1,389 @@
-[github_hosted]
-readme_listings = [
-    "https://github.com/16EAGLE/getSpatialData",
-    "https://github.com/APA-Technology-Division/urban-and-regional-planning-resources",
-    "https://github.com/Agri-Hub/Callisto-Dataset-Collection",
-    "https://github.com/CS-SI/eodag",
-    "https://github.com/CUTR-at-USF/awesome-transit",
-    "https://github.com/Clay-foundation/model",
-    "https://github.com/DataONEorg/d1_python",
-    "https://github.com/DataONEorg/rdataone",
-    "https://github.com/ECCC-MSC/msc-pygeoapi",
-    "https://github.com/EDIorg/ecocomDP",
-    "https://github.com/ESIPFed/Awesome-Earth-Artificial-Intelligence",
-    "https://github.com/Greater-Wellington-Regional-Council/Environmental-Outcomes-Platform",
-    "https://github.com/Green-Software-Foundation/awesome-green-software",
-    "https://github.com/IndEcol/Dashboard",
-    "https://github.com/IrishMarineInstitute/awesome-erddap",
-    "https://github.com/JuliaDataCubes/EarthDataLab.jl",
-    "https://github.com/KKulma/climate-change-data",
-    "https://github.com/NASA-IMPACT/veda-ui",
-    "https://github.com/NEONScience/NEON-utilities",
-    "https://github.com/Pierre-VF/OpenClimateResources",
-    "https://github.com/RolnickLab/OpenForest",
-    "https://github.com/USGCRP/gcis",
-    "https://github.com/Unidata/siphon",
-    "https://github.com/adarsh-singh01/PrithWe",
-    "https://github.com/alan-turing-institute/environmental-ds-book",
-    "https://github.com/allenai/satlas",
-    "https://github.com/arctic-risk/awesome-arctic-data",
-    "https://github.com/awesome-cryosphere/cryosphere-links",
-    "https://github.com/awesome-spectral-indices/awesome-spectral-indices",
-    "https://github.com/blaylockbk/SynopticPy",
-    "https://github.com/blutjens/awesome-forests/",
-    "https://github.com/brycejohnston/awesome-agriculture",
-    "https://github.com/chrisleaman/awesome-coastal",
-    "https://github.com/daviddao/code-against-climate-change",
-    "https://github.com/digitalearthafrica/deafrica-sandbox-notebooks",
-    "https://github.com/edgi-govdata-archiving/ECHO-Cross-Program",
-    "https://github.com/eea/geonetwork-eea",
-    "https://github.com/geco-bern/ingestr/",
-    "https://github.com/github/GreenSoftwareDirectory",
-    "https://github.com/jaychempan/Awesome-LWMs",
-    "https://github.com/kapadia/usgs",
-    "https://github.com/kr-stn/awesome-sentinel",
-    "https://github.com/lf-energy/lfenergy-landscape",
-    "https://github.com/michaeldavie/env_canada",
-    "https://github.com/microsoft/AIforEarthDataSets",
-    "https://github.com/microsoft/PlanetaryComputerDataCatalog",
-    "https://github.com/mysociety/caps",
-    "https://github.com/nasa/cmr-stac",
-    "https://github.com/nasa/earthdata-search",
-    "https://github.com/nglgzz/awesome-clean-tech",
-    "https://github.com/nsidc/earthaccess",
-    "https://github.com/nychealth/EH-dataportal",
-    "https://github.com/opengeos/geospatial-data-catalogs",
-    "https://github.com/opengeos/leafmap",
-    "https://github.com/pangeo-data/awesome-open-climate-science",
-    "https://github.com/philippgaertner/awesome-earth-engine-apps",
-    "https://github.com/philsturgeon/awesome-earth",
-    "https://github.com/piersyork/owidR",
-    "https://github.com/pogopaule/awesome-sustainability-jobs",
-    "https://github.com/px39n/Awesome-Vegetation-Index",
-    "https://github.com/pydap/pydap",
-    "https://github.com/r-earthengine/ee_extra",
-    "https://github.com/r-spatial/rgee",
-    "https://github.com/rOpenGov/eurostat",
-    "https://github.com/rOpenGov/giscoR",
-    "https://github.com/radiantearth/radiant-mlhub",
-    "https://github.com/raoulcollenteur/Python-Hydrology-Tools",
-    "https://github.com/resource-watch/resource-watch",
-    "https://github.com/ropensci/FedData",
-    "https://github.com/ropensci/epair",
-    "https://github.com/samapriya/awesome-gee-community-datasets/",
-    "https://github.com/samuelrince/awesome-green-ai",
-    "https://github.com/sentinel-hub/custom-scripts",
-    "https://github.com/smart-data-models/dataModel.Environment",
-    "https://github.com/softwareunderground/awesome-open-geoscience",
-    "https://github.com/stac-utils/stac-index",
-    "https://github.com/wenhwu/awesome-remote-sensing-change-detection",
-]
+[[github_hosted.readme_listings]]
+url = "https://github.com/16EAGLE/getSpatialData"
+license = "?"
 
-[gitlab_hosted]
-readme_listings = ["https://gitlab.com/geoharmonizer_inea/eumap"]
+[[github_hosted.readme_listings]]
+url = "https://github.com/APA-Technology-Division/urban-and-regional-planning-resources"
+license = "?"
 
-[webpages]
-html = ["https://energy.acm.org/resources/", "https://opensustain.tech/"]
+[[github_hosted.readme_listings]]
+url = "https://github.com/Agri-Hub/Callisto-Dataset-Collection"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/CS-SI/eodag"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/CUTR-at-USF/awesome-transit"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/Clay-foundation/model"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/DataONEorg/d1_python"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/DataONEorg/rdataone"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/ECCC-MSC/msc-pygeoapi"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/EDIorg/ecocomDP"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/ESIPFed/Awesome-Earth-Artificial-Intelligence"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/Greater-Wellington-Regional-Council/Environmental-Outcomes-Platform"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/Green-Software-Foundation/awesome-green-software"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/IndEcol/Dashboard"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/IrishMarineInstitute/awesome-erddap"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/JuliaDataCubes/EarthDataLab.jl"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/KKulma/climate-change-data"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/NASA-IMPACT/veda-ui"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/NEONScience/NEON-utilities"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/Pierre-VF/OpenClimateResources"
+license = "MIT"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/RolnickLab/OpenForest"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/USGCRP/gcis"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/Unidata/siphon"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/adarsh-singh01/PrithWe"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/alan-turing-institute/environmental-ds-book"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/allenai/satlas"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/arctic-risk/awesome-arctic-data"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/awesome-cryosphere/cryosphere-links"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/awesome-spectral-indices/awesome-spectral-indices"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/blaylockbk/SynopticPy"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/blutjens/awesome-forests/"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/brycejohnston/awesome-agriculture"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/chrisleaman/awesome-coastal"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/daviddao/code-against-climate-change"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/digitalearthafrica/deafrica-sandbox-notebooks"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/edgi-govdata-archiving/ECHO-Cross-Program"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/eea/geonetwork-eea"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/geco-bern/ingestr/"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/github/GreenSoftwareDirectory"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/jaychempan/Awesome-LWMs"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/kapadia/usgs"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/kr-stn/awesome-sentinel"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/lf-energy/lfenergy-landscape"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/michaeldavie/env_canada"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/microsoft/AIforEarthDataSets"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/microsoft/PlanetaryComputerDataCatalog"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/mysociety/caps"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/nasa/cmr-stac"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/nasa/earthdata-search"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/nglgzz/awesome-clean-tech"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/nsidc/earthaccess"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/nychealth/EH-dataportal"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/opengeos/geospatial-data-catalogs"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/opengeos/leafmap"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/pangeo-data/awesome-open-climate-science"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/philippgaertner/awesome-earth-engine-apps"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/philsturgeon/awesome-earth"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/piersyork/owidR"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/pogopaule/awesome-sustainability-jobs"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/px39n/Awesome-Vegetation-Index"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/pydap/pydap"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/r-earthengine/ee_extra"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/r-spatial/rgee"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/rOpenGov/eurostat"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/rOpenGov/giscoR"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/radiantearth/radiant-mlhub"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/raoulcollenteur/Python-Hydrology-Tools"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/resource-watch/resource-watch"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/ropensci/FedData"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/ropensci/epair"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/samapriya/awesome-gee-community-datasets/"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/samuelrince/awesome-green-ai"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/sentinel-hub/custom-scripts"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/smart-data-models/dataModel.Environment"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/softwareunderground/awesome-open-geoscience"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/stac-utils/stac-index"
+license = "?"
+
+[[github_hosted.readme_listings]]
+url = "https://github.com/wenhwu/awesome-remote-sensing-change-detection"
+license = "?"
+
+[[gitlab_hosted.readme_listings]]
+url = "https://gitlab.com/geoharmonizer_inea/eumap"
+license = "?"
+
+[[webpages.html]]
+url = "https://energy.acm.org/resources/"
+license = "?"
+
+[[webpages.html]]
+url = "https://opensustain.tech/"
+license = "Creative Commons Attribution 4.0 International"
 
 [faults]
-urls = [
-    "http://sciencepolicy.colorado.edu/icecaps/research/media_coverage/",
-    "https://archive.ceda.ac.uk/",
-    "https://cds.climate.copernicus.eu/",
-    "https://climate.esa.int/en/odp/",
-    "https://data.apps.fao.org/",
-    "https://data.subak.org/",
-    "https://db.cger.nies.go.jp/portal/geds/index",
-    "https://energy.acm.org/resources/",
-    "https://globalenergymonitor.org/",
-    "https://globalfishingwatch.org/",
-    "https://globalsolaratlas.info/",
-    "https://globalwindatlas.info/",
-    "https://maps.opendatascience.eu/",
-    "https://podaac.jpl.nasa.gov/cloud-datasets",
-    "https://power.larc.nasa.gov/",
-    "https://wiki.openmod-initiative.org/wiki/Open_Models",
-    "https://www.earthdata.nasa.gov/",
-]
 invalid_urls = []
+[[faults.urls]]
+url = "http://sciencepolicy.colorado.edu/icecaps/research/media_coverage/"
+license = "?"
+
+[[faults.urls]]
+url = "https://archive.ceda.ac.uk/"
+license = "?"
+
+[[faults.urls]]
+url = "https://cds.climate.copernicus.eu/"
+license = "?"
+
+[[faults.urls]]
+url = "https://climate.esa.int/en/odp/"
+license = "?"
+
+[[faults.urls]]
+url = "https://data.apps.fao.org/"
+license = "?"
+
+[[faults.urls]]
+url = "https://data.subak.org/"
+license = "?"
+
+[[faults.urls]]
+url = "https://db.cger.nies.go.jp/portal/geds/index"
+license = "?"
+
+[[faults.urls]]
+url = "https://energy.acm.org/resources/"
+license = "?"
+
+[[faults.urls]]
+url = "https://globalenergymonitor.org/"
+license = "?"
+
+[[faults.urls]]
+url = "https://globalfishingwatch.org/"
+license = "?"
+
+[[faults.urls]]
+url = "https://globalsolaratlas.info/"
+license = "?"
+
+[[faults.urls]]
+url = "https://globalwindatlas.info/"
+license = "?"
+
+[[faults.urls]]
+url = "https://maps.opendatascience.eu/"
+license = "?"
+
+[[faults.urls]]
+url = "https://podaac.jpl.nasa.gov/cloud-datasets"
+license = "?"
+
+[[faults.urls]]
+url = "https://power.larc.nasa.gov/"
+license = "?"
+
+[[faults.urls]]
+url = "https://wiki.openmod-initiative.org/wiki/Open_Models"
+license = "?"
+
+[[faults.urls]]
+url = "https://www.earthdata.nasa.gov/"
+license = "?"
