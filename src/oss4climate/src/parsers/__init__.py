@@ -5,6 +5,7 @@ Module for parsers and web I/O
 import time
 from dataclasses import dataclass, field
 from datetime import timedelta
+from typing import Any
 
 import requests
 import tomllib
@@ -443,6 +444,25 @@ class ResourceListing:
         self.fault_invalid_urls = _flexible_sorted_list_of_targets(
             self.fault_invalid_urls
         )
+
+    def all_targets(self) -> list[dict[str, str]]:
+        return (
+            self.fault_invalid_urls
+            + self.fault_urls
+            + self.webpage_html
+            + self.github_readme_listings
+            + self.gitlab_readme_listings
+        )
+
+    def targets_by_license(self) -> dict[list[str, Any]]:
+        r_by_license = dict()
+        for res in self.all_targets():
+            i = res["license"]
+            if i not in r_by_license:
+                r_by_license[i] = []
+
+            r_by_license[i].append(res["url"])
+        return r_by_license
 
     @staticmethod
     def from_toml(toml_file_path: str) -> "ResourceListing":
