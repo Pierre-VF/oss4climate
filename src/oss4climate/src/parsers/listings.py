@@ -34,6 +34,16 @@ def _parse_readme(readme: str, readme_type: EnumDocumentationFileType) -> str | 
         return None
 
 
+def _flexible_url_parse(i: str | dict[str, str]) -> str:
+    if isinstance(i, str):
+        out = i
+    elif isinstance(i, dict) and "url" in i:
+        out = i["url"]
+    else:
+        raise ValueError(f"Unable to parse {i}")
+    return out
+
+
 def fetch_all(
     listings_toml_file: str,
     cache_lifetime: timedelta | None = None,
@@ -50,6 +60,7 @@ def fetch_all(
     failed_gitlab_readme_listings = []
     failed_webpage_listings = []
     for i in listing.github_readme_listings:
+        i = _flexible_url_parse(i)
         try:
             readme_i, readme_type_i = github_data_io.fetch_repository_readme(
                 i, cache_lifetime=cache_lifetime
@@ -62,6 +73,7 @@ def fetch_all(
             failed_github_readme_listings.append(i)
 
     for i in listing.gitlab_readme_listings:
+        i = _flexible_url_parse(i)
         try:
             readme_i, readme_type_i = gitlab_data_io.fetch_repository_readme(
                 i, cache_lifetime=cache_lifetime
@@ -74,6 +86,7 @@ def fetch_all(
             failed_gitlab_readme_listings.append(i)
 
     for i in listing.webpage_html:
+        i = _flexible_url_parse(i)
         try:
             res += __fetch_from_webpage(i, cache_lifetime=cache_lifetime)
         except Exception:
@@ -82,11 +95,16 @@ def fetch_all(
 
     # Marking the invalid listings input for tracing
     res += ParsingTargets(
-        unknown=listing.fault_urls,
-        invalid=listing.fault_invalid_urls
-        + failed_github_readme_listings
-        + failed_gitlab_readme_listings
-        + failed_webpage_listings,
+        unknown=[_flexible_url_parse(i) for i in listing.fault_urls],
+        invalid=[
+            _flexible_url_parse(i)
+            for i in (
+                listing.fault_invalid_urls
+                + failed_github_readme_listings
+                + failed_gitlab_readme_listings
+                + failed_webpage_listings
+            )
+        ],
     )
 
     res.ensure_sorted_cleaned_and_unique_elements()

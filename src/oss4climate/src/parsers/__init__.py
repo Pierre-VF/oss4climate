@@ -12,6 +12,7 @@ from tomlkit import document, dump
 
 from oss4climate.src.database import load_from_database, save_to_database
 from oss4climate.src.helpers import (
+    cleaned_url,
     sorted_list_of_cleaned_urls,
     url_base_matches_domain,
 )
@@ -359,6 +360,36 @@ def isolate_relevant_urls(urls: list[str]) -> list[str]:
 
 
 # For listings
+_type_listing_entry = str | dict[str, str]
+
+
+def _flexible_sorted_list_of_targets(x: _type_listing_entry) -> list[dict[str, str]]:
+    urls = []
+    urls_with_licenses = dict()
+    for i in x:
+        if isinstance(i, dict):
+            if "url" in i:
+                cleaned_url_i = cleaned_url(i["url"])
+                urls.append(cleaned_url_i)
+                urls_with_licenses[cleaned_url_i] = i
+            else:
+                raise ValueError(f"Entry does not have a 'url' field ({i})")
+
+        elif isinstance(i, str):
+            urls.append(i)
+
+        else:
+            raise TypeError()
+
+    out = []
+    for i in sorted_list_of_cleaned_urls(urls):
+        if i in urls_with_licenses:
+            out.append(urls_with_licenses[i])
+        else:
+            out.append({"url": i, "license": "?"})
+    return out
+
+
 @dataclass
 class ResourceListing:
     """
@@ -366,17 +397,17 @@ class ResourceListing:
     """
 
     # For compatibility, all these repo must have data in the README
-    github_readme_listings: list[str] = field(default_factory=list)
+    github_readme_listings: list[_type_listing_entry] = field(default_factory=list)
 
     # For compatibility, all these repo must have data in the README
-    gitlab_readme_listings: list[str] = field(default_factory=list)
+    gitlab_readme_listings: list[_type_listing_entry] = field(default_factory=list)
 
     # For the links must be given as hrefs in "a" tags
-    webpage_html: list[str] = field(default_factory=list)
+    webpage_html: list[_type_listing_entry] = field(default_factory=list)
 
     # Faults
-    fault_urls: list[str] = field(default_factory=list)
-    fault_invalid_urls: list[str] = field(default_factory=list)
+    fault_urls: list[_type_listing_entry] = field(default_factory=list)
+    fault_invalid_urls: list[_type_listing_entry] = field(default_factory=list)
 
     def __add__(self, other: "ResourceListing") -> "ResourceListing":
         return ResourceListing(
@@ -401,15 +432,17 @@ class ResourceListing:
         """
         Sorts all fields alphabetically and ensures that there is no redundancies in them
         """
-        self.github_readme_listings = sorted_list_of_cleaned_urls(
+        self.github_readme_listings = _flexible_sorted_list_of_targets(
             self.github_readme_listings
         )
-        self.gitlab_readme_listings = sorted_list_of_cleaned_urls(
+        self.gitlab_readme_listings = _flexible_sorted_list_of_targets(
             self.gitlab_readme_listings
         )
-        self.webpage_html = sorted_list_of_cleaned_urls(self.webpage_html)
-        self.fault_urls = sorted_list_of_cleaned_urls(self.fault_urls)
-        self.fault_invalid_urls = sorted_list_of_cleaned_urls(self.fault_invalid_urls)
+        self.webpage_html = _flexible_sorted_list_of_targets(self.webpage_html)
+        self.fault_urls = _flexible_sorted_list_of_targets(self.fault_urls)
+        self.fault_invalid_urls = _flexible_sorted_list_of_targets(
+            self.fault_invalid_urls
+        )
 
     @staticmethod
     def from_toml(toml_file_path: str) -> "ResourceListing":
