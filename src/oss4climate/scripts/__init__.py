@@ -131,4 +131,8 @@ def update_listing_of_listings(
 
     list_of_listings += listings_open_sustain
     list_of_listings.ensure_sorted_cleaned_and_unique_elements()
+
+    # Fetch licenses
+    list_of_listings.fetch_all_licenses()
+
     list_of_listings.to_toml(target_output_file)

@@ -488,6 +488,29 @@ class ResourceListing:
         with open(toml_file_path, "w") as fp:
             dump(doc, fp, sort_keys=True)
 
+    def fetch_all_licenses(self, force_update: bool = False) -> None:
+        from . import github_data_io, gitlab_data_io
+
+        for i in self.github_readme_listings:
+            if isinstance(i, dict):
+                if force_update or (i.get("license") == "?"):
+                    try:
+                        x = github_data_io.fetch_repository_details(i["url"])
+                        if x.license:
+                            i["license"] = x.license
+                    except Exception:
+                        pass
+
+        for i in self.gitlab_readme_listings:
+            if isinstance(i, dict):
+                if force_update or (i.get("license") == "?"):
+                    try:
+                        x = gitlab_data_io.fetch_repository_details(i["url"])
+                        if x.license:
+                            i["license"] = x.license
+                    except Exception:
+                        pass
+
 
 def fetch_all_project_urls_from_html_webpage(
     url: str,
