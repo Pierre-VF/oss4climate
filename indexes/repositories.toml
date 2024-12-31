@@ -1390,6 +1390,7 @@ repositories = [
     "https://github.com/andrewlyden/PyPSA-GB",
     "https://github.com/anellenson/DecisionTree_WaveForecasts",
     "https://github.com/anikfal/PostWRF",
+    "https://github.com/anikfal/wrftailor",
     "https://github.com/aodn/aodn-portal",
     "https://github.com/apburt/treeseg",
     "https://github.com/appelmar/gdalcubes",
