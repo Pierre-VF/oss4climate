@@ -10,7 +10,9 @@ import pandas as pd
 from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import HTMLResponse
 
+from oss4climate.src.config import FILE_INPUT_LISTINGS_INDEX
 from oss4climate.src.parsers.licenses import LicenseCategoriesEnum
+from oss4climate.src.parsers.listings import ResourceListing
 from oss4climate_app.config import (
     URL_CODE_REPOSITORY,
     URL_FEEDBACK_FORM,
@@ -28,9 +30,6 @@ app = APIRouter(include_in_schema=False)
 
 @lru_cache(maxsize=1)
 def listing_credits() -> str:
-    from oss4climate.src.config import FILE_INPUT_LISTINGS_INDEX
-    from oss4climate.src.parsers.listings import ResourceListing
-
     list_of_listings = ResourceListing.from_json(FILE_INPUT_LISTINGS_INDEX)
 
     def f_clean_name(x: str) -> str:
@@ -72,7 +71,7 @@ def _render_ui_template(
     resp = {
         "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
         "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
-        "credits_text": f"With contributions from listings: {listing_credits()}",
+        "credits_text": f"With contributions from manually curated listings: {listing_credits()}",
     }
     if content is not None:
         resp = resp | content
