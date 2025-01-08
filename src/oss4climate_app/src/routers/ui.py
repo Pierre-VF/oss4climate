@@ -3,6 +3,7 @@ Module containing the API code
 """
 
 from datetime import date, timedelta
+from functools import lru_cache
 from typing import Optional
 
 import pandas as pd
@@ -25,6 +26,39 @@ from oss4climate_app.src.templates import render_template
 app = APIRouter(include_in_schema=False)
 
 
+@lru_cache(maxsize=1)
+def listing_credits() -> str:
+    from oss4climate.src.config import FILE_INPUT_LISTINGS_INDEX
+    from oss4climate.src.parsers.listings import ResourceListing
+
+    list_of_listings = ResourceListing.from_json(FILE_INPUT_LISTINGS_INDEX)
+
+    def f_clean_name(x: str) -> str:
+        out = x.replace("https://", "")
+        if out.endswith("/"):
+            out = out[:-1]
+        for j in ["github.com/", "gitlab.com/"]:
+            if out.startswith(j):
+                out = out[len(j) :]
+        return out
+
+    df = list_of_listings.to_dataframe()
+    # Sorting listings by descending number of datasets (and requiring at least 2 targets to be credited)
+    min_targets = 2
+    df_no_nas = (
+        df.dropna()
+        .sort_values("target_count", ascending=False)
+        .query(f"target_count>={min_targets}")
+    )
+    html_credit_text = ", ".join(
+        [
+            f'<a href="{i["url"]}">{f_clean_name(i["url"])}</a> ({int(i["target_count"])} entries)'
+            for __, i in df_no_nas.iterrows()
+        ]
+    )
+    return html_credit_text
+
+
 def _f_none_to_unknown(x: str | date | None) -> str:
     if x is None:
         return "(unknown)"
@@ -38,6 +72,7 @@ def _render_ui_template(
     resp = {
         "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
         "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
+        "credits_text": f"With contributions from listings: {listing_credits()}",
     }
     if content is not None:
         resp = resp | content
@@ -54,7 +89,7 @@ def ui_base_search_page(request: Request):
             "languages": characteristics.unique_languages,
             "licenses": characteristics.unique_licenses,
             "unique_license_categories": unique_license_categories(),
-            "free_text": " ",
+            "free_text": "",
         },
     )
 

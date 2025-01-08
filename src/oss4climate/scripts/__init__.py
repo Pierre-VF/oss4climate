@@ -124,7 +124,7 @@ def add_projects_to_listing(
 def update_listing_of_listings(
     target_output_file: str = FILE_INPUT_LISTINGS_INDEX,
 ) -> None:
-    list_of_listings = ResourceListing.from_json(FILE_INPUT_LISTINGS_INDEX)
+    list_of_listings = ResourceListing.from_json(target_output_file)
 
     # Add data from listings of listings
     listings_open_sustain = fetch_listing_of_listings_from_opensustain_webpage()

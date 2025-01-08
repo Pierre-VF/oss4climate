@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from datetime import timedelta
 from typing import Any
 
+import pandas as pd
 import requests
 import tomllib
 from tomlkit import document, dump
@@ -558,6 +559,16 @@ class ResourceListing:
 
         with open(json_file_path, "w") as fp:
             json.dump(json_ready_dict, fp, indent=4, sort_keys=True)
+
+    def to_dataframe(self) -> pd.DataFrame:
+        df = pd.concat(
+            [
+                pd.DataFrame(data=self.github_readme_listings),
+                pd.DataFrame(data=self.gitlab_readme_listings),
+                pd.DataFrame(data=self.webpage_html),
+            ]
+        )
+        return df
 
     def fetch_all_licenses(self, force_update: bool = False) -> None:
         from . import github_data_io, gitlab_data_io
