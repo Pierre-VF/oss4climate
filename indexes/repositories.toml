@@ -2676,7 +2676,7 @@ repositories = [
     "https://github.com/opfab/operatorfabric-core",
     "https://github.com/orbisgis/geoclimate",
     "https://github.com/orcasound/aifororcas-livesystem",
-    "https://github.com/orgs/NREL",
+    "https://github.com/NREL",
     "https://github.com/os-climate/os_c_data_commons",
     "https://github.com/os-climate/physrisk",
     "https://github.com/osPlanning/omx",
