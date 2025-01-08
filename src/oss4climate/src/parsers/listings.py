@@ -55,7 +55,7 @@ def parse_listing(
     url: str | dict,
     listing_type: EnumListingType,
     cache_lifetime: timedelta | None = None,
-) -> ParsingTargets | None:
+) -> ParsingTargets:
     i = _flexible_url_parse(url)
     if listing_type == EnumListingType.GITHUB:
         readme_i, readme_type_i = github_data_io.fetch_repository_readme(

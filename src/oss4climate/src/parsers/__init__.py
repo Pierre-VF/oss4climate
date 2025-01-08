@@ -200,6 +200,16 @@ class ParsingTargets:
         self.invalid += other.invalid
         return self
 
+    def __len__(self) -> int:
+        return (
+            len(self.github_repositories)
+            + len(self.github_organisations)
+            + len(self.gitlab_projects)
+            + len(self.gitlab_groups)
+            + len(self.unknown)
+            + len(self.invalid)
+        )
+
     def as_url_list(self, known_repositories_only: bool = True) -> list[str]:
         out = self.github_repositories + self.gitlab_projects
         if not known_repositories_only:
@@ -539,9 +549,11 @@ class ResourceListing:
         ) -> int | ModuleNotFoundError:
             if force_update or (i.get("target_count") is None):
                 try:
-                    out = listings.parse_listing(
-                        i["url"],
-                        listing_type=listing_type,
+                    out = len(
+                        listings.parse_listing(
+                            i["url"],
+                            listing_type=listing_type,
+                        )
                     )
                 except Exception:
                     out = None
@@ -551,24 +563,30 @@ class ResourceListing:
 
         for i in self.github_readme_listings:
             if isinstance(i, dict):
-                i["target_count"] = f_get_target_counts(
+                x = f_get_target_counts(
                     i,
                     listing_type=listings.EnumListingType.GITHUB,
                 )
+                if x:
+                    i["target_count"] = x
 
         for i in self.gitlab_readme_listings:
             if isinstance(i, dict):
-                i["target_count"] = f_get_target_counts(
+                x = f_get_target_counts(
                     i,
                     listing_type=listings.EnumListingType.GITLAB,
                 )
+                if x:
+                    i["target_count"] = x
 
         for i in self.webpage_html:
             if isinstance(i, dict):
-                i["target_count"] = f_get_target_counts(
+                x = f_get_target_counts(
                     i,
                     listing_type=listings.EnumListingType.HTML,
                 )
+                if x:
+                    i["target_count"] = x
 
 
 def fetch_all_project_urls_from_html_webpage(
