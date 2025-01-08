@@ -531,6 +531,45 @@ class ResourceListing:
                     except Exception:
                         pass
 
+    def fetch_all_target_counts(self, force_update: bool = False) -> None:
+        from . import listings
+
+        def f_get_target_counts(
+            i, listing_type: listings.EnumListingType
+        ) -> int | ModuleNotFoundError:
+            if force_update or (i.get("target_count") is None):
+                try:
+                    out = listings.parse_listing(
+                        i["url"],
+                        listing_type=listing_type,
+                    )
+                except Exception:
+                    out = None
+            else:
+                out = i.get("target_count")
+            return out
+
+        for i in self.github_readme_listings:
+            if isinstance(i, dict):
+                i["target_count"] = f_get_target_counts(
+                    i,
+                    listing_type=listings.EnumListingType.GITHUB,
+                )
+
+        for i in self.gitlab_readme_listings:
+            if isinstance(i, dict):
+                i["target_count"] = f_get_target_counts(
+                    i,
+                    listing_type=listings.EnumListingType.GITLAB,
+                )
+
+        for i in self.webpage_html:
+            if isinstance(i, dict):
+                i["target_count"] = f_get_target_counts(
+                    i,
+                    listing_type=listings.EnumListingType.HTML,
+                )
+
 
 def fetch_all_project_urls_from_html_webpage(
     url: str,

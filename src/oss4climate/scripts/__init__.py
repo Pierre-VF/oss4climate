@@ -134,5 +134,6 @@ def update_listing_of_listings(
 
     # Fetch licenses
     list_of_listings.fetch_all_licenses()
+    list_of_listings.fetch_all_target_counts()
 
     list_of_listings.to_toml(target_output_file)
