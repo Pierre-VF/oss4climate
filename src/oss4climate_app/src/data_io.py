@@ -111,7 +111,7 @@ def search_for_results(query: str) -> pd.DataFrame:
     def _f_score_in_name(x):
         kw = query.lower().split(" ")
         res = 0
-        x_lower = x.lower()
+        x_lower = str(x).lower()
         for i in kw:
             if len(i) > 3:  # To reduce noise (quick and dirty)
                 if i in x_lower:

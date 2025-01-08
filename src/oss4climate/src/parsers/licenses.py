@@ -21,7 +21,9 @@ class LicenseCategoriesEnum(Enum):
 
 
 def license_category_from_license_name(name: str) -> LicenseCategoriesEnum:
-    if name in ["Apache License 2.0"]:
+    if not isinstance(name, str):
+        out = LicenseCategoriesEnum.UNKNOWN
+    elif name in ["Apache License 2.0"]:
         out = LicenseCategoriesEnum.APACHE
     elif name in [
         'BSD 2-Clause "Simplified" License',
