@@ -124,7 +124,7 @@ def add_projects_to_listing(
 def update_listing_of_listings(
     target_output_file: str = FILE_INPUT_LISTINGS_INDEX,
 ) -> None:
-    list_of_listings = ResourceListing.from_toml(FILE_INPUT_LISTINGS_INDEX)
+    list_of_listings = ResourceListing.from_json(FILE_INPUT_LISTINGS_INDEX)
 
     # Add data from listings of listings
     listings_open_sustain = fetch_listing_of_listings_from_opensustain_webpage()
@@ -136,4 +136,4 @@ def update_listing_of_listings(
     list_of_listings.fetch_all_licenses()
     list_of_listings.fetch_all_target_counts()
 
-    list_of_listings.to_toml(target_output_file)
+    list_of_listings.to_json(target_output_file)

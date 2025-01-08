@@ -32,7 +32,7 @@ The underlying listing data comes from a variety of repositories, some of which 
 
 Input to the discovery process are given in the files in the **indexes** folder (you are welcome to add your own contribution):
 
-- the listings scraped are listed in **[listings.toml](indexes/listings.toml)** (if you are interested in project listings, you should check all URLs in this file)
+- the listings scraped are listed in **[listings.json](indexes/listings.json)** (if you are interested in project listings, you should check all URLs in this file)
 - repositories found in the listings and added manually are found in **[repositories.toml](indexes/repositories.toml)**  
 - the associated scrapers in the folder **"src/oss4climate/src/parsers"**
 

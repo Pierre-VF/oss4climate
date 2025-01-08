@@ -78,7 +78,7 @@ def parse_listing(
 
 
 def fetch_all(
-    listings_toml_file: str,
+    listings_file: str,
     cache_lifetime: timedelta | None = None,
 ) -> ParsingTargets:
     """
@@ -86,7 +86,12 @@ def fetch_all(
 
     :return: sum of all listings targets (sorted and unique)
     """
-    listing = ResourceListing.from_toml(listings_toml_file)
+    if listings_file.endswith(".toml"):
+        listing = ResourceListing.from_toml(listings_file)
+    elif listings_file.endswith(".json"):
+        listing = ResourceListing.from_json(listings_file)
+    else:
+        raise ValueError(f"Only supporting TOML and JSON files (not {listings_file})")
 
     res = ParsingTargets()
     failed_github_readme_listings = []

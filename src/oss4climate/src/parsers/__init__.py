@@ -2,6 +2,7 @@
 Module for parsers and web I/O
 """
 
+import json
 import time
 from dataclasses import dataclass, field
 from datetime import timedelta
@@ -490,6 +491,22 @@ class ResourceListing:
             fault_invalid_urls=x["faults"].get("invalid_urls", []),
         )
 
+    @staticmethod
+    def from_json(json_file_path: str) -> "ResourceListing":
+        if not json_file_path.endswith(".json"):
+            raise ValueError("Input must be a JSON file")
+
+        with open(json_file_path, "r") as f:
+            x = json.load(f)
+
+        return ResourceListing(
+            github_readme_listings=x["github_hosted"].get("readme_listings", []),
+            gitlab_readme_listings=x["gitlab_hosted"].get("readme_listings", []),
+            webpage_html=x["webpages"].get("html", []),
+            fault_urls=x["faults"].get("urls", []),
+            fault_invalid_urls=x["faults"].get("invalid_urls", []),
+        )
+
     def to_toml(self, toml_file_path: str) -> None:
         if not toml_file_path.endswith(".toml"):
             raise ValueError("Output must be a TOML file")
@@ -517,6 +534,30 @@ class ResourceListing:
 
         with open(toml_file_path, "w") as fp:
             dump(doc, fp, sort_keys=True)
+
+    def to_json(self, json_file_path: str) -> None:
+        if not json_file_path.endswith(".json"):
+            raise ValueError("Output must be a JSON file")
+
+        # Outputting to a new JSON
+        json_ready_dict = {
+            "github_hosted": {
+                "readme_listings": self.github_readme_listings,
+            },
+            "gitlab_hosted": {
+                "readme_listings": self.gitlab_readme_listings,
+            },
+            "webpages": {
+                "html": self.webpage_html,
+            },
+            "faults": {
+                "urls": self.fault_urls,
+                "invalid_urls": self.fault_invalid_urls,
+            },
+        }
+
+        with open(json_file_path, "w") as fp:
+            json.dump(json_ready_dict, fp, indent=4, sort_keys=True)
 
     def fetch_all_licenses(self, force_update: bool = False) -> None:
         from . import github_data_io, gitlab_data_io

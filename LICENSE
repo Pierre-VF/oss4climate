@@ -6,7 +6,7 @@ source code (including documentation) and listing data.
 ----------------------------------------------------------------------------------------
 
 Listing data may only be reused in a way that complies
-with the license of the listings (each entry in the "listings.toml" is provided with its
+with the license of the listings (each entry in the "listings.json" is provided with its
 associated license). Some of them (e.g. OpenSustain) are licensed under Creative Common,
 which will require you to acknowledge the original source as well.
 
