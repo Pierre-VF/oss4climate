@@ -148,13 +148,8 @@ def fetch_repositories_in_organisation(
     per_page = 100
     while get_more:
         try:
-            if page == 1:
-                # To be nicer on cache
-                url_i = f"https://api.github.com/orgs/{organisation_name}/repos?per_page={per_page}"
-            else:
-                url_i = f"https://api.github.com/orgs/{organisation_name}/repos?per_page={per_page}&page={page}"
             res = _web_get(
-                url_i,
+                f"https://api.github.com/orgs/{organisation_name}/repos?per_page={per_page}&page={page}",
                 cache_lifetime=cache_lifetime,
             )
             page += 1
