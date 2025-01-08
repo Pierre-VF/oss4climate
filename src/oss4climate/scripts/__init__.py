@@ -35,7 +35,6 @@ def format_individual_file(file_path: str) -> None:
 
 def format_all_files():
     format_individual_file(FILE_INPUT_INDEX)
-    format_individual_file(FILE_INPUT_LISTINGS_INDEX)
     format_individual_file(FILE_OUTPUT_SUMMARY_TOML)
 
 
@@ -60,8 +59,9 @@ def _add_projects_to_listing_file(
     log_info(f"Exporting new index to {file_path}")
     new_targets.to_toml(file_path)
 
-    # Format the file for human readability
-    format_individual_file(file_path)
+    if file_path.endswith(".toml"):
+        # Format the file for human readability
+        format_individual_file(file_path)
 
 
 def discover_projects(

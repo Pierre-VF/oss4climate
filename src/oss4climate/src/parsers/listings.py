@@ -62,7 +62,7 @@ def parse_listing(
             i, cache_lifetime=cache_lifetime
         )
         out = _parse_readme(readme_i, readme_type_i)
-    elif listing_type == EnumListingType.GITHUB:
+    elif listing_type == EnumListingType.GITLAB:
         readme_i, readme_type_i = gitlab_data_io.fetch_repository_readme(
             i, cache_lifetime=cache_lifetime
         )
@@ -102,8 +102,8 @@ def fetch_all(
             res += parse_listing(
                 i, listing_type=EnumListingType.GITHUB, cache_lifetime=cache_lifetime
             )
-        except Exception:
-            log_warning(f"Failed fetching listing README from {i}")
+        except Exception as e:
+            log_warning(f"Failed fetching listing README from {i} (details: {e})")
             failed_github_readme_listings.append(i)
 
     for i in listing.gitlab_readme_listings:
@@ -111,8 +111,8 @@ def fetch_all(
             res += parse_listing(
                 i, listing_type=EnumListingType.GITLAB, cache_lifetime=cache_lifetime
             )
-        except Exception:
-            log_warning(f"Failed fetching listing README from {i}")
+        except Exception as e:
+            log_warning(f"Failed fetching listing README from {i} (details: {e})")
             failed_gitlab_readme_listings.append(i)
 
     for i in listing.webpage_html:
@@ -120,8 +120,8 @@ def fetch_all(
             res += parse_listing(
                 i, listing_type=EnumListingType.HTML, cache_lifetime=cache_lifetime
             )
-        except Exception:
-            log_warning(f"Failed fetching listing webpage from {i}")
+        except Exception as e:
+            log_warning(f"Failed fetching listing webpage from {i} (details: {e})")
             failed_webpage_listings.append(i)
 
     # Marking the invalid listings input for tracing
