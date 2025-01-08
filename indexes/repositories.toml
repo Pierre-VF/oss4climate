@@ -3550,4 +3550,6 @@ invalid_urls = [
     "https://github.com/samapriya/awesome-gee-community-datasets/",
     "https://github.com/settings/codespaces",
     "https://gitlab.com/geoharmonizer_inea/eumap/blob/master/LICENSE",
+    "https://github.com/energy-modelling-ireland/wiki",
+    "https://github.com/settings/codespaces",
 ]
