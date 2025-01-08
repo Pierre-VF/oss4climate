@@ -190,3 +190,9 @@ tbody tr:nth-child(even) {
 tbody tr:nth-child(odd) {
     background-color: #3aff3311;
 }
+
+div.credits {
+    margin-top: 50px;
+    font-size: 14px;
+    line-height: 1.5em;
+}

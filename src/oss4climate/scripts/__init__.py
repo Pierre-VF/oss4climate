@@ -35,7 +35,6 @@ def format_individual_file(file_path: str) -> None:
 
 def format_all_files():
     format_individual_file(FILE_INPUT_INDEX)
-    format_individual_file(FILE_INPUT_LISTINGS_INDEX)
     format_individual_file(FILE_OUTPUT_SUMMARY_TOML)
 
 
@@ -60,8 +59,9 @@ def _add_projects_to_listing_file(
     log_info(f"Exporting new index to {file_path}")
     new_targets.to_toml(file_path)
 
-    # Format the file for human readability
-    format_individual_file(file_path)
+    if file_path.endswith(".toml"):
+        # Format the file for human readability
+        format_individual_file(file_path)
 
 
 def discover_projects(
@@ -124,11 +124,16 @@ def add_projects_to_listing(
 def update_listing_of_listings(
     target_output_file: str = FILE_INPUT_LISTINGS_INDEX,
 ) -> None:
-    list_of_listings = ResourceListing.from_toml(FILE_INPUT_LISTINGS_INDEX)
+    list_of_listings = ResourceListing.from_json(target_output_file)
 
     # Add data from listings of listings
     listings_open_sustain = fetch_listing_of_listings_from_opensustain_webpage()
 
     list_of_listings += listings_open_sustain
     list_of_listings.ensure_sorted_cleaned_and_unique_elements()
-    list_of_listings.to_toml(target_output_file)
+
+    # Fetch licenses
+    list_of_listings.fetch_all_licenses()
+    list_of_listings.fetch_all_target_counts()
+
+    list_of_listings.to_json(target_output_file)

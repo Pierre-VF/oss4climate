@@ -2,16 +2,20 @@
 Module for parsers and web I/O
 """
 
+import json
 import time
 from dataclasses import dataclass, field
 from datetime import timedelta
+from typing import Any
 
+import pandas as pd
 import requests
 import tomllib
 from tomlkit import document, dump
 
 from oss4climate.src.database import load_from_database, save_to_database
 from oss4climate.src.helpers import (
+    cleaned_url,
     sorted_list_of_cleaned_urls,
     url_base_matches_domain,
 )
@@ -198,6 +202,16 @@ class ParsingTargets:
         self.invalid += other.invalid
         return self
 
+    def __len__(self) -> int:
+        return (
+            len(self.github_repositories)
+            + len(self.github_organisations)
+            + len(self.gitlab_projects)
+            + len(self.gitlab_groups)
+            + len(self.unknown)
+            + len(self.invalid)
+        )
+
     def as_url_list(self, known_repositories_only: bool = True) -> list[str]:
         out = self.github_repositories + self.gitlab_projects
         if not known_repositories_only:
@@ -359,6 +373,36 @@ def isolate_relevant_urls(urls: list[str]) -> list[str]:
 
 
 # For listings
+_type_listing_entry = str | dict[str, str]
+
+
+def _flexible_sorted_list_of_targets(x: _type_listing_entry) -> list[dict[str, str]]:
+    urls = []
+    urls_with_licenses = dict()
+    for i in x:
+        if isinstance(i, dict):
+            if "url" in i:
+                cleaned_url_i = cleaned_url(i["url"])
+                urls.append(cleaned_url_i)
+                urls_with_licenses[cleaned_url_i] = i
+            else:
+                raise ValueError(f"Entry does not have a 'url' field ({i})")
+
+        elif isinstance(i, str):
+            urls.append(i)
+
+        else:
+            raise TypeError()
+
+    out = []
+    for i in sorted_list_of_cleaned_urls(urls):
+        if i in urls_with_licenses:
+            out.append(urls_with_licenses[i])
+        else:
+            out.append({"url": i, "license": "?"})
+    return out
+
+
 @dataclass
 class ResourceListing:
     """
@@ -366,17 +410,17 @@ class ResourceListing:
     """
 
     # For compatibility, all these repo must have data in the README
-    github_readme_listings: list[str] = field(default_factory=list)
+    github_readme_listings: list[_type_listing_entry] = field(default_factory=list)
 
     # For compatibility, all these repo must have data in the README
-    gitlab_readme_listings: list[str] = field(default_factory=list)
+    gitlab_readme_listings: list[_type_listing_entry] = field(default_factory=list)
 
     # For the links must be given as hrefs in "a" tags
-    webpage_html: list[str] = field(default_factory=list)
+    webpage_html: list[_type_listing_entry] = field(default_factory=list)
 
     # Faults
-    fault_urls: list[str] = field(default_factory=list)
-    fault_invalid_urls: list[str] = field(default_factory=list)
+    fault_urls: list[_type_listing_entry] = field(default_factory=list)
+    fault_invalid_urls: list[_type_listing_entry] = field(default_factory=list)
 
     def __add__(self, other: "ResourceListing") -> "ResourceListing":
         return ResourceListing(
@@ -401,15 +445,36 @@ class ResourceListing:
         """
         Sorts all fields alphabetically and ensures that there is no redundancies in them
         """
-        self.github_readme_listings = sorted_list_of_cleaned_urls(
+        self.github_readme_listings = _flexible_sorted_list_of_targets(
             self.github_readme_listings
         )
-        self.gitlab_readme_listings = sorted_list_of_cleaned_urls(
+        self.gitlab_readme_listings = _flexible_sorted_list_of_targets(
             self.gitlab_readme_listings
         )
-        self.webpage_html = sorted_list_of_cleaned_urls(self.webpage_html)
-        self.fault_urls = sorted_list_of_cleaned_urls(self.fault_urls)
-        self.fault_invalid_urls = sorted_list_of_cleaned_urls(self.fault_invalid_urls)
+        self.webpage_html = _flexible_sorted_list_of_targets(self.webpage_html)
+        self.fault_urls = _flexible_sorted_list_of_targets(self.fault_urls)
+        self.fault_invalid_urls = _flexible_sorted_list_of_targets(
+            self.fault_invalid_urls
+        )
+
+    def all_targets(self) -> list[dict[str, str]]:
+        return (
+            self.fault_invalid_urls
+            + self.fault_urls
+            + self.webpage_html
+            + self.github_readme_listings
+            + self.gitlab_readme_listings
+        )
+
+    def targets_by_license(self) -> dict[list[str, Any]]:
+        r_by_license = dict()
+        for res in self.all_targets():
+            i = res["license"]
+            if i not in r_by_license:
+                r_by_license[i] = []
+
+            r_by_license[i].append(res["url"])
+        return r_by_license
 
     @staticmethod
     def from_toml(toml_file_path: str) -> "ResourceListing":
@@ -418,6 +483,22 @@ class ResourceListing:
 
         with open(toml_file_path, "rb") as f:
             x = tomllib.load(f)
+
+        return ResourceListing(
+            github_readme_listings=x["github_hosted"].get("readme_listings", []),
+            gitlab_readme_listings=x["gitlab_hosted"].get("readme_listings", []),
+            webpage_html=x["webpages"].get("html", []),
+            fault_urls=x["faults"].get("urls", []),
+            fault_invalid_urls=x["faults"].get("invalid_urls", []),
+        )
+
+    @staticmethod
+    def from_json(json_file_path: str) -> "ResourceListing":
+        if not json_file_path.endswith(".json"):
+            raise ValueError("Input must be a JSON file")
+
+        with open(json_file_path, "r") as f:
+            x = json.load(f)
 
         return ResourceListing(
             github_readme_listings=x["github_hosted"].get("readme_listings", []),
@@ -454,6 +535,110 @@ class ResourceListing:
 
         with open(toml_file_path, "w") as fp:
             dump(doc, fp, sort_keys=True)
+
+    def to_json(self, json_file_path: str) -> None:
+        if not json_file_path.endswith(".json"):
+            raise ValueError("Output must be a JSON file")
+
+        # Outputting to a new JSON
+        json_ready_dict = {
+            "github_hosted": {
+                "readme_listings": self.github_readme_listings,
+            },
+            "gitlab_hosted": {
+                "readme_listings": self.gitlab_readme_listings,
+            },
+            "webpages": {
+                "html": self.webpage_html,
+            },
+            "faults": {
+                "urls": self.fault_urls,
+                "invalid_urls": self.fault_invalid_urls,
+            },
+        }
+
+        with open(json_file_path, "w") as fp:
+            json.dump(json_ready_dict, fp, indent=4, sort_keys=True)
+
+    def to_dataframe(self) -> pd.DataFrame:
+        df = pd.concat(
+            [
+                pd.DataFrame(data=self.github_readme_listings),
+                pd.DataFrame(data=self.gitlab_readme_listings),
+                pd.DataFrame(data=self.webpage_html),
+            ]
+        )
+        return df
+
+    def fetch_all_licenses(self, force_update: bool = False) -> None:
+        from . import github_data_io, gitlab_data_io
+
+        for i in self.github_readme_listings:
+            if isinstance(i, dict):
+                if force_update or (i.get("license") == "?"):
+                    try:
+                        x = github_data_io.fetch_repository_details(i["url"])
+                        if x.license:
+                            i["license"] = x.license
+                    except Exception:
+                        pass
+
+        for i in self.gitlab_readme_listings:
+            if isinstance(i, dict):
+                if force_update or (i.get("license") == "?"):
+                    try:
+                        x = gitlab_data_io.fetch_repository_details(i["url"])
+                        if x.license:
+                            i["license"] = x.license
+                    except Exception:
+                        pass
+
+    def fetch_all_target_counts(self, force_update: bool = False) -> None:
+        from . import listings
+
+        def f_get_target_counts(
+            i, listing_type: listings.EnumListingType
+        ) -> int | ModuleNotFoundError:
+            if force_update or (i.get("target_count") is None):
+                try:
+                    out = len(
+                        listings.parse_listing(
+                            i["url"],
+                            listing_type=listing_type,
+                        )
+                    )
+                except Exception:
+                    out = None
+            else:
+                out = i.get("target_count")
+            return out
+
+        for i in self.github_readme_listings:
+            if isinstance(i, dict):
+                x = f_get_target_counts(
+                    i,
+                    listing_type=listings.EnumListingType.GITHUB,
+                )
+                if x:
+                    i["target_count"] = x
+
+        for i in self.gitlab_readme_listings:
+            if isinstance(i, dict):
+                x = f_get_target_counts(
+                    i,
+                    listing_type=listings.EnumListingType.GITLAB,
+                )
+                if x:
+                    i["target_count"] = x
+
+        for i in self.webpage_html:
+            if isinstance(i, dict):
+                x = f_get_target_counts(
+                    i,
+                    listing_type=listings.EnumListingType.HTML,
+                )
+                if x:
+                    i["target_count"] = x
 
 
 def fetch_all_project_urls_from_html_webpage(

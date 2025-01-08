@@ -4,6 +4,7 @@ from urllib.request import urlretrieve
 import pandas as pd
 
 from oss4climate.src.config import (
+    FILE_INPUT_LISTINGS_INDEX,
     FILE_OUTPUT_DIR,
     FILE_OUTPUT_LISTING_CSV,
     FILE_OUTPUT_LISTING_FEATHER,
@@ -11,6 +12,7 @@ from oss4climate.src.config import (
     FILE_OUTPUT_SUMMARY_TOML,
     URL_LISTING_CSV,
     URL_LISTING_FEATHER,
+    URL_LISTINGS_INDEX,
     URL_OPTIMISED_LISTING_FEATHER,
     URL_RAW_INDEX,
 )
@@ -25,6 +27,7 @@ def _download_file(url: str, target: str) -> None:
 
 def download_listing_data_for_app():
     os.makedirs(FILE_OUTPUT_DIR, exist_ok=True)
+    _download_file(URL_LISTINGS_INDEX, FILE_INPUT_LISTINGS_INDEX)
     _download_file(URL_OPTIMISED_LISTING_FEATHER, FILE_OUTPUT_OPTIMISED_LISTING_FEATHER)
     print("Download complete")
 

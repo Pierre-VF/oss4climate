@@ -142,19 +142,30 @@ def fetch_repositories_in_organisation(
         organisation_name
     )
 
-    try:
-        res = _web_get(
-            f"https://api.github.com/orgs/{organisation_name}/repos",
-            cache_lifetime=cache_lifetime,
-        )
-    except requests.exceptions.HTTPError:
-        # Where orgs do not work, one is potentially looking at a user instead
-        res = _web_get(
-            f"https://api.github.com/users/{organisation_name}/repos",
-            cache_lifetime=cache_lifetime,
-        )
+    get_more = True
+    out = {}
+    page = 1
+    per_page = 100
+    while get_more:
+        try:
+            res = _web_get(
+                f"https://api.github.com/orgs/{organisation_name}/repos?per_page={per_page}&page={page}",
+                cache_lifetime=cache_lifetime,
+            )
+            page += 1
+        except requests.exceptions.HTTPError as e:
+            if page > 1:
+                raise e
+            # Where orgs do not work, one is potentially looking at a user instead (not supporting several pages on users)
+            res = _web_get(
+                f"https://api.github.com/users/{organisation_name}/repos",
+                cache_lifetime=cache_lifetime,
+            )
 
-    return {r["name"]: r["html_url"] for r in res}
+        out_i = {r["name"]: r["html_url"] for r in res}
+        get_more = len(out_i) == per_page
+        out = out | out_i
+    return out
 
 
 def _master_branch_name(

@@ -23,7 +23,7 @@ To carry out a search without installing anything, you can just use the **web-ap
 
 ## What is the license of the code and the data?
 
-The **code is licensed under an MIT license**, as the aim is to make it reusable by anyone.
+The license differs between the source code and the listings data. Please make sure to check the [license file][LICENSE] for all details.
 
 The underlying listing data comes from a variety of repositories, some of which have a creative common licence. **That means that while you are free to reuse and adapt the software, there are restrictions on the usage of the listings data below.** Having noted this, the listing data can be downloaded as [TOML](https://data.pierrevf.consulting/oss4climate/summary.toml), [CSV](https://data.pierrevf.consulting/oss4climate/listing_data.csv) or [Feather (for Python pandas)](https://data.pierrevf.consulting/oss4climate/listing_data.feather).
 
@@ -32,7 +32,7 @@ The underlying listing data comes from a variety of repositories, some of which 
 
 Input to the discovery process are given in the files in the **indexes** folder (you are welcome to add your own contribution):
 
-- the listings scraped are listed in **[listings.toml](indexes/listings.toml)** (if you are interested in project listings, you should check all URLs in this file)
+- the listings scraped are listed in **[listings.json](indexes/listings.json)** (if you are interested in project listings, you should check all URLs in this file)
 - repositories found in the listings and added manually are found in **[repositories.toml](indexes/repositories.toml)**  
 - the associated scrapers in the folder **"src/oss4climate/src/parsers"**
 
