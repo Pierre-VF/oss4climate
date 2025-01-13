@@ -68,10 +68,13 @@ def _f_none_to_unknown(x: str | date | None) -> str:
 def _render_ui_template(
     request: Request, template_file: str, content: dict | None = None
 ):
+    url = request.url.components
+    canonical_url = f"{url.scheme}://{url.netloc}{url.path}"
     resp = {
         "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
         "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
         "credits_text": f"With contributions from manually curated listings: {listing_credits()}",
+        "canonical_url": canonical_url,
     }
     if content is not None:
         resp = resp | content
