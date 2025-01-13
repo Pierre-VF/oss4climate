@@ -1,44 +1,36 @@
 [tool.poetry]
 name = "oss4climate"
-version = "0.0.0"
+version = "0.1.0"
 description = "Package to create listings of Open Source for Energy"
 authors = ["Pierre VF"]
-packages = [
-    {include = "oss4climate", from = "src"},
-    {include = "oss4climate_app", from = "src"}
+
+requires-python = ">=3.12"
+dependencies = [
+    "requests>=2.32.3",
+    "pydantic>=2.10",
+    "pydantic-settings>=2.7.1",
+    "pandas>=2.2.2",
+    "beautifulsoup4>=4.12.3",
+    "tomlkit>=0.13.2",
+    "sqlmodel>=0.0.22",
+    "black>=24.10.0",
+    "pyyaml>=6.0.2",
+    "typer>=0.15.1",
+    "scikit-learn>=1.6.0",
+    "markdown>=3.7",
+    "pyarrow>=18.0.0",
+    "pytest>=8.3.4",
+    "ruff>=0.8.6",
+    "fastapi>=0.115.6",
+    "uvicorn>=0.34.0",
+    "jinja2>=3.1.5",
+    "gunicorn>=23.0.0",
+    "tqdm>=4.67.1",
+    "sentry-sdk[fastapi]>=2.19.2",
+    "http>=0.28.1",
+    "docutils>=0.21.2",
+    "spacy>=3.8.3",
 ]
-package-mode = true
-
-[tool.poetry.dependencies]
-python = "^3.12,<3.13"
-requests = "^2.32.3"
-pydantic = "^2.10"
-pydantic-settings = "^2.7.1"
-pandas = "^2.2.2"
-beautifulsoup4 = "^4.12.3"
-tomlkit = "^0.13.2"
-sqlmodel = "^0.0.22"
-black = "^24.10.0"
-pyyaml = "^6.0.2"
-typer = "^0.15.1"
-scikit-learn = "^1.6.0"
-markdown = "^3.7"
-pyarrow = "^18.0.0"
-pytest = "^8.3.4"
-ruff = "^0.8.6"
-fastapi = "^0.115.6"
-uvicorn = "^0.34.0"
-jinja2 = "^3.1.5"
-gunicorn = "^23.0.0"
-tqdm = "^4.67.1"
-sentry-sdk = {extras = ["fastapi"], version = "^2.19.2"}
-httpx = "^0.28.1"
-docutils = "^0.21.2"
-spacy = "^3.8.3"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.4"
-pre-commit = "^4.0.1"
 
 [build-system]
 requires = ["poetry-core"]
