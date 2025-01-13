@@ -29,13 +29,8 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Installing packages 
-        run: make install
-        
-      - name: Run code test
-        run: make test
-
+      
+      # Check and fix the code
       - name: Defining Git identity 
         run: | 
           git config user.name github_actions
@@ -51,3 +46,10 @@ jobs:
           message: "Automatic code reformatting"
           add: "."
           push: true
+
+      # Run and test
+      - name: Installing packages 
+        run: make install
+        
+      - name: Run code test
+        run: make test
