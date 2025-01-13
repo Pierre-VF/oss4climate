@@ -2,6 +2,7 @@ import os
 from dataclasses import dataclass
 from datetime import date
 from functools import lru_cache
+from typing import Optional
 
 import pandas as pd
 
@@ -81,10 +82,11 @@ NLP_MODEL = get_spacy_english_model()
 
 
 @lru_cache(maxsize=10)
-def search_for_results(query: str) -> pd.DataFrame:
-    if len(query) < 1:
+def search_for_results(query: Optional[str] = None) -> pd.DataFrame:
+    if (query is None) or (len(query) < 1):
         df_x = SEARCH_RESULTS.documents_without_readme
         df_x["score"] = 1
+        df_x.sort_values("name", inplace=True)
         return df_x
 
     lemmatized_query = " ".join(

@@ -68,10 +68,13 @@ def _f_none_to_unknown(x: str | date | None) -> str:
 def _render_ui_template(
     request: Request, template_file: str, content: dict | None = None
 ):
+    url = request.url.components
+    canonical_url = f"{url.scheme}://{url.netloc}{url.path}"
     resp = {
         "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
         "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
         "credits_text": f"With contributions from manually curated listings: {listing_credits()}",
+        "canonical_url": canonical_url,
     }
     if content is not None:
         resp = resp | content
@@ -102,7 +105,7 @@ async def search(request: Request):
 async def search_results(
     request: Request,
     background_tasks: BackgroundTasks,
-    query: str,
+    query: Optional[str] = None,
     language: Optional[str] = None,
     license_category: Optional[str] = None,
     n_results: int = 100,
@@ -110,7 +113,9 @@ async def search_results(
     exclude_forks: Optional[bool] = None,
     exclude_inactive: Optional[bool] = None,
 ):
-    df_out = search_for_results(query.strip().lower())
+    if query:
+        query = query.strip().lower()
+    df_out = search_for_results(query)
 
     # Adding a primitive refinment mechanism by language (not implemented in the most effective manner)
     if language and (language != "*"):

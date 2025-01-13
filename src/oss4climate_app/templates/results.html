@@ -1,5 +1,11 @@
 {% extends "_base.html" %}
-{% block heading %} Search results for "{{ query }}"{% endblock %}
+{% block heading %} 
+    {% if query %}
+        Search results for "{{ query }}"
+    {% else %}    
+        All repositories indexed (sorted by alphabetical name)
+    {% endif %}
+{% endblock %}
 
 {% block content %}
     {% if n_total_found < 1 %}
