@@ -1,5 +1,4 @@
 
-POETRY_VERSION := 1.8.5
 CLI_NAME := "oss4climate.cli"
 
 .PHONY: install

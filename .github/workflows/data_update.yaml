@@ -46,30 +46,14 @@ jobs:
       - name: Installing packages 
         run: make install
         
-      #
-      # Below, one must be careful to activate the "poetry" environment where relevant, 
-      #  as the commands do not operate in the right environment without it
-      #      
-
-      # Needs poetry environment
       - name: Running discovery
-        run: source $(poetry env info --path)/bin/activate && make discover
+        run: make discover
         
       - name: Defining Git identity 
         run: | 
           git config user.name github_actions
           git config user.email github_actions@pierrevf.consulting
       
-      # Code cleanup
-      #- name: Commit changes back
-      #  uses: EndBug/add-and-commit@v9
-      #  with:
-      #    author_name: github_actions
-      #    message: "Indexing new sources"
-      #    add: "."
-      #    push: true
-      #    new_branch: "index-update/${{ github.run_id }}"
-
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:

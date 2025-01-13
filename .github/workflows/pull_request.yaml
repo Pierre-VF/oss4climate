@@ -33,24 +33,17 @@ jobs:
       - name: Installing packages 
         run: make install
         
-      # Code testing
       - name: Run code test
         run: make test
 
-      #
-      # Below, one must be careful to activate the "poetry" environment where relevant, 
-      #  as the commands do not operate in the right environment without it
-      #              
       - name: Defining Git identity 
         run: | 
           git config user.name github_actions
           git config user.email github_actions@pierrevf.consulting
 
-      # Code cleanup
       - name: Run code cleanup
         run: make check_code
       
-      # Code cleanup
       - name: Commit changes back
         uses: EndBug/add-and-commit@v9
         with:
