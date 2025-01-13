@@ -113,7 +113,9 @@ async def search_results(
     exclude_forks: Optional[bool] = None,
     exclude_inactive: Optional[bool] = None,
 ):
-    df_out = search_for_results(query.strip().lower())
+    if query:
+        query = query.strip().lower()
+    df_out = search_for_results(query)
 
     # Adding a primitive refinment mechanism by language (not implemented in the most effective manner)
     if language and (language != "*"):

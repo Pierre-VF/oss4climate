@@ -86,6 +86,7 @@ def search_for_results(query: Optional[str] = None) -> pd.DataFrame:
     if (query is None) or (len(query) < 1):
         df_x = SEARCH_RESULTS.documents_without_readme
         df_x["score"] = 1
+        df_x.sort_values("name", inplace=True)
         return df_x
 
     lemmatized_query = " ".join(
