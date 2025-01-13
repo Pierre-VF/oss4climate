@@ -76,7 +76,7 @@
 	"forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "apt update && apt install -y git && make install_dev"
+	"postCreateCommand": "apt update && apt install -y git && make install"
 
 	// Make sure that the poetry shell is used
 	//"postStartCommand": "poetry shell"

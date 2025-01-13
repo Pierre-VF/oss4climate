@@ -35,7 +35,7 @@ jobs:
         
       # Code testing
       - name: Run code test
-        run: source $(poetry env info --path)/bin/activate && make test
+        run: make test
 
       #
       # Below, one must be careful to activate the "poetry" environment where relevant, 
@@ -48,7 +48,7 @@ jobs:
 
       # Code cleanup
       - name: Run code cleanup
-        run: source $(poetry env info --path)/bin/activate && ruff format .
+        run: make check_code
       
       # Code cleanup
       - name: Commit changes back

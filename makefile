@@ -4,14 +4,6 @@ CLI_NAME := "oss4climate.cli"
 
 .PHONY: install
 install:
-	pip install pipx
-	pipx ensurepath
-	pipx install poetry==$(POETRY_VERSION) || echo "Poetry already installed"
-	poetry config virtualenvs.create true 
-	poetry install --no-cache
-	
-.PHONY: install_dev
-install_dev:
 	uv sync
 
 .PHONY: add
@@ -21,6 +13,11 @@ add:
 .PHONY: build
 build:
 	uv lock
+
+.PHONY: check_code
+check_code:
+	uvx pre-commit install
+	uvx pre-commit run --all
 
 .PHONY: discover
 discover:
