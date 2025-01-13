@@ -105,7 +105,7 @@ async def search(request: Request):
 async def search_results(
     request: Request,
     background_tasks: BackgroundTasks,
-    query: str,
+    query: Optional[str] = None,
     language: Optional[str] = None,
     license_category: Optional[str] = None,
     n_results: int = 100,
