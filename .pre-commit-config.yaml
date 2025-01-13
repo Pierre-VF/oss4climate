@@ -1,5 +1,16 @@
 repos:
+
 - repo: https://github.com/kynan/nbstripout
   rev: 0.7.1
   hooks:
     - id: nbstripout
+    
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  # Ruff version.
+  rev: v0.9.1
+  hooks:
+    # # Run the linter (disabled for now, as we're just looking at formatting)
+    # - id: ruff
+    #  args: [ --fix ]
+    # Run the formatter.
+    - id: ruff-format
