@@ -171,6 +171,11 @@
                 "url": "https://github.com/Pierre-VF/OpenClimateResources"
             },
             {
+                "license": "Other",
+                "target_count": 2,
+                "url": "https://github.com/Pierre-VF/oss4climate"
+            },
+            {
                 "license": "Apache License 2.0",
                 "url": "https://github.com/RolnickLab/OpenForest"
             },
@@ -439,7 +444,8 @@
     "gitlab_hosted": {
         "readme_listings": [
             {
-                "license": "?",
+                "license": "MIT License",
+                "target_count": 1,
                 "url": "https://gitlab.com/geoharmonizer_inea/eumap"
             }
         ]
