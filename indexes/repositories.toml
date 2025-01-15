@@ -55,6 +55,7 @@ organisations = [
     "https://github.com/mbta",
     "https://github.com/mfdz",
     "https://github.com/oada",
+    "https://github.com/open-energy-transition",
     "https://github.com/open-renewable-energy-systems",
     "https://github.com/openclimatefix",
     "https://github.com/openeemeter",
@@ -3550,6 +3551,4 @@ invalid_urls = [
     "https://github.com/samapriya/awesome-gee-community-datasets/",
     "https://github.com/settings/codespaces",
     "https://gitlab.com/geoharmonizer_inea/eumap/blob/master/LICENSE",
-    "https://github.com/energy-modelling-ireland/wiki",
-    "https://github.com/settings/codespaces",
 ]
