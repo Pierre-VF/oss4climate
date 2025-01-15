@@ -583,6 +583,8 @@ class ResourceListing:
                         x = github_data_io.fetch_repository_details(i["url"])
                         if x.license:
                             i["license"] = x.license
+                        if x.license_url:
+                            i["license_url"] = x.license_url
                     except Exception:
                         pass
 
@@ -593,6 +595,8 @@ class ResourceListing:
                         x = gitlab_data_io.fetch_repository_details(i["url"])
                         if x.license:
                             i["license"] = x.license
+                        if x.license_url:
+                            i["license_url"] = x.license_url
                     except Exception:
                         pass
 

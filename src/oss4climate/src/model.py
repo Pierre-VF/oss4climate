@@ -35,6 +35,7 @@ class ProjectDetails(BaseModel):
     website: Optional[str]
     description: Optional[str]
     license: Optional[str]
+    license_url: Optional[str]
     latest_update: Optional[date]
     language: Optional[str]
     last_commit: Optional[date]

@@ -195,6 +195,7 @@ def fetch_repository_details(
     # organisation_url = f"https://{gitlab_host}/{repo_id.split('/')[0]}"
     organisation = repo_id.split("/")[0]
     license = _get_from_dict_with_default(r, "license", {}).get("name")
+    license_url = r.get("license_url")
     (
         readme,
         readme_type,
@@ -240,6 +241,7 @@ def fetch_repository_details(
         website=None,
         description=r["description"],
         license=license,
+        license_url=license_url,
         language=None,  # Not available
         latest_update=latest_update,
         last_commit=last_commit,

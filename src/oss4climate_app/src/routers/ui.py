@@ -56,8 +56,10 @@ def listing_credits() -> str:
     def _f_clean_text(i: dict) -> str:
         x = f'<a href="{i["url"]}">{f_clean_name(i["url"])}</a> ({int(i["target_count"])} entries'
         license = i.get("license")
+        license_url = i.get("license_url")
         if license not in [None, "?", "Other"]:
-            license_url = licence_url_from_license_name(license)
+            if license_url is None:
+                license_url = licence_url_from_license_name(license)
             if license_url:
                 x += f""" licensed under <a href="{license_url}">{license}</a>"""
             else:

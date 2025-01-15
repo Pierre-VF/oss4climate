@@ -261,7 +261,10 @@ def fetch_repository_details(
 
     license = r["license"]
     if license is not None:
-        license = license["name"]
+        license = license.get("name")
+        license_url = license.get("url")
+    else:
+        license_url = None
 
     readme, readme_type = fetch_repository_readme(
         repo_path, branch=branch2use, fail_on_issue=fail_on_issue
@@ -275,6 +278,7 @@ def fetch_repository_details(
         website=r["homepage"],
         description=r["description"],
         license=license,
+        license_url=license_url,
         language=r["language"],
         latest_update=datetime.fromisoformat(r["updated_at"]).date(),
         last_commit=last_commit,
