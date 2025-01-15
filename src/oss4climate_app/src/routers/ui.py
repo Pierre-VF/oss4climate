@@ -11,7 +11,10 @@ from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import HTMLResponse
 
 from oss4climate.src.config import FILE_INPUT_LISTINGS_INDEX
-from oss4climate.src.parsers.licenses import LicenseCategoriesEnum
+from oss4climate.src.parsers.licenses import (
+    LicenseCategoriesEnum,
+    licence_url_from_license_name,
+)
 from oss4climate.src.parsers.listings import ResourceListing
 from oss4climate_app.config import (
     URL_CODE_REPOSITORY,
@@ -49,12 +52,20 @@ def listing_credits() -> str:
         .sort_values("target_count", ascending=False)
         .query(f"target_count>={min_targets}")
     )
-    html_credit_text = ", ".join(
-        [
-            f'<a href="{i["url"]}">{f_clean_name(i["url"])}</a> ({int(i["target_count"])} entries)'
-            for __, i in df_no_nas.iterrows()
-        ]
-    )
+
+    def _f_clean_text(i: dict) -> str:
+        x = f'<a href="{i["url"]}">{f_clean_name(i["url"])}</a> ({int(i["target_count"])} entries'
+        license = i.get("license")
+        if license not in [None, "?", "Other"]:
+            license_url = licence_url_from_license_name(license)
+            if license_url:
+                x += f""" licensed under <a href="{license_url}">{license}</a>"""
+            else:
+                x += f" licensed under {license}"
+        x += ")"
+        return x
+
+    html_credit_text = ", ".join([_f_clean_text(i) for __, i in df_no_nas.iterrows()])
     return html_credit_text
 
 
