@@ -273,10 +273,14 @@ def fetch_repository_details(
 
     license = r["license"]
     if license is not None:
-        license_url = license.get("url")
         license = license.get("name")
-    else:
-        license_url = None
+
+    license_url = fetch_license_url(
+        repo_name=repo_path,
+        branch=branch2use,
+        fail_on_issue=fail_on_issue,
+        cache_lifetime=cache_lifetime,
+    )
 
     readme, readme_type = fetch_repository_readme(
         repo_path, branch=branch2use, fail_on_issue=fail_on_issue
@@ -311,6 +315,32 @@ def fetch_repository_details(
         forked_from=forked_from,
     )
     return details
+
+
+def fetch_license_url(
+    repo_name: str,
+    branch: str | None = None,
+    fail_on_issue: bool = True,
+    cache_lifetime: timedelta | None = None,
+) -> str | None:
+    repo_name = _extract_organisation_and_repository_as_url_block(repo_name)
+
+    if branch is None:
+        branch = _master_branch_name(repo_name, cache_lifetime=cache_lifetime)
+
+    license_url = None
+    file_tree = fetch_repository_file_tree(
+        repo_name, fail_on_issue=fail_on_issue, cache_lifetime=cache_lifetime
+    )
+    for i in file_tree:
+        lower_i = i.lower()
+        if lower_i.startswith("license"):
+            if branch == "main":
+                # Keeping what worked well so far
+                license_url = f"https://raw.githubusercontent.com/{repo_name}/main/{i}"
+            else:
+                license_url = f"https://raw.githubusercontent.com/{repo_name}/refs/heads/{branch}/{i}"
+    return license_url
 
 
 def fetch_repository_readme(

@@ -76,36 +76,43 @@
         "readme_listings": [
             {
                 "license": "GNU General Public License v3.0",
+                "license_url": "https://raw.githubusercontent.com/16EAGLE/getSpatialData/refs/heads/master/LICENSE",
                 "target_count": 1,
                 "url": "https://github.com/16EAGLE/getSpatialData"
             },
             {
                 "license": "Creative Commons Zero v1.0 Universal",
+                "license_url": "https://raw.githubusercontent.com/APA-Technology-Division/urban-and-regional-planning-resources/main/LICENSE",
                 "target_count": 49,
                 "url": "https://github.com/APA-Technology-Division/urban-and-regional-planning-resources"
             },
             {
                 "license": "Apache License 2.0",
+                "license_url": "https://raw.githubusercontent.com/Agri-Hub/Callisto-Dataset-Collection/main/LICENSE",
                 "target_count": 60,
                 "url": "https://github.com/Agri-Hub/Callisto-Dataset-Collection"
             },
             {
                 "license": "Apache License 2.0",
+                "license_url": "https://raw.githubusercontent.com/CS-SI/eodag/refs/heads/master/LICENSE",
                 "target_count": 4,
                 "url": "https://github.com/CS-SI/eodag"
             },
             {
                 "license": "Creative Commons Zero v1.0 Universal",
+                "license_url": "https://raw.githubusercontent.com/CUTR-at-USF/awesome-transit/refs/heads/master/LICENSE.md",
                 "target_count": 268,
                 "url": "https://github.com/CUTR-at-USF/awesome-transit"
             },
             {
                 "license": "Apache License 2.0",
+                "license_url": "https://raw.githubusercontent.com/Clay-foundation/model/main/LICENSE-MODEL.md",
                 "target_count": 1,
                 "url": "https://github.com/Clay-foundation/model"
             },
             {
                 "license": "Apache License 2.0",
+                "license_url": "https://raw.githubusercontent.com/DataONEorg/d1_python/refs/heads/master/LICENSE.md",
                 "target_count": 2,
                 "url": "https://github.com/DataONEorg/d1_python"
             },
@@ -116,24 +123,29 @@
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/ECCC-MSC/msc-pygeoapi/refs/heads/master/LICENSE.md",
                 "target_count": 4,
                 "url": "https://github.com/ECCC-MSC/msc-pygeoapi"
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/EDIorg/ecocomDP/main/LICENSE.md",
                 "url": "https://github.com/EDIorg/ecocomDP"
             },
             {
                 "license": "Creative Commons Zero v1.0 Universal",
+                "license_url": "https://raw.githubusercontent.com/ESIPFed/Awesome-Earth-Artificial-Intelligence/refs/heads/master/LICENSE",
                 "target_count": 56,
                 "url": "https://github.com/ESIPFed/Awesome-Earth-Artificial-Intelligence"
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/Greater-Wellington-Regional-Council/Environmental-Outcomes-Platform/main/LICENSE",
                 "url": "https://github.com/Greater-Wellington-Regional-Council/Environmental-Outcomes-Platform"
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/Green-Software-Foundation/awesome-green-software/main/license",
                 "target_count": 33,
                 "url": "https://github.com/Green-Software-Foundation/awesome-green-software"
             },
@@ -144,11 +156,13 @@
             },
             {
                 "license": "Creative Commons Zero v1.0 Universal",
+                "license_url": "https://raw.githubusercontent.com/IrishMarineInstitute/awesome-erddap/refs/heads/master/LICENSE.md",
                 "target_count": 19,
                 "url": "https://github.com/IrishMarineInstitute/awesome-erddap"
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/JuliaDataCubes/EarthDataLab.jl/refs/heads/master/LICENSE.md",
                 "url": "https://github.com/JuliaDataCubes/EarthDataLab.jl"
             },
             {
@@ -158,52 +172,63 @@
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/NASA-IMPACT/veda-ui/main/LICENSE",
                 "target_count": 2,
                 "url": "https://github.com/NASA-IMPACT/veda-ui"
             },
             {
                 "license": "GNU Affero General Public License v3.0",
+                "license_url": "https://raw.githubusercontent.com/NEONScience/NEON-utilities/main/LICENSE.txt",
                 "url": "https://github.com/NEONScience/NEON-utilities"
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/Pierre-VF/OpenClimateResources/main/LICENSE",
                 "target_count": 3,
                 "url": "https://github.com/Pierre-VF/OpenClimateResources"
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/Pierre-VF/oss4climate/main/LICENSE",
                 "target_count": 2,
                 "url": "https://github.com/Pierre-VF/oss4climate"
             },
             {
                 "license": "Apache License 2.0",
+                "license_url": "https://raw.githubusercontent.com/RolnickLab/OpenForest/main/LICENSE",
                 "url": "https://github.com/RolnickLab/OpenForest"
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/USGCRP/gcis/refs/heads/master/LICENSE.md",
                 "url": "https://github.com/USGCRP/gcis"
             },
             {
                 "license": "BSD 3-Clause \"New\" or \"Revised\" License",
+                "license_url": "https://raw.githubusercontent.com/Unidata/siphon/main/LICENSE",
                 "target_count": 1,
                 "url": "https://github.com/Unidata/siphon"
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/adarsh-singh01/PrithWe/main/LICENSE",
                 "url": "https://github.com/adarsh-singh01/PrithWe"
             },
             {
                 "license": "Creative Commons Attribution 4.0 International",
+                "license_url": "https://raw.githubusercontent.com/alan-turing-institute/environmental-ds-book/main/LICENSE-CODE",
                 "target_count": 6,
                 "url": "https://github.com/alan-turing-institute/environmental-ds-book"
             },
             {
                 "license": "Apache License 2.0",
+                "license_url": "https://raw.githubusercontent.com/allenai/satlas/main/LICENSE",
                 "target_count": 4,
                 "url": "https://github.com/allenai/satlas"
             },
             {
                 "license": "Creative Commons Zero v1.0 Universal",
+                "license_url": "https://raw.githubusercontent.com/arctic-risk/awesome-arctic-data/main/LICENSE",
                 "url": "https://github.com/arctic-risk/awesome-arctic-data"
             },
             {
@@ -213,26 +238,31 @@
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/awesome-spectral-indices/awesome-spectral-indices/main/LICENSE",
                 "target_count": 10,
                 "url": "https://github.com/awesome-spectral-indices/awesome-spectral-indices"
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/blaylockbk/SynopticPy/main/LICENSE",
                 "target_count": 2,
                 "url": "https://github.com/blaylockbk/SynopticPy"
             },
             {
                 "license": "Creative Commons Zero v1.0 Universal",
+                "license_url": "https://raw.githubusercontent.com/blutjens/awesome-forests/main/license",
                 "target_count": 15,
                 "url": "https://github.com/blutjens/awesome-forests/"
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/brycejohnston/awesome-agriculture/refs/heads/master/LICENSE.md",
                 "target_count": 51,
                 "url": "https://github.com/brycejohnston/awesome-agriculture"
             },
             {
                 "license": "Creative Commons Zero v1.0 Universal",
+                "license_url": "https://raw.githubusercontent.com/chrisleaman/awesome-coastal/refs/heads/master/LICENSE",
                 "target_count": 37,
                 "url": "https://github.com/chrisleaman/awesome-coastal"
             },
@@ -243,11 +273,13 @@
             },
             {
                 "license": "Apache License 2.0",
+                "license_url": "https://raw.githubusercontent.com/digitalearthafrica/deafrica-sandbox-notebooks/main/LICENSE",
                 "target_count": 5,
                 "url": "https://github.com/digitalearthafrica/deafrica-sandbox-notebooks"
             },
             {
                 "license": "GNU General Public License v3.0",
+                "license_url": "https://raw.githubusercontent.com/edgi-govdata-archiving/ECHO-Cross-Program/main/LICENSE",
                 "target_count": 1,
                 "url": "https://github.com/edgi-govdata-archiving/ECHO-Cross-Program"
             },
@@ -262,61 +294,74 @@
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/github/GreenSoftwareDirectory/main/LICENSE.txt",
                 "target_count": 74,
                 "url": "https://github.com/github/GreenSoftwareDirectory"
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/jaychempan/Awesome-LWMs/main/LICENSE",
                 "target_count": 5,
                 "url": "https://github.com/jaychempan/Awesome-LWMs"
             },
             {
                 "license": "ISC License",
+                "license_url": "https://raw.githubusercontent.com/kapadia/usgs/refs/heads/master/LICENSE",
                 "url": "https://github.com/kapadia/usgs"
             },
             {
                 "license": "Creative Commons Attribution 4.0 International",
+                "license_url": "https://raw.githubusercontent.com/kr-stn/awesome-sentinel/main/LICENSE",
                 "target_count": 30,
                 "url": "https://github.com/kr-stn/awesome-sentinel"
             },
             {
                 "license": "Apache License 2.0",
+                "license_url": "https://raw.githubusercontent.com/lf-energy/lfenergy-landscape/main/LICENSE",
                 "url": "https://github.com/lf-energy/lfenergy-landscape"
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/michaeldavie/env_canada/refs/heads/master/LICENSE",
                 "url": "https://github.com/michaeldavie/env_canada"
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/microsoft/AIforEarthDataSets/main/LICENSE",
                 "url": "https://github.com/microsoft/AIforEarthDataSets"
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/microsoft/PlanetaryComputerDataCatalog/main/LICENSE",
                 "target_count": 1,
                 "url": "https://github.com/microsoft/PlanetaryComputerDataCatalog"
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/mysociety/caps/refs/heads/master/LICENSE.txt",
                 "target_count": 2,
                 "url": "https://github.com/mysociety/caps"
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/nasa/cmr-stac/refs/heads/master/LICENSE.txt",
                 "target_count": 2,
                 "url": "https://github.com/nasa/cmr-stac"
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/nasa/earthdata-search/main/LICENSE",
                 "target_count": 2,
                 "url": "https://github.com/nasa/earthdata-search"
             },
             {
                 "license": "Creative Commons Zero v1.0 Universal",
+                "license_url": "https://raw.githubusercontent.com/nglgzz/awesome-clean-tech/refs/heads/master/LICENSE",
                 "url": "https://github.com/nglgzz/awesome-clean-tech"
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/nsidc/earthaccess/main/LICENSE.txt",
                 "target_count": 1,
                 "url": "https://github.com/nsidc/earthaccess"
             },
@@ -326,26 +371,31 @@
             },
             {
                 "license": "Creative Commons Zero v1.0 Universal",
+                "license_url": "https://raw.githubusercontent.com/open-energy-transition/Awesome-Electric-Grid-Mapping/main/LICENSE",
                 "target_count": 23,
                 "url": "https://github.com/open-energy-transition/Awesome-Electric-Grid-Mapping"
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/opengeos/geospatial-data-catalogs/refs/heads/master/LICENSE",
                 "target_count": 9,
                 "url": "https://github.com/opengeos/geospatial-data-catalogs"
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/opengeos/leafmap/refs/heads/master/LICENSE",
                 "target_count": 8,
                 "url": "https://github.com/opengeos/leafmap"
             },
             {
                 "license": "Creative Commons Zero v1.0 Universal",
+                "license_url": "https://raw.githubusercontent.com/pangeo-data/awesome-open-climate-science/refs/heads/master/LICENSE",
                 "target_count": 10,
                 "url": "https://github.com/pangeo-data/awesome-open-climate-science"
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/philippgaertner/awesome-earth-engine-apps/main/LICENSE",
                 "url": "https://github.com/philippgaertner/awesome-earth-engine-apps"
             },
             {
@@ -355,10 +405,12 @@
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/piersyork/owidR/main/LICENSE.md",
                 "url": "https://github.com/piersyork/owidR"
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/pogopaule/awesome-sustainability-jobs/main/LICENSE.md",
                 "target_count": 1,
                 "url": "https://github.com/pogopaule/awesome-sustainability-jobs"
             },
@@ -368,25 +420,30 @@
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/pydap/pydap/main/LICENSE",
                 "target_count": 1,
                 "url": "https://github.com/pydap/pydap"
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/r-earthengine/ee_extra/refs/heads/master/LICENSE",
                 "target_count": 6,
                 "url": "https://github.com/r-earthengine/ee_extra"
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/r-spatial/rgee/refs/heads/master/LICENSE.md",
                 "target_count": 13,
                 "url": "https://github.com/r-spatial/rgee"
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/rOpenGov/eurostat/refs/heads/master/LICENSE",
                 "url": "https://github.com/rOpenGov/eurostat"
             },
             {
                 "license": "GNU General Public License v3.0",
+                "license_url": "https://raw.githubusercontent.com/rOpenGov/giscoR/main/LICENSE.md",
                 "url": "https://github.com/rOpenGov/giscoR"
             },
             {
@@ -400,43 +457,52 @@
             },
             {
                 "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/resource-watch/resource-watch/refs/heads/master/LICENSE",
                 "target_count": 14,
                 "url": "https://github.com/resource-watch/resource-watch"
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/ropensci/FedData/main/LICENSE",
                 "url": "https://github.com/ropensci/FedData"
             },
             {
                 "license": "GNU General Public License v3.0",
+                "license_url": "https://raw.githubusercontent.com/ropensci/epair/refs/heads/master/LICENSE.md",
                 "target_count": 1,
                 "url": "https://github.com/ropensci/epair"
             },
             {
                 "license": "Creative Commons Attribution 4.0 International",
+                "license_url": "https://raw.githubusercontent.com/samapriya/awesome-gee-community-datasets/refs/heads/master/LICENSE",
                 "url": "https://github.com/samapriya/awesome-gee-community-datasets/"
             },
             {
                 "license": "Creative Commons Zero v1.0 Universal",
+                "license_url": "https://raw.githubusercontent.com/samuelrince/awesome-green-ai/main/LICENSE",
                 "target_count": 27,
                 "url": "https://github.com/samuelrince/awesome-green-ai"
             },
             {
                 "license": "Creative Commons Attribution Share Alike 4.0 International",
+                "license_url": "https://raw.githubusercontent.com/sentinel-hub/custom-scripts/main/LICENSE.md",
                 "url": "https://github.com/sentinel-hub/custom-scripts"
             },
             {
                 "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/smart-data-models/dataModel.Environment/refs/heads/master/LICENSE",
                 "target_count": 1,
                 "url": "https://github.com/smart-data-models/dataModel.Environment"
             },
             {
                 "license": "Creative Commons Zero v1.0 Universal",
+                "license_url": "https://raw.githubusercontent.com/softwareunderground/awesome-open-geoscience/main/LICENSE",
                 "target_count": 98,
                 "url": "https://github.com/softwareunderground/awesome-open-geoscience"
             },
             {
                 "license": "Apache License 2.0",
+                "license_url": "https://raw.githubusercontent.com/stac-utils/stac-index/refs/heads/master/LICENSE",
                 "url": "https://github.com/stac-utils/stac-index"
             },
             {
@@ -450,6 +516,7 @@
         "readme_listings": [
             {
                 "license": "MIT License",
+                "license_url": "https://gitlab.com/geoharmonizer_inea/eumap/-/blob/master/LICENSE",
                 "target_count": 1,
                 "url": "https://gitlab.com/geoharmonizer_inea/eumap"
             }
