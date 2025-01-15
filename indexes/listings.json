@@ -171,6 +171,11 @@
                 "url": "https://github.com/Pierre-VF/OpenClimateResources"
             },
             {
+                "license": "MIT License",
+                "target_count": 2,
+                "url": "https://github.com/Pierre-VF/oss4climate"
+            },
+            {
                 "license": "Apache License 2.0",
                 "url": "https://github.com/RolnickLab/OpenForest"
             },
@@ -320,6 +325,11 @@
                 "url": "https://github.com/nychealth/EH-dataportal"
             },
             {
+                "license": "Creative Commons Zero v1.0 Universal",
+                "target_count": 23,
+                "url": "https://github.com/open-energy-transition/Awesome-Electric-Grid-Mapping"
+            },
+            {
                 "license": "MIT License",
                 "target_count": 9,
                 "url": "https://github.com/opengeos/geospatial-data-catalogs"
@@ -439,7 +449,8 @@
     "gitlab_hosted": {
         "readme_listings": [
             {
-                "license": "?",
+                "license": "MIT License",
+                "target_count": 1,
                 "url": "https://gitlab.com/geoharmonizer_inea/eumap"
             }
         ]
