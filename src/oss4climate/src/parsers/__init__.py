@@ -573,9 +573,12 @@ class ResourceListing:
     def fetch_all_licenses(self, force_update: bool = False) -> None:
         from . import github_data_io, gitlab_data_io
 
+        def _f_license_missing(i):
+            return i.get("license") in ["?", None]
+
         for i in self.github_readme_listings:
             if isinstance(i, dict):
-                if force_update or (i.get("license") == "?"):
+                if force_update or _f_license_missing(i):
                     try:
                         x = github_data_io.fetch_repository_details(i["url"])
                         if x.license:
@@ -585,7 +588,7 @@ class ResourceListing:
 
         for i in self.gitlab_readme_listings:
             if isinstance(i, dict):
-                if force_update or (i.get("license") == "?"):
+                if force_update or _f_license_missing(i):
                     try:
                         x = gitlab_data_io.fetch_repository_details(i["url"])
                         if x.license:
