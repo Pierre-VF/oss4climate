@@ -13,7 +13,7 @@ from typing import Any
 from urllib.parse import quote_plus, urlparse
 
 from oss4climate.src.config import SETTINGS
-from oss4climate.src.helpers import url_base_matches_domain
+from oss4climate.src.helpers import get_key_of_maximum_value, url_base_matches_domain
 from oss4climate.src.log import log_info
 from oss4climate.src.model import EnumDocumentationFileType, ProjectDetails
 from oss4climate.src.parsers import (
@@ -145,6 +145,19 @@ def fetch_repositories_in_group(
     return {r["name"]: r["web_url"] for r in res}
 
 
+def fetch_repository_language_details(
+    repo_name: str,
+    cache_lifetime: timedelta | None = None,
+) -> dict[str, int]:
+    gitlab_host = _extract_gitlab_host(url=repo_name)
+    repo_id = _extract_organisation_and_repository_as_url_block(repo_name)
+    r = _web_get(
+        f"https://{gitlab_host}/api/v4/projects/{quote_plus(repo_id)}/languages",
+        cache_lifetime=cache_lifetime,
+    )
+    return r
+
+
 def fetch_repository_readme(
     repo_name: str,
     fail_on_issue: bool = True,
@@ -204,6 +217,11 @@ def fetch_repository_details(
         fail_on_issue=fail_on_issue,
         cache_lifetime=cache_lifetime,
     )
+    raw_languages = fetch_repository_language_details(
+        repo_path, cache_lifetime=cache_lifetime
+    )
+    dominant_language = get_key_of_maximum_value(raw_languages)
+    languages = list(raw_languages.keys())
 
     # Fields treated as optional or unstable across non-"gitlab.com" instances
     fork_details = _get_from_dict_with_default(r, "forked_from_project", {})
@@ -242,7 +260,8 @@ def fetch_repository_details(
         description=r["description"],
         license=license,
         license_url=license_url,
-        language=None,  # Not available
+        language=dominant_language,
+        all_languages=languages,
         latest_update=latest_update,
         last_commit=last_commit,
         open_pull_requests=n_open_prs,

@@ -14,7 +14,7 @@ from functools import lru_cache
 import requests
 
 from oss4climate.src.config import SETTINGS
-from oss4climate.src.helpers import url_base_matches_domain
+from oss4climate.src.helpers import get_key_of_maximum_value, url_base_matches_domain
 from oss4climate.src.log import log_info
 from oss4climate.src.model import EnumDocumentationFileType, ProjectDetails
 from oss4climate.src.parsers import (
@@ -207,6 +207,18 @@ def extract_repository_organisation(repo_path: str) -> str:
     return organisation
 
 
+def fetch_repository_language_details(
+    repo_path: str,
+    cache_lifetime: timedelta | None = None,
+) -> dict[str, int]:
+    repo_path = _extract_organisation_and_repository_as_url_block(repo_path)
+    r = _web_get(
+        f"https://api.github.com/repos/{repo_path}/languages",
+        cache_lifetime=cache_lifetime,
+    )
+    return r
+
+
 def fetch_repository_details(
     repo_path: str,
     fail_on_issue: bool = True,
@@ -261,14 +273,21 @@ def fetch_repository_details(
 
     license = r["license"]
     if license is not None:
-        license = license.get("name")
         license_url = license.get("url")
+        license = license.get("name")
     else:
         license_url = None
 
     readme, readme_type = fetch_repository_readme(
         repo_path, branch=branch2use, fail_on_issue=fail_on_issue
     )
+
+    raw_languages = fetch_repository_language_details(
+        repo_path=repo_path,
+        cache_lifetime=cache_lifetime,
+    )
+    dominant_language = get_key_of_maximum_value(raw_languages)
+    languages = list(raw_languages.keys())
 
     details = ProjectDetails(
         id=repo_path,
@@ -279,7 +298,8 @@ def fetch_repository_details(
         description=r["description"],
         license=license,
         license_url=license_url,
-        language=r["language"],
+        language=dominant_language,
+        all_languages=languages,
         latest_update=datetime.fromisoformat(r["updated_at"]).date(),
         last_commit=last_commit,
         open_pull_requests=n_open_pull_requests,
