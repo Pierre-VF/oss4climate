@@ -54,17 +54,17 @@ def listing_credits() -> str:
     )
 
     def _f_clean_text(i: dict) -> str:
-        x = f'<a href="{i["url"]}">{f_clean_name(i["url"])}</a> ({int(i["target_count"])} entries'
+        x = f'<b><a href="{i["url"]}">{f_clean_name(i["url"])}</a></b>'
         license = i.get("license")
         license_url = i.get("license_url")
         if license not in [None, "?", "Other"]:
             if license_url is None:
                 license_url = licence_url_from_license_name(license)
             if license_url:
-                x += f""" licensed under <a href="{license_url}">{license}</a>"""
+                x += f""" licensed under <i><a href="{license_url}">{license}</a></i>"""
             else:
                 x += f" licensed under {license}"
-        x += ")"
+        x += f""" ({int(i["target_count"])} entries)"""
         return x
 
     html_credit_text = ", ".join([_f_clean_text(i) for __, i in df_no_nas.iterrows()])

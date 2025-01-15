@@ -574,7 +574,7 @@ class ResourceListing:
         from . import github_data_io, gitlab_data_io
 
         def _f_license_missing(i):
-            return i.get("license") in ["?", None]
+            return i.get("license") in ["?", None] or (i.get("license_url") is None)
 
         for i in self.github_readme_listings:
             if isinstance(i, dict):
