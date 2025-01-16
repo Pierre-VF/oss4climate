@@ -3,7 +3,7 @@
 {
 	"name": "OSS4climate",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "ghcr.io/astral-sh/uv:0.5.16-python3.12-bookworm",
+	"image": "mcr.microsoft.com/devcontainers/python:1-3.12-bullseye",
 	"customizations": {
 		"vscode": {
 			"extensions": [
@@ -73,9 +73,11 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// Currently used:
 	// (none)
-	"forwardPorts": [8080],
+	"forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "apt update && apt install -y git && make install"
+	"postCreateCommand": "make install_dev"
 
+	// Make sure that the poetry shell is used
+	//"postStartCommand": "poetry shell"
 }

@@ -120,7 +120,7 @@ class SearchEngine:
             if index_size_increase > bytes_limit:
                 # To avoid size exploding
                 log_warning(
-                    f"Skipping indexing of URL {url} as it would yield a {round(index_size_increase / 1e6, 1)} MB size increase"
+                    f"Skipping indexing of URL {url} as it would yield a {round(index_size_increase/1e6,1)} MB size increase"
                 )
             else:
                 for k, v in new_words_indexed.items():

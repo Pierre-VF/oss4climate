@@ -18,27 +18,39 @@ jobs:
       contents: write
 
     steps:
-      - name: "Create UV installation"
-        uses: astral-sh/setup-uv@v5
-        with:
-          version: "0.5.16"
-
       - name: "Checkout code"
         uses: actions/checkout@v4
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
-      
-      # Check and fix the code
+
+      - name: Installing Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Installing packages 
+        run: make install
+        
+      # Code testing
+      - name: Run code test
+        run: source $(poetry env info --path)/bin/activate && make test
+
+      #
+      # Below, one must be careful to activate the "poetry" environment where relevant, 
+      #  as the commands do not operate in the right environment without it
+      #              
       - name: Defining Git identity 
         run: | 
           git config user.name github_actions
           git config user.email github_actions@pierrevf.consulting
 
+      # Code cleanup
       - name: Run code cleanup
-        run: make check_code
+        run: source $(poetry env info --path)/bin/activate && ruff format .
       
+      # Code cleanup
       - name: Commit changes back
         uses: EndBug/add-and-commit@v9
         with:
@@ -46,10 +58,3 @@ jobs:
           message: "Automatic code reformatting"
           add: "."
           push: true
-
-      # Run and test
-      - name: Installing packages 
-        run: make install
-        
-      - name: Run code test
-        run: make test
