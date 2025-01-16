@@ -8,7 +8,9 @@ def get_spacy_english_model(minimal: bool = True):
         import os
 
         print("Downloading the spacy model")
-        os.system("python -m spacy download en_core_web_sm")
+        # Pip is required prior to the model install (for dependency reasons as of 13/1/2025)
+        os.system("uv pip install pip")
+        os.system("uv run spacy download en_core_web_sm")
         print("Done")
         import en_core_web_sm
 
