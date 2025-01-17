@@ -23,6 +23,11 @@ def listing_credits(html: bool = True) -> str:
     df = list_of_listings.to_dataframe()
     # Sorting listings by descending number of datasets (and requiring at least 2 targets to be credited)
     min_targets = 2
+
+    for i, r in df.iterrows():
+        if (not isinstance(r["license_url"], str)) or r["license_url"] == "NaN":
+            df.loc[i, "license_url"] = licence_url_from_license_name(r["license"])
+
     df_no_nas = (
         df.dropna()
         .sort_values("target_count", ascending=False)
@@ -63,3 +68,7 @@ def listing_credits(html: bool = True) -> str:
 
     html_credit_text = ", ".join([_f_clean_text(i) for __, i in df_no_nas.iterrows()])
     return html_credit_text
+
+
+if __name__ == "__main__":
+    x = listing_credits()
