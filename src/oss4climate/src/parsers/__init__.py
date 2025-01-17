@@ -378,7 +378,7 @@ def identify_parsing_targets(x: list[str]) -> ParsingTargets:
     from oss4climate.src.parsers import github_data_io, gitlab_data_io
 
     out_bitbucket = ParsingTargets(
-        bitbucket_targets=[i for i in x if i.startswith(BITBUCKET_BASE_URL)]
+        bitbucket_repositories=[i for i in x if i.startswith(BITBUCKET_BASE_URL)]
     )
 
     out_github = github_data_io.split_across_target_sets(x)
