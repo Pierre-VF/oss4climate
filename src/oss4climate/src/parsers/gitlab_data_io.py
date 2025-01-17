@@ -31,7 +31,17 @@ GITLAB_URL_BASE = f"https://{GITLAB_DOMAIN}/"
 
 def is_gitlab_url(url: str, include_self_hosted: bool = True) -> bool:
     if include_self_hosted:
-        return url.startswith(GITLAB_ANY_URL_PREFIX)
+        if url.startswith(GITLAB_ANY_URL_PREFIX):
+            return True
+        elif url.startswith("https://git."):
+            try:
+                r = fetch_repository_language_details(url)
+                return True
+            except Exception:
+                # Any failure to run the request means that it's not a Gitlab
+                return False
+        else:
+            return False
     else:
         return url_base_matches_domain(url, GITLAB_DOMAIN)
 
@@ -43,7 +53,7 @@ class GitlabTargetType(Enum):
 
     @staticmethod
     def identify(url: str) -> "GitlabTargetType":
-        if not url.startswith(GITLAB_ANY_URL_PREFIX):
+        if not is_gitlab_url(url):
             return GitlabTargetType.UNKNOWN
         processed = _extract_organisation_and_repository_as_url_block(url)
         n_slashes = processed.count("/")
