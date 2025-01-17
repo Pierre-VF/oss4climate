@@ -35,14 +35,15 @@ def _extract_organisation_and_repository_as_url_block(x: str) -> str:
     # Cleaning up Github prefix
     if is_github_url(x):
         x = x.replace(GITHUB_URL_BASE, "")
+    fixed_x = "/".join(x.split("/")[:2])
     # Removing eventual extra information in URL
     for i in ["#", "&"]:
-        if i in x:
-            x = x.split(i)[0]
+        if i in fixed_x:
+            fixed_x = fixed_x.split(i)[0]
     # Removing trailing "/", if any
-    while x.endswith("/"):
-        x = x[:-1]
-    return x
+    while fixed_x.endswith("/"):
+        fixed_x = fixed_x[:-1]
+    return fixed_x
 
 
 def clean_github_repository_url(url: str) -> str:
@@ -56,6 +57,8 @@ class GithubTargetType(Enum):
 
     @staticmethod
     def identify(url: str) -> "GithubTargetType":
+        if not is_github_url(url):
+            return GithubTargetType.UNKNOWN
         processed = _extract_organisation_and_repository_as_url_block(url)
         n_slashes = processed.count("/")
         if n_slashes < 1:

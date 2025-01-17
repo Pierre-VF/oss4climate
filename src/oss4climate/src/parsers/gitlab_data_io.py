@@ -31,7 +31,17 @@ GITLAB_URL_BASE = f"https://{GITLAB_DOMAIN}/"
 
 def is_gitlab_url(url: str, include_self_hosted: bool = True) -> bool:
     if include_self_hosted:
-        return url.startswith(GITLAB_ANY_URL_PREFIX)
+        if url.startswith(GITLAB_ANY_URL_PREFIX):
+            return True
+        elif url.startswith("https://git."):
+            try:
+                r = fetch_repository_language_details(url)
+                return True
+            except Exception:
+                # Any failure to run the request means that it's not a Gitlab
+                return False
+        else:
+            return False
     else:
         return url_base_matches_domain(url, GITLAB_DOMAIN)
 
@@ -43,7 +53,7 @@ class GitlabTargetType(Enum):
 
     @staticmethod
     def identify(url: str) -> "GitlabTargetType":
-        if not url.startswith(GITLAB_ANY_URL_PREFIX):
+        if not is_gitlab_url(url):
             return GitlabTargetType.UNKNOWN
         processed = _extract_organisation_and_repository_as_url_block(url)
         n_slashes = processed.count("/")
@@ -87,14 +97,17 @@ def _extract_organisation_and_repository_as_url_block(x: str) -> str:
     else:
         h = _extract_gitlab_host(url=x)
         x = x.replace(f"https://{h}/", "")
+    fixed_x = "/".join(
+        x.split("/")[:2]
+    )  # For complex multiple projects nested, this might not work well
     # Removing eventual extra information in URL
     for i in ["#", "&"]:
-        if i in x:
-            x = x.split(i)[0]
+        if i in fixed_x:
+            fixed_x = fixed_x.split(i)[0]
     # Removing trailing "/", if any
-    while x.endswith("/"):
-        x = x[:-1]
-    return x
+    while fixed_x.endswith("/"):
+        fixed_x = fixed_x[:-1]
+    return fixed_x
 
 
 @lru_cache(maxsize=1)

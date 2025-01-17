@@ -180,6 +180,8 @@ class ParsingTargets:
     github_organisations: list[str] = field(default_factory=list)
     gitlab_projects: list[str] = field(default_factory=list)
     gitlab_groups: list[str] = field(default_factory=list)
+    bitbucket_projects: list[str] = field(default_factory=list)
+    bitbucket_repositories: list[str] = field(default_factory=list)
     unknown: list[str] = field(default_factory=list)
     invalid: list[str] = field(default_factory=list)
 
@@ -187,6 +189,9 @@ class ParsingTargets:
         return ParsingTargets(
             github_organisations=self.github_organisations + other.github_organisations,
             github_repositories=self.github_repositories + other.github_repositories,
+            bitbucket_projects=self.bitbucket_projects + other.bitbucket_projects,
+            bitbucket_repositories=self.bitbucket_repositories
+            + other.bitbucket_repositories,
             gitlab_groups=self.gitlab_groups + other.gitlab_groups,
             gitlab_projects=self.gitlab_projects + other.gitlab_projects,
             unknown=self.unknown + other.unknown,
@@ -198,6 +203,8 @@ class ParsingTargets:
         self.github_organisations += other.github_organisations
         self.gitlab_groups += other.gitlab_groups
         self.gitlab_projects += other.gitlab_projects
+        self.bitbucket_projects += other.bitbucket_projects
+        self.bitbucket_repositories += other.bitbucket_repositories
         self.unknown += other.unknown
         self.invalid += other.invalid
         return self
@@ -208,16 +215,23 @@ class ParsingTargets:
             + len(self.github_organisations)
             + len(self.gitlab_projects)
             + len(self.gitlab_groups)
+            + len(self.bitbucket_projects)
+            + len(self.bitbucket_repositories)
             + len(self.unknown)
             + len(self.invalid)
         )
 
     def as_url_list(self, known_repositories_only: bool = True) -> list[str]:
-        out = self.github_repositories + self.gitlab_projects
+        out = (
+            self.github_repositories
+            + self.gitlab_projects
+            + self.bitbucket_repositories
+        )
         if not known_repositories_only:
             out += (
                 self.github_organisations
                 + self.gitlab_groups
+                + self.bitbucket_projects
                 + self.unknown
                 + self.invalid
             )
@@ -233,6 +247,10 @@ class ParsingTargets:
         )
         self.gitlab_groups = sorted_list_of_cleaned_urls(self.gitlab_groups)
         self.gitlab_projects = sorted_list_of_cleaned_urls(self.gitlab_projects)
+        self.bitbucket_projects = sorted_list_of_cleaned_urls(self.bitbucket_projects)
+        self.bitbucket_repositories = sorted_list_of_cleaned_urls(
+            self.bitbucket_repositories
+        )
         self.unknown = sorted_list_of_cleaned_urls(self.unknown)
         self.invalid = sorted_list_of_cleaned_urls(self.invalid)
 
@@ -243,6 +261,8 @@ class ParsingTargets:
             + self.github_repositories
             + self.gitlab_groups
             + self.gitlab_projects
+            + self.bitbucket_projects
+            + self.bitbucket_repositories
         )
 
     def _target_is_valid(self, url: str) -> bool:
@@ -269,6 +289,10 @@ class ParsingTargets:
         )
         self.gitlab_groups = self._check_targets_validity(self.gitlab_groups)
         self.gitlab_projects = self._check_targets_validity(self.gitlab_projects)
+        self.bitbucket_projects = self._check_targets_validity(self.bitbucket_projects)
+        self.bitbucket_repositories = self._check_targets_validity(
+            self.bitbucket_repositories
+        )
 
     def cleanup(self) -> None:
         """
@@ -283,6 +307,9 @@ class ParsingTargets:
         ]
         self.gitlab_projects = [
             i for i in self.gitlab_projects if i not in self.gitlab_groups
+        ]
+        self.bitbucket_repositories = [
+            i for i in self.bitbucket_repositories if i not in self.bitbucket_projects
         ]
         # Removing unknown repos
         self.unknown = [
@@ -300,11 +327,17 @@ class ParsingTargets:
         with open(toml_file_path, "rb") as f:
             x = tomllib.load(f)
 
+        for i in ["github_hosted", "gitlab_hosted", "bitbucket_hosted"]:
+            if x.get(i) is None:
+                x[i] = {}
+
         return ParsingTargets(
             github_organisations=x["github_hosted"].get("organisations", []),
             github_repositories=x["github_hosted"].get("repositories", []),
             gitlab_groups=x["gitlab_hosted"].get("groups", []),
             gitlab_projects=x["gitlab_hosted"].get("projects", []),
+            bitbucket_projects=x["bitbucket_hosted"].get("projects", []),
+            bitbucket_repositories=x["bitbucket_hosted"].get("repositories", []),
             unknown=x["dropped_targets"].get("urls", []),
             invalid=x["dropped_targets"].get("invalid_urls", []),
         )
@@ -324,6 +357,10 @@ class ParsingTargets:
                 "groups": self.gitlab_groups,
                 "projects": self.gitlab_projects,
             },
+            "bitbucket_hosted": {
+                "projects": self.bitbucket_projects,
+                "repositories": self.bitbucket_repositories,
+            },
             "dropped_targets": {
                 "urls": self.unknown,
                 "invalid_urls": self.invalid,
@@ -338,22 +375,31 @@ class ParsingTargets:
 
 
 def identify_parsing_targets(x: list[str]) -> ParsingTargets:
-    from oss4climate.src.parsers import github_data_io, gitlab_data_io
+    from oss4climate.src.parsers import (
+        bitbucket_data_io,
+        github_data_io,
+        gitlab_data_io,
+    )
 
     out_github = github_data_io.split_across_target_sets(x)
     out_gitlab = gitlab_data_io.split_across_target_sets(out_github.unknown)
     out_github.unknown = []
+    out_bitbucket = bitbucket_data_io.split_across_target_sets(out_gitlab.unknown)
+    out_gitlab.unknown = []
 
-    out = out_github + out_gitlab
+    out = out_bitbucket + out_github + out_gitlab
     return out
 
 
 def isolate_relevant_urls(urls: list[str]) -> list[str]:
-    from oss4climate.src.parsers.github_data_io import GITHUB_URL_BASE
-    from oss4climate.src.parsers.gitlab_data_io import GITLAB_ANY_URL_PREFIX
+    from oss4climate.src.parsers import (
+        bitbucket_data_io,
+        github_data_io,
+        gitlab_data_io,
+    )
 
     def __f(i) -> bool:
-        if i.startswith(GITHUB_URL_BASE):
+        if github_data_io.is_github_url(i):
             if (
                 ("/tree/" in i)
                 or ("/blob/" in i)
@@ -364,7 +410,9 @@ def isolate_relevant_urls(urls: list[str]) -> list[str]:
                 return False
             else:
                 return True
-        elif i.startswith(GITLAB_ANY_URL_PREFIX):
+        elif gitlab_data_io.is_gitlab_url(i):
+            return True
+        elif bitbucket_data_io.is_bitbucket_url(i):
             return True
         else:
             return False
