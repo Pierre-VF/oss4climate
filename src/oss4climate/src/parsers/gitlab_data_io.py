@@ -87,14 +87,17 @@ def _extract_organisation_and_repository_as_url_block(x: str) -> str:
     else:
         h = _extract_gitlab_host(url=x)
         x = x.replace(f"https://{h}/", "")
+    fixed_x = "/".join(
+        x.split("/")[:2]
+    )  # For complex multiple projects nested, this might not work well
     # Removing eventual extra information in URL
     for i in ["#", "&"]:
-        if i in x:
-            x = x.split(i)[0]
+        if i in fixed_x:
+            fixed_x = fixed_x.split(i)[0]
     # Removing trailing "/", if any
-    while x.endswith("/"):
-        x = x[:-1]
-    return x
+    while fixed_x.endswith("/"):
+        fixed_x = fixed_x[:-1]
+    return fixed_x
 
 
 @lru_cache(maxsize=1)

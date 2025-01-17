@@ -25,17 +25,19 @@ def is_bitbucket_url(url: str) -> bool:
 
 
 def _extract_organisation_and_repository_as_url_block(x: str) -> str:
-    # Cleaning up Github prefix
+    # Cleaning up Bitbucket prefix
     if is_bitbucket_url(x):
         x = x.replace(BITBUCKET_URL_BASE, "")
+    # Not keeping more than 2 slashes
+    fixed_x = "/".join(x.split("/")[:2])
     # Removing eventual extra information in URL
     for i in ["#", "&"]:
-        if i in x:
-            x = x.split(i)[0]
+        if i in fixed_x:
+            fixed_x = fixed_x.split(i)[0]
     # Removing trailing "/", if any
-    while x.endswith("/"):
-        x = x[:-1]
-    return x
+    while fixed_x.endswith("/"):
+        fixed_x = fixed_x[:-1]
+    return fixed_x
 
 
 def clean_bitbucket_repository_url(url: str) -> str:
@@ -49,6 +51,8 @@ class BitbucketTargetType(Enum):
 
     @staticmethod
     def identify(url: str) -> "BitbucketTargetType":
+        if not is_bitbucket_url(url):
+            return BitbucketTargetType.UNKNOWN
         processed = _extract_organisation_and_repository_as_url_block(url)
         n_slashes = processed.count("/")
         if n_slashes < 1:
@@ -73,9 +77,10 @@ def split_across_target_sets(
             repos.append(i)
         else:
             others.append(i)
+
     return ParsingTargets(
-        bitbucket_projects=projs,
-        bitbucket_repositories=repos,
+        bitbucket_projects=[clean_bitbucket_repository_url(i) for i in projs],
+        bitbucket_repositories=[clean_bitbucket_repository_url(i) for i in repos],
         unknown=others,
     )
 
