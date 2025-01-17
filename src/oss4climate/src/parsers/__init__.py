@@ -375,26 +375,31 @@ BITBUCKET_BASE_URL = "https://bitbucket.org/"
 
 
 def identify_parsing_targets(x: list[str]) -> ParsingTargets:
-    from oss4climate.src.parsers import github_data_io, gitlab_data_io
-
-    out_bitbucket = ParsingTargets(
-        bitbucket_repositories=[i for i in x if i.startswith(BITBUCKET_BASE_URL)]
+    from oss4climate.src.parsers import (
+        bitbucket_data_io,
+        github_data_io,
+        gitlab_data_io,
     )
 
     out_github = github_data_io.split_across_target_sets(x)
     out_gitlab = gitlab_data_io.split_across_target_sets(out_github.unknown)
     out_github.unknown = []
+    out_bitbucket = bitbucket_data_io.split_across_target_sets(out_gitlab.unknown)
+    out_gitlab.unknown = []
 
     out = out_bitbucket + out_github + out_gitlab
     return out
 
 
 def isolate_relevant_urls(urls: list[str]) -> list[str]:
-    from oss4climate.src.parsers.github_data_io import GITHUB_URL_BASE
-    from oss4climate.src.parsers.gitlab_data_io import GITLAB_ANY_URL_PREFIX
+    from oss4climate.src.parsers import (
+        bitbucket_data_io,
+        github_data_io,
+        gitlab_data_io,
+    )
 
     def __f(i) -> bool:
-        if i.startswith(GITHUB_URL_BASE):
+        if github_data_io.is_github_url(i):
             if (
                 ("/tree/" in i)
                 or ("/blob/" in i)
@@ -405,9 +410,9 @@ def isolate_relevant_urls(urls: list[str]) -> list[str]:
                 return False
             else:
                 return True
-        elif i.startswith(GITLAB_ANY_URL_PREFIX):
+        elif gitlab_data_io.is_gitlab_url(i):
             return True
-        elif i.startswith(BITBUCKET_BASE_URL):
+        elif bitbucket_data_io.is_bitbucket_url(i):
             return True
         else:
             return False
