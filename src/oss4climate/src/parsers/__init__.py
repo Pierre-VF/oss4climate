@@ -308,6 +308,9 @@ class ParsingTargets:
         self.gitlab_projects = [
             i for i in self.gitlab_projects if i not in self.gitlab_groups
         ]
+        self.bitbucket_repositories = [
+            i for i in self.bitbucket_repositories if i not in self.bitbucket_projects
+        ]
         # Removing unknown repos
         self.unknown = [
             i for i in self.unknown if not self.__included_in_valid_targets(i)
@@ -369,9 +372,6 @@ class ParsingTargets:
 
         with open(toml_file_path, "w") as fp:
             dump(doc, fp, sort_keys=True)
-
-
-BITBUCKET_BASE_URL = "https://bitbucket.org/"
 
 
 def identify_parsing_targets(x: list[str]) -> ParsingTargets:
