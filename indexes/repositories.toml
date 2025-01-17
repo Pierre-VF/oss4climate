@@ -2125,6 +2125,7 @@ repositories = [
     "https://github.com/hpxmlwg/hpxml",
     "https://github.com/hsbay/cdrmex",
     "https://github.com/hubblo-org/scaphandre",
+    "https://github.com/huggingface/AIEnergyScore",
     "https://github.com/hultenvp/soliscloud_api",
     "https://github.com/hundredrabbits/Grimgrains",
     "https://github.com/hunter-stanke/rFIA",
