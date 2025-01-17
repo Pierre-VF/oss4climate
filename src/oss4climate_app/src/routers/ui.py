@@ -3,19 +3,15 @@ Module containing the API code
 """
 
 from datetime import date, timedelta
-from functools import lru_cache
 from typing import Optional
 
 import pandas as pd
 from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import HTMLResponse
 
-from oss4climate.src.config import FILE_INPUT_LISTINGS_INDEX
 from oss4climate.src.parsers.licenses import (
     LicenseCategoriesEnum,
-    licence_url_from_license_name,
 )
-from oss4climate.src.parsers.listings import ResourceListing
 from oss4climate_app.config import (
     URL_CODE_REPOSITORY,
     URL_FEEDBACK_FORM,
@@ -28,47 +24,9 @@ from oss4climate_app.src.data_io import (
 from oss4climate_app.src.log_activity import log_search
 from oss4climate_app.src.templates import render_template
 
+from . import listing_credits
+
 app = APIRouter(include_in_schema=False)
-
-
-@lru_cache(maxsize=1)
-def listing_credits() -> str:
-    list_of_listings = ResourceListing.from_json(FILE_INPUT_LISTINGS_INDEX)
-
-    def f_clean_name(x: str) -> str:
-        out = x.replace("https://", "")
-        if out.endswith("/"):
-            out = out[:-1]
-        for j in ["github.com/", "gitlab.com/"]:
-            if out.startswith(j):
-                out = out[len(j) :]
-        return out
-
-    df = list_of_listings.to_dataframe()
-    # Sorting listings by descending number of datasets (and requiring at least 2 targets to be credited)
-    min_targets = 2
-    df_no_nas = (
-        df.dropna()
-        .sort_values("target_count", ascending=False)
-        .query(f"target_count>={min_targets}")
-    )
-
-    def _f_clean_text(i: dict) -> str:
-        x = f'<b><a href="{i["url"]}">{f_clean_name(i["url"])}</a></b>'
-        license = i.get("license")
-        license_url = i.get("license_url")
-        if license not in [None, "?", "Other"]:
-            if license_url is None:
-                license_url = licence_url_from_license_name(license)
-            if license_url:
-                x += f""" licensed under <i><a href="{license_url}">{license}</a></i>"""
-            else:
-                x += f" licensed under {license}"
-        x += f""" ({int(i["target_count"])} entries)"""
-        return x
-
-    html_credit_text = ", ".join([_f_clean_text(i) for __, i in df_no_nas.iterrows()])
-    return html_credit_text
 
 
 def _f_none_to_unknown(x: str | date | None) -> str:
