@@ -121,7 +121,11 @@ def search_for_results(query: Optional[str] = None) -> pd.DataFrame:
         return res
 
     df_combined["score"] = df_combined["description"] * 10 + df_combined["readme"]
-    df_out = SEARCH_RESULTS.documents_without_readme.merge(
+    df_out = SEARCH_RESULTS.documents_without_readme
+    if "score" in df_out.keys():
+        df_out.drop(columns=["score"], inplace=True)
+
+    df_out = df_out.merge(
         df_combined[["score"]],
         how="outer",
         left_on="url",
@@ -144,6 +148,8 @@ def search_for_results(query: Optional[str] = None) -> pd.DataFrame:
 def clear_cache():
     repository_index_characteristics_from_documents.cache_clear()
     search_for_results.cache_clear()
+    n_repositories_indexed.cache_clear()
+    unique_license_categories.cache_clear()
 
 
 def refresh_data(force_refresh: bool = False):
