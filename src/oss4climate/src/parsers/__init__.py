@@ -340,7 +340,7 @@ class ParsingTargets:
         ]
         self.codeberg_repositories = [
             i
-            for i in self.bitbucket_repositories
+            for i in self.codeberg_repositories
             if i not in self.codeberg_organisations
         ]
         # Removing unknown repos
@@ -388,14 +388,6 @@ class ParsingTargets:
         # Outputting to a new TOML
         doc = document()
         toml_ready_dict = {
-            "github_hosted": {
-                "organisations": self.github_organisations,
-                "repositories": self.github_repositories,
-            },
-            "gitlab_hosted": {
-                "groups": self.gitlab_groups,
-                "projects": self.gitlab_projects,
-            },
             "bitbucket_hosted": {
                 "projects": self.bitbucket_projects,
                 "repositories": self.bitbucket_repositories,
@@ -403,6 +395,14 @@ class ParsingTargets:
             "codeberg_hosted": {
                 "organisations": self.codeberg_organisations,
                 "repositories": self.codeberg_repositories,
+            },
+            "github_hosted": {
+                "organisations": self.github_organisations,
+                "repositories": self.github_repositories,
+            },
+            "gitlab_hosted": {
+                "groups": self.gitlab_groups,
+                "projects": self.gitlab_projects,
             },
             "dropped_targets": {
                 "urls": self.unknown,
