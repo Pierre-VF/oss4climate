@@ -183,6 +183,14 @@ def read_about(request: Request):
     )
 
 
+@app.get("/privacy", include_in_schema=False)
+def read_privacy(request: Request):
+    return _render_ui_template(
+        request=request,
+        template_file="privacy.html",
+    )
+
+
 # Corresponding HEAD endpoints ( https://fastapi.tiangolo.com/reference/fastapi/#fastapi.FastAPI.head )
 def _default_head_behaviour(request: Request):
     pass
