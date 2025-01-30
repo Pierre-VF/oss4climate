@@ -23,7 +23,7 @@ To carry out a search without installing anything, you can just use the **web-ap
 
 ## What is the license of the code and the data?
 
-The license differs between the source code and the listings data. Please make sure to check the [license file][LICENSE] for all details.
+The license differs between the source code and the listings data. Please make sure to check the [license file](LICENSE) for all details.
 
 The underlying listing data comes from a variety of repositories, some of which have a creative common licence. **That means that while you are free to reuse and adapt the software, there are restrictions on the usage of the listings data below.** Having noted this, the listing data can be downloaded as [TOML](https://data.pierrevf.consulting/oss4climate/summary.toml), [CSV](https://data.pierrevf.consulting/oss4climate/listing_data.csv) or [Feather (for Python pandas)](https://data.pierrevf.consulting/oss4climate/listing_data.feather).
 
@@ -41,7 +41,18 @@ The following projects are credited as major contributors to the underlying data
 
 - [OpenSustain.tech](https://opensustain.tech/) (who kindly licensed their dataset under *Creative Commons Attribution 4.0 International*)
 
-- (... list in progress ...)
+- Other listings found in [listings.json](indexes/listings.json)
+
+
+Data from the repositories themselves is fetched directly from the hosting platforms. The platforms currently supported are given in the table below.
+
+| Platform  | Identified in discovery | Data scraped        |
+|-----------|-------------------------|---------------------|
+| Gitlab    | Yes                     | Yes                 |
+| Gihub     | Yes                     | Yes                 |
+| Bitbucket | Yes                     | Not yet             |
+| Codeberg  | Yes                     | Not yet             |
+
 
 
 ## Development and contribution
