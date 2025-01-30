@@ -3487,6 +3487,7 @@ groups = [
     "https://gitlab.com/openlandmap",
     "https://gitlab.com/project-catalyst",
     "https://gitlab.com/shyft-os",
+    "https://gitlab.lrz.de/energy-management-technologies-public",
     "https://gitlab.windenergy.dtu.dk/pyconturb",
 ]
 projects = [
@@ -3656,11 +3657,6 @@ invalid_urls = [
     "https://github.com/energy-modelling-ireland/wiki",
     "https://github.com/geco-bern/ingestr/",
     "https://github.com/samapriya/awesome-gee-community-datasets/",
-    "https://github.com/settings/codespaces",
-    "https://github.com/settings/tokens",
-    "https://gitlab.com/-/user_settings/personal_access_tokens",
-    "https://gitlab.com/geoharmonizer_inea/eumap/blob/master/LICENSE",
-    "https://github.com/energy-modelling-ireland/wiki",
     "https://github.com/settings/codespaces",
     "https://github.com/settings/tokens",
     "https://gitlab.com/-/user_settings/personal_access_tokens",
