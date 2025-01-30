@@ -1,10 +1,12 @@
 import pathlib
 import uuid
+from functools import lru_cache
 
 from oss4climate.src.config import (
     URL_LISTING_CSV,
     URL_LISTING_FEATHER,
     URL_LISTINGS_INDEX,
+    Settings,
 )
 
 _script_dir = pathlib.Path(__file__).resolve().parent
@@ -23,3 +25,8 @@ URL_DATA_LISTINGS_JSON = URL_LISTINGS_INDEX
 URL_DATA_CSV = URL_LISTING_CSV
 URL_DATA_FEATHER = URL_LISTING_FEATHER
 URL_FAVICON = "https://www.pierrevf.consulting/wp-content/uploads/2023/11/cropped-logo_base_png-32x32.png"
+
+
+@lru_cache(maxsize=1)
+def umami_site_id() -> str:
+    return Settings().UMAMI_SITE_ID

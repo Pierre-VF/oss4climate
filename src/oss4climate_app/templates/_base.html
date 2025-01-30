@@ -8,7 +8,11 @@
             {% endblock %}</title>
         <link href="{{ url_for('static', path='/css/styles.css') }}?version={{ APP_VERSION }}" rel="stylesheet">
         <!-- For github buttons -->
-        <script async defer src="https://buttons.github.io/buttons.js"></script>
+        <script async defer src="https://buttons.github.io/buttons.js"></script>        
+        {% if UMAMI_SITE_ID != "" %}
+            <script defer src="https://cloud.umami.is/script.js" data-website-id="{{ UMAMI_SITE_ID }}"></script>
+        {% endif %}
+        
         <link rel="canonical" href="{{ canonical_url }}">
     </head>
     <body>
@@ -26,6 +30,13 @@
 
         <div class="credits">
             <p class="center">{{ credits_text | safe }}</p>
+            <p class="center">-</p>
+            <p class="center">
+                Maintained by <a href="https://pierrevf.consulting/">PierreVF Consulting</a> 
+                | 
+                <a href="{{ URL_CODE_REPOSITORY }}">Source code</a> 
+                | 
+                <a href="/ui/privacy">Privacy policy</a></p>
         </div>
     </body>
 </html>
