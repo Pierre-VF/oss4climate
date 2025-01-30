@@ -1,3 +1,32 @@
+[bitbucket_hosted]
+projects = []
+repositories = [
+    "https://bitbucket.org/Xeelk/pymfa2",
+    "https://bitbucket.org/blacklandgrasslandmodels/swat_development",
+    "https://bitbucket.org/cioapps/wapor-et-look",
+    "https://bitbucket.org/cmutel/brightway2-calc",
+    "https://bitbucket.org/cmutel/brightway2-data",
+    "https://bitbucket.org/cmutel/brightway2-io",
+    "https://bitbucket.org/cnes_aviso/fes",
+    "https://bitbucket.org/corizon/agrosense",
+    "https://bitbucket.org/enroute-mobi/ara",
+    "https://bitbucket.org/enroute-mobi/chouette-core",
+    "https://bitbucket.org/harald_g_svendsen/powergama",
+    "https://bitbucket.org/maurow/1dhydro",
+    "https://bitbucket.org/maurow/rchannelode.jl",
+    "https://bitbucket.org/pysdi/pysdi",
+]
+
+[codeberg_hosted]
+organisations = []
+repositories = [
+    "https://codeberg.org/FBRC/RFB-dev-kit",
+    "https://codeberg.org/LibreWater/Acraea-Prototype",
+    "https://codeberg.org/adamhsparks/epicrop",
+    "https://codeberg.org/dancingCycle/gtfs-display",
+    "https://codeberg.org/dancingCycle/gtfs-rt-display",
+]
+
 [github_hosted]
 organisations = [
     "https://github.com/BatteryDataAlliance",
@@ -162,6 +191,7 @@ repositories = [
     "https://github.com/BattMoTeam/BattMo",
     "https://github.com/Battery-Intelligence-Lab/SLIDE",
     "https://github.com/BatteryDataAlliance/battery-data-interface",
+    "https://github.com/BatteryDataAlliance/pymacnet",
     "https://github.com/BelgianBiodiversityPlatform/python-dwca-reader",
     "https://github.com/BerkeleySandProject/sandmining-watch",
     "https://github.com/Big-Biodiversity-Collaborative/SwallowtailClimateChange",
@@ -1004,6 +1034,7 @@ repositories = [
     "https://github.com/PoisotLab/SpeciesDistributionToolkit.jl",
     "https://github.com/PowerGenome/PowerGenome",
     "https://github.com/PowerGridModel/power-grid-model",
+    "https://github.com/PowerGridModel/power-grid-model-benchmark",
     "https://github.com/PredictiveEcology/LandR",
     "https://github.com/Project-AgML/AgML",
     "https://github.com/Project-OSRM/osrm-backend",
@@ -1147,6 +1178,7 @@ repositories = [
     "https://github.com/TEOS-10/GSW-Python",
     "https://github.com/TGSAI/mdio-python",
     "https://github.com/TIDES-transit/TIDES",
+    "https://github.com/TNO/ChaProEV",
     "https://github.com/TNO/EXIOMOD-open",
     "https://github.com/TOMP-WG/TOMP-API",
     "https://github.com/TRI-AMDD/beep",
@@ -1599,6 +1631,7 @@ repositories = [
     "https://github.com/carbonplan/cmip6-downscaling",
     "https://github.com/carbonplan/forest-offsets",
     "https://github.com/carbonplan/forest-risks",
+    "https://github.com/carderne/gridfinder",
     "https://github.com/carderne/gridfinder.git",
     "https://github.com/carderne/predictive-mapping-global-power",
     "https://github.com/carlos-alberto-silva/ForestGapR",
@@ -1668,6 +1701,7 @@ repositories = [
     "https://github.com/cmichi/gtfs-visualizations",
     "https://github.com/cmoscardi/bus_kalman",
     "https://github.com/cncf-tags/green-reviews-tooling",
+    "https://github.com/cncf/landscape2",
     "https://github.com/cnumr/GreenIT-Analysis",
     "https://github.com/cnumr/ecoCode",
     "https://github.com/cnumr/ecoindex_cli",
@@ -1700,6 +1734,7 @@ repositories = [
     "https://github.com/corentin-dfg/Satellite-Image-Time-Series-Datasets",
     "https://github.com/correctiv/grundwasser-data",
     "https://github.com/cortinah/hockeystick",
+    "https://github.com/covXtreme/covXtreme",
     "https://github.com/covxtreme/.github",
     "https://github.com/cozy/coachCO2",
     "https://github.com/cp-PYFOREST/Land-Use-Assessment",
@@ -1991,6 +2026,7 @@ repositories = [
     "https://github.com/flechtenberg/pulpo",
     "https://github.com/fledge-power/contributing",
     "https://github.com/flexiblepower/powermatcher",
+    "https://github.com/flixOpt/flixOpt",
     "https://github.com/floschl/pysamosa",
     "https://github.com/fnemina/pyOSOAA",
     "https://github.com/forc-db/ForC",
@@ -2159,6 +2195,7 @@ repositories = [
     "https://github.com/hydroshare/hydroshare",
     "https://github.com/hydroversebr/hydrobr",
     "https://github.com/hyperledger-labs/blockchain-carbon-accounting",
+    "https://github.com/hyphae/APIS",
     "https://github.com/hyphae/apis-common",
     "https://github.com/hyriver/hyriver.github.io",
     "https://github.com/hyriver/pydaymet",
@@ -2258,6 +2295,7 @@ repositories = [
     "https://github.com/jlandmann/glaciersat",
     "https://github.com/jmcollin78/versatile_thermostat",
     "https://github.com/jmcook1186/biosnicar-py",
+    "https://github.com/jmertic/lfx-landscape-tools",
     "https://github.com/jmigueldelgado/buhayra",
     "https://github.com/jneme910/CART",
     "https://github.com/jnioche/carbonintensity-api",
@@ -2692,9 +2730,17 @@ repositories = [
     "https://github.com/openforis/arena",
     "https://github.com/openforis/sepal",
     "https://github.com/opengeh/.github",
+    "https://github.com/opengeos/Earth-Engine-Catalog",
     "https://github.com/opengeos/HyperCoast",
+    "https://github.com/opengeos/NASA-CMR-STAC",
+    "https://github.com/opengeos/Planetary-Computer-Catalog",
+    "https://github.com/opengeos/aws-open-data",
+    "https://github.com/opengeos/aws-open-data-geo",
+    "https://github.com/opengeos/aws-open-data-stac",
     "https://github.com/opengeos/geospatial-data-catalogs",
     "https://github.com/opengeos/leafmap",
+    "https://github.com/opengeos/maxar-open-data",
+    "https://github.com/opengeos/stac-index-catalogs",
     "https://github.com/opengeos/whiteboxgui",
     "https://github.com/opengeospatial/ogcapi-environmental-data-retrieval",
     "https://github.com/openghg/openghg",
@@ -3041,6 +3087,7 @@ repositories = [
     "https://github.com/rubisco-sfa/ILAMB",
     "https://github.com/rudolfwilliam/satellite_image_forecasting",
     "https://github.com/rulixiang/ChangeDetectionPCAKmeans",
+    "https://github.com/rust-transit/gtfs-structure",
     "https://github.com/s-macke/VoxelSpace",
     "https://github.com/saaste/fmi-weather-client",
     "https://github.com/sachit27/greenR",
@@ -3153,6 +3200,7 @@ repositories = [
     "https://github.com/socialincome-san/public",
     "https://github.com/socib/Leaflet.TimeDimension",
     "https://github.com/softwareunderground/awesome-open-geoscience",
+    "https://github.com/sogno-platform/cimpy",
     "https://github.com/sogno-platform/dpsim",
     "https://github.com/soilspectroscopy/ossl-manual",
     "https://github.com/solartherm/solartherm",
@@ -3519,25 +3567,6 @@ projects = [
     "https://gitlab.windenergy.dtu.dk/toolbox/WindEnergyToolbox",
 ]
 
-[bitbucket_hosted]
-projects = []
-repositories = [
-    "https://bitbucket.org/Xeelk/pymfa2",
-    "https://bitbucket.org/blacklandgrasslandmodels/swat_development",
-    "https://bitbucket.org/cioapps/wapor-et-look",
-    "https://bitbucket.org/cmutel/brightway2-calc",
-    "https://bitbucket.org/cmutel/brightway2-data",
-    "https://bitbucket.org/cmutel/brightway2-io",
-    "https://bitbucket.org/cnes_aviso/fes",
-    "https://bitbucket.org/corizon/agrosense",
-    "https://bitbucket.org/enroute-mobi/ara",
-    "https://bitbucket.org/enroute-mobi/chouette-core",
-    "https://bitbucket.org/harald_g_svendsen/powergama",
-    "https://bitbucket.org/maurow/1dhydro",
-    "https://bitbucket.org/maurow/rchannelode.jl",
-    "https://bitbucket.org/pysdi/pysdi",
-]
-
 [dropped_targets]
 urls = [
     "http://sciencepolicy.colorado.edu/icecaps/research/media_coverage/",
@@ -3632,6 +3661,7 @@ invalid_urls = [
     "https://gitlab.com/-/user_settings/personal_access_tokens",
     "https://gitlab.com/geoharmonizer_inea/eumap/blob/master/LICENSE",
     "https://github.com/energy-modelling-ireland/wiki",
+    "https://github.com/settings/codespaces",
     "https://github.com/settings/tokens",
     "https://gitlab.com/-/user_settings/personal_access_tokens",
     "https://gitlab.com/geoharmonizer_inea/eumap/blob/master/LICENSE",
