@@ -15,6 +15,7 @@ from oss4climate.src.parsers.licenses import (
 from oss4climate_app.config import (
     URL_CODE_REPOSITORY,
     URL_FEEDBACK_FORM,
+    umami_site_id,
 )
 from oss4climate_app.src.data_io import (
     repository_index_characteristics_from_documents,
@@ -42,6 +43,7 @@ def _render_ui_template(
     url = request.url.components
     canonical_url = f"{url.scheme}://{url.netloc}{url.path}"
     resp = {
+        "UMAMI_SITE_ID": umami_site_id(),
         "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
         "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
         "credits_text": f"With contributions from manually curated listings: {listing_credits()}",
