@@ -541,6 +541,7 @@
         "html": [
             {
                 "url": "https://wiki.openmod-initiative.org/",
+                "target_count": 149,
                 "license":"Creative Commons Attribution 4.0 International",
                 "license_url": "https://creativecommons.org/licenses/by/4.0/"
             }
