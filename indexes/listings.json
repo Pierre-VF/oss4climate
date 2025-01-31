@@ -531,8 +531,18 @@
             },
             {
                 "license": "Creative Commons Attribution 4.0 International",
+                "license_url": "https://creativecommons.org/licenses/by/4.0/",
                 "target_count": 2205,
                 "url": "https://opensustain.tech/"
+            }
+        ]
+    },
+    "websites": {
+        "html": [
+            {
+                "url": "https://wiki.openmod-initiative.org/",
+                "license":"Creative Commons Attribution 4.0 International",
+                "license_url": "https://creativecommons.org/licenses/by/4.0/"
             }
         ]
     }
