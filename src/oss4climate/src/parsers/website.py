@@ -80,9 +80,9 @@ def crawl_website(
         else:
             url_x = url
         _web_get(f"{url_x}/robots.txt")
-        has_robots_txt = False
-    except:
         has_robots_txt = True
+    except:
+        has_robots_txt = False
 
     if has_robots_txt:
         raise NotImplementedError(
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     log_info("Loading organisations and repositories to be indexed")
     targets = ParsingTargets.from_toml(FILE_INPUT_INDEX)
 
-    new_targets = crawl_website("https://wiki.openmod-initiative.org/", max_pages=10000)
+    new_targets = crawl_website("https://wiki.openmod-initiative.org/", max_pages=20000)
 
     extended_targets = targets + new_targets
 
