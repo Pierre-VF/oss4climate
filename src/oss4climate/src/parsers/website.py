@@ -72,7 +72,26 @@ def crawl_website(
     remove_unknown: bool = True,
     cache_lifetime: timedelta | None = None,
     max_pages: int | None = None,
+    ignore_path_regex: str | None = None,
 ) -> ParsingTargets:
+    try:
+        if url.endswith("/"):
+            url_x = url[:-1]
+        else:
+            url_x = url
+        _web_get(f"{url_x}/robots.txt")
+        has_robots_txt = False
+    except:
+        has_robots_txt = True
+
+    if has_robots_txt:
+        raise NotImplementedError(
+            "Unable to respect robots.txt at this stage - scraping is forbidden"
+        )
+
+    if ignore_path_regex:
+        raise NotImplementedError("Regex for path ignore is not implemented yet")
+
     targets = ParsingTargets()
     urls_crawled = []
     urls_to_crawl = [url]
@@ -87,6 +106,9 @@ def crawl_website(
                 new_urls, new_targets = scrape_page(
                     url_i, cache_lifetime=cache_lifetime
                 )
+            except KeyboardInterrupt:
+                log_info("User got tired, stopping here")
+                break
             except Exception as e:
                 log_info(f"Failed to scrape {url_i} ({e})")
             # Adding the results
@@ -98,6 +120,8 @@ def crawl_website(
                 if crawl_counter > max_pages:
                     log_info("Reached the maximum number of crawls - stopping")
                     break
+                else:
+                    log_info(f"Crawl {crawl_counter} / {max_pages} allowed")
 
     if remove_unknown:
         targets.unknown = []
@@ -117,7 +141,7 @@ if __name__ == "__main__":
     log_info("Loading organisations and repositories to be indexed")
     targets = ParsingTargets.from_toml(FILE_INPUT_INDEX)
 
-    new_targets = crawl_website("https://wiki.openmod-initiative.org/", max_pages=400)
+    new_targets = crawl_website("https://wiki.openmod-initiative.org/", max_pages=10000)
 
     extended_targets = targets + new_targets
 
@@ -128,5 +152,7 @@ if __name__ == "__main__":
     extended_targets.to_toml(FILE_INPUT_INDEX)
 
     format_individual_file(FILE_INPUT_INDEX)
+
+    print(f"{len(new_targets)} new targets scraped")
 
     print("Done")
