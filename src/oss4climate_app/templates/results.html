@@ -31,7 +31,12 @@
             <input type="text" id="focusLicense" onkeyup="filterTable()" placeholder="License"> 
             or reorder current page by clicking on the column to sort)
         </p>
-        <table id="results_table">
+
+        {% if query %}
+        <table id="results_table" data-umami-event="search_result_display" data-umami-event-searchterm="{{ query }}">
+        {% else %}    
+        <table id="results_table" data-umami-event="search_result_display_all">
+        {% endif %}
             <tr>
                 <th onclick="sortTable(0)" class="left">Name</th>
                 <th onclick="sortTable(1)">Description</th>
@@ -41,7 +46,15 @@
             </tr>
             {% for i, r in results.iterrows() %}
                 <tr>
-                    <td class="left"><a href="{{ r.url }}" target="_blank" rel="noopener noreferrer">{{ r["organisation"] }}/{{ r["name"] }}</a></td>
+                    <td class="left">
+                        <a 
+                            href="{{ r.url }}" 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            data-umami-event="redirect-to-solution-page"
+                            data-umami-event-url="{{ r.url }}"
+                            data-umami-event-keyword="{{ query }}"
+                        >{{ r["organisation"] }}/{{ r["name"] }}</a></td>
                     <td>{{ r.description }}</td>
                     <td>{{ r.language }}</td>
                     <td>{{ r.license }}</td>
