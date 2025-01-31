@@ -52,18 +52,18 @@ class GitlabTargetType(Enum):
     UNKNOWN = "UNKNOWN"
 
     @staticmethod
-    def identify(url: str) -> "GitlabTargetType":
+    def identify(url: str) -> tuple["GitlabTargetType", str]:
         if not is_gitlab_url(url):
-            return GitlabTargetType.UNKNOWN
+            return GitlabTargetType.UNKNOWN, url
         processed = _extract_organisation_and_repository_as_url_block(url)
         n_slashes = processed.count("/")
         if n_slashes < 1:
-            return GitlabTargetType.GROUP
+            return GitlabTargetType.GROUP, processed
         elif n_slashes >= 1:
             # TODO : this is not good enough for sub-projects (but best quick fix for now)
-            return GitlabTargetType.PROJECT
+            return GitlabTargetType.PROJECT, processed
         else:
-            return GitlabTargetType.UNKNOWN
+            return GitlabTargetType.UNKNOWN, processed
 
 
 def split_across_target_sets(
@@ -73,11 +73,11 @@ def split_across_target_sets(
     projects = []
     others = []
     for i in x:
-        tt_i = GitlabTargetType.identify(i)
+        tt_i, clean_url_i = GitlabTargetType.identify(i)
         if tt_i is GitlabTargetType.GROUP:
-            groups.append(i)
+            groups.append(clean_url_i)
         elif tt_i is GitlabTargetType.PROJECT:
-            projects.append(i)
+            projects.append(clean_url_i)
         else:
             others.append(i)
     return ParsingTargets(
@@ -97,8 +97,10 @@ def _extract_organisation_and_repository_as_url_block(x: str) -> str:
     else:
         h = _extract_gitlab_host(url=x)
         x = x.replace(f"https://{h}/", "")
+
+    fixed_x = x.split("/-/")[0]  # To remove trees and the like
     fixed_x = "/".join(
-        x.split("/")[:2]
+        fixed_x.split("/")[:2]
     )  # For complex multiple projects nested, this might not work well
     # Removing eventual extra information in URL
     for i in ["#", "&"]:
