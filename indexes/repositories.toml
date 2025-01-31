@@ -3580,6 +3580,8 @@ repositories = [
 [gitlab_hosted]
 groups = [
     "https://gitlab.com/fame-framework",
+    "https://gitlab.com/hotmaps",
+    "https://gitlab.com/mosaik",
     "https://gitlab.com/openlandmap",
     "https://gitlab.com/project-catalyst",
     "https://gitlab.com/shyft-os",
@@ -3587,6 +3589,7 @@ groups = [
     "https://gitlab.windenergy.dtu.dk/pyconturb",
 ]
 projects = [
+    "https://git.coop/webarch/mediawiki",
     "https://git.geomar.de/markus-pahlow/UVic-updates-opem",
     "https://git.iws.uni-stuttgart.de/dumux-repositories/dumux",
     "https://git.rwth-aachen.de/SHEMAT-Suite/SHEMAT-Suite-open",
@@ -3621,6 +3624,7 @@ projects = [
     "https://gitlab.com/foodsharing-dev/foodsharing",
     "https://gitlab.com/geoharmonizer_inea/eumap",
     "https://gitlab.com/hkex/resipy",
+    "https://gitlab.com/hotmaps/potential",
     "https://gitlab.com/hotmaps/potential/WWTP",
     "https://gitlab.com/ibarraespinosa/vein",
     "https://gitlab.com/joular/joularjx",
@@ -3638,6 +3642,7 @@ projects = [
     "https://gitlab.com/publictransitanalytics-pub/readme",
     "https://gitlab.com/retrofitcoop/macquette",
     "https://gitlab.com/rootmodels/OpenSimRoot",
+    "https://gitlab.com/smspp/smspp-project",
     "https://gitlab.com/sunpeek/sunpeek",
     "https://gitlab.com/then-try-this/climate-tool",
     "https://gitlab.com/wgms/glathida",
@@ -3655,8 +3660,10 @@ projects = [
     "https://gitlab.opengeosys.org/ogs/ogs",
     "https://gitlab.orfeo-toolbox.org/remote_modules/let-it-snow/",
     "https://gitlab.pnnl.gov/exasgd/frameworks/exago",
+    "https://gitlab.tubit.tu-berlin.de/electricity-modeling/crossborder-skript",
     "https://gitlab.version.fz-juelich.de/esde/machine-learning/mlair",
     "https://gitlab.vtt.fi/backbone/backbone",
+    "https://gitlab.vtt.fi/backbone/models/helsinki-dhc-model",
     "https://gitlab.windenergy.dtu.dk/OpenLAC/BasicDTUController",
     "https://gitlab.windenergy.dtu.dk/TOPFARM/PyWake",
     "https://gitlab.windenergy.dtu.dk/TOPFARM/TopFarm2",
