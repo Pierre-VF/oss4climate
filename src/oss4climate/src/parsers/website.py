@@ -61,7 +61,7 @@ def scrape_page(
 
     parsing_targets = identify_parsing_targets(external_links)
     interesting_internal_links = [
-        i for i in internal_links if _is_interesting_internal_url(i)
+        i.split("#")[0] for i in internal_links if _is_interesting_internal_url(i)
     ]
 
     return interesting_internal_links, parsing_targets
@@ -69,6 +69,7 @@ def scrape_page(
 
 def crawl_website(
     url: str,
+    remove_unknown: bool = True,
     cache_lifetime: timedelta | None = None,
     max_pages: int | None = None,
 ) -> ParsingTargets:
@@ -98,12 +99,17 @@ def crawl_website(
                     log_info("Reached the maximum number of crawls - stopping")
                     break
 
+    if remove_unknown:
+        targets.unknown = []
+        targets.invalid = []
+
     # Ensuring unicity
     targets.cleanup()
     return targets
 
 
 if __name__ == "__main__":
+    from oss4climate.scripts import format_individual_file
     from oss4climate.src.config import FILE_INPUT_INDEX
     from oss4climate.src.log import log_info
     from oss4climate.src.parsers import ParsingTargets
@@ -111,7 +117,7 @@ if __name__ == "__main__":
     log_info("Loading organisations and repositories to be indexed")
     targets = ParsingTargets.from_toml(FILE_INPUT_INDEX)
 
-    new_targets = crawl_website("https://wiki.openmod-initiative.org/", max_pages=100)
+    new_targets = crawl_website("https://wiki.openmod-initiative.org/", max_pages=400)
 
     extended_targets = targets + new_targets
 
@@ -120,3 +126,7 @@ if __name__ == "__main__":
     extended_targets.cleanup()
     log_info(f"Exporting to {FILE_INPUT_INDEX}")
     extended_targets.to_toml(FILE_INPUT_INDEX)
+
+    format_individual_file(FILE_INPUT_INDEX)
+
+    print("Done")
