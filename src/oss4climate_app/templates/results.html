@@ -15,17 +15,10 @@
             If you specified a license or language, you might also want to rerun the query without these filters.
         </p>
 
-    {% else %} 
-
-        {% if n_total_found > n_found %}
-            <p>{{n_total_found}} results found (showing only {{ n_found }} here):</p>
-        {% else %}    
-            <p>{{n_total_found}} results found:</p>
-        {% endif %}
+    {% else %}    
+        <p>{{n_total_found}} results found:</p>
 
         <p>
-            {% if show_previous %}<a href="{{ url_previous }}">Previous << </a>{% endif %} 
-            {% if show_next %}<a href="{{ url_next }}">>> Next</a>{% endif %} 
             (Filter current page: 
             <input type="text" id="focusLanguage" onkeyup="filterTable()" placeholder="Language">
             <input type="text" id="focusLicense" onkeyup="filterTable()" placeholder="License"> 
@@ -62,12 +55,6 @@
                 </tr>
             {% endfor %}
         </table>
-
-        
-        <p>
-            {% if show_previous %}<a href="{{ url_previous }}">Previous << </a>{% endif %} 
-            {% if show_next %}<a href="{{ url_next }}">>> Next</a>{% endif %}
-        </p>
 
         <p>Not finding what you were looking for? Please give us <b><a href="{{ URL_FEEDBACK_FORM }}">your feedback</a></b>.</p>
     {% endif %}

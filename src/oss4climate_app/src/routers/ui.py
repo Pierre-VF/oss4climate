@@ -81,10 +81,11 @@ async def search_results(
     query: Optional[str] = None,
     language: Optional[str] = None,
     license_category: Optional[str] = None,
-    n_results: int = 100,
-    offset: int | None = None,
     exclude_forks: Optional[bool] = None,
     exclude_inactive: Optional[bool] = None,
+    # For backwards compatibility of links
+    n_results: Optional[int] = None,
+    offset: Optional[int] = None,
 ):
     if query:
         query = query.strip().lower()
@@ -107,39 +108,21 @@ async def search_results(
         t_limit = date.today() - timedelta(days=365)
         df_out = df_out[df_out["last_commit"] >= t_limit]
 
-    if offset is None:
-        df_shown = df_out.head(n_results)
-    else:
-        df_shown = df_out.iloc[offset : offset + n_results].copy()
-
     # Refining output
-    df_shown = df_shown.drop(
-        columns=["score"]  # Dropping scores, as it's not informative to the user
+    df_out.drop(
+        columns=["score"],  # Dropping scores, as it's not informative to the user
+        inplace=True,
     )
     for i in ["license", "last_commit"]:
-        df_shown.loc[:, i] = df_shown[i].apply(_f_none_to_unknown)
+        df_out.loc[:, i] = df_out[i].apply(_f_none_to_unknown)
 
-    n_found = len(df_shown)
     n_total_found = len(df_out)
-
-    # URLs
-    current_url = f"results?query={query}&n_results={n_results}"
-    if language:
-        current_url = f"{current_url}&language={language}"
-    if license_category:
-        current_url = f"{current_url}&license_category={license_category}"
-    current_offset = 0 if offset is None else offset
-
-    url_previous = f"{current_url}&offset={current_offset - n_results}"
-    url_next = f"{current_url}&offset={current_offset + n_results}"
-
-    show_previous = current_offset > 0
-    show_next = current_offset <= (n_total_found - n_results)
+    n_found = n_total_found
 
     # Filling the gaps for clean display
     cols_to_clean = ["description", "language", "license"]
-    df_shown.loc[:, cols_to_clean] = (
-        df_shown[cols_to_clean]
+    df_out.loc[:, cols_to_clean] = (
+        df_out[cols_to_clean]
         .replace(
             {
                 None: pd.NA,
@@ -155,7 +138,7 @@ async def search_results(
         log_search,
         search_term=query,
         number_of_results=n_total_found,
-        view_offset=current_offset,
+        view_offset=None,
     )
 
     return _render_ui_template(
@@ -165,12 +148,8 @@ async def search_results(
             "request": request,
             "n_found": n_found,
             "n_total_found": n_total_found,
-            "results": df_shown,
+            "results": df_out,
             "query": query,
-            "url_previous": url_previous,
-            "url_next": url_next,
-            "show_previous": show_previous,
-            "show_next": show_next,
         },
     )
 
