@@ -3664,4 +3664,6 @@ invalid_urls = [
     "https://github.com/settings/tokens",
     "https://gitlab.com/-/user_settings/personal_access_tokens",
     "https://gitlab.com/geoharmonizer_inea/eumap/blob/master/LICENSE",
+    "https://github.com/energy-modelling-ireland/wiki",
+    "https://gitlab.com/geoharmonizer_inea/eumap/blob/master/LICENSE",
 ]
