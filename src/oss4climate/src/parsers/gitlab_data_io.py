@@ -46,24 +46,37 @@ def is_gitlab_url(url: str, include_self_hosted: bool = True) -> bool:
         return url_base_matches_domain(url, GITLAB_DOMAIN)
 
 
+def _clean_url(url: str) -> str:
+    x = url.split("/-/")[0]  # To remove trees and the like
+    # Removing eventual extra information in URL
+    for i in ["#", "&"]:
+        if i in x:
+            x = x.split(i)[0]
+    # Removing trailing "/", if any
+    while x.endswith("/"):
+        x = x[:-1]
+    return x
+
+
 class GitlabTargetType(Enum):
     GROUP = "GROUP"
     PROJECT = "PROJECT"
     UNKNOWN = "UNKNOWN"
 
     @staticmethod
-    def identify(url: str) -> "GitlabTargetType":
+    def identify(url: str) -> tuple["GitlabTargetType", str]:
         if not is_gitlab_url(url):
-            return GitlabTargetType.UNKNOWN
+            return GitlabTargetType.UNKNOWN, url
         processed = _extract_organisation_and_repository_as_url_block(url)
+        clean_url = _clean_url(url)  # To remove trees and the like
         n_slashes = processed.count("/")
         if n_slashes < 1:
-            return GitlabTargetType.GROUP
+            return GitlabTargetType.GROUP, clean_url
         elif n_slashes >= 1:
             # TODO : this is not good enough for sub-projects (but best quick fix for now)
-            return GitlabTargetType.PROJECT
+            return GitlabTargetType.PROJECT, clean_url
         else:
-            return GitlabTargetType.UNKNOWN
+            return GitlabTargetType.UNKNOWN, clean_url
 
 
 def split_across_target_sets(
@@ -73,11 +86,11 @@ def split_across_target_sets(
     projects = []
     others = []
     for i in x:
-        tt_i = GitlabTargetType.identify(i)
+        tt_i, clean_url_i = GitlabTargetType.identify(i)
         if tt_i is GitlabTargetType.GROUP:
-            groups.append(i)
+            groups.append(clean_url_i)
         elif tt_i is GitlabTargetType.PROJECT:
-            projects.append(i)
+            projects.append(clean_url_i)
         else:
             others.append(i)
     return ParsingTargets(
@@ -91,22 +104,19 @@ def _extract_gitlab_host(url: str) -> str:
 
 
 def _extract_organisation_and_repository_as_url_block(x: str) -> str:
+    x = _clean_url(x)
+
     # Cleaning up Gitlab prefix
     if is_gitlab_url(x, include_self_hosted=False):
         x = x.replace(GITLAB_URL_BASE, "")
     else:
         h = _extract_gitlab_host(url=x)
         x = x.replace(f"https://{h}/", "")
+
     fixed_x = "/".join(
         x.split("/")[:2]
     )  # For complex multiple projects nested, this might not work well
-    # Removing eventual extra information in URL
-    for i in ["#", "&"]:
-        if i in fixed_x:
-            fixed_x = fixed_x.split(i)[0]
-    # Removing trailing "/", if any
-    while fixed_x.endswith("/"):
-        fixed_x = fixed_x[:-1]
+
     return fixed_x
 
 

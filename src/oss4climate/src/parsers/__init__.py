@@ -512,8 +512,11 @@ class ResourceListing:
     # For compatibility, all these repo must have data in the README
     gitlab_readme_listings: list[_type_listing_entry] = field(default_factory=list)
 
-    # For the links must be given as hrefs in "a" tags
+    # For where the links must be given as hrefs in "a" tags
     webpage_html: list[_type_listing_entry] = field(default_factory=list)
+
+    # For the websites to be scraped fully
+    website: list[_type_listing_entry] = field(default_factory=list)
 
     # Faults
     fault_urls: list[_type_listing_entry] = field(default_factory=list)
@@ -582,11 +585,16 @@ class ResourceListing:
             x = tomllib.load(f)
 
         return ResourceListing(
-            github_readme_listings=x["github_hosted"].get("readme_listings", []),
-            gitlab_readme_listings=x["gitlab_hosted"].get("readme_listings", []),
-            webpage_html=x["webpages"].get("html", []),
-            fault_urls=x["faults"].get("urls", []),
-            fault_invalid_urls=x["faults"].get("invalid_urls", []),
+            github_readme_listings=x.get("github_hosted", {}).get(
+                "readme_listings", []
+            ),
+            gitlab_readme_listings=x.get("gitlab_hosted", {}).get(
+                "readme_listings", []
+            ),
+            webpage_html=x.get("webpages", {}).get("html", []),
+            website=x.get("websites", {}).get("html", []),
+            fault_urls=x.get("faults", {}).get("urls", []),
+            fault_invalid_urls=x.get("faults", {}).get("invalid_urls", []),
         )
 
     @staticmethod
@@ -598,11 +606,16 @@ class ResourceListing:
             x = json.load(f)
 
         return ResourceListing(
-            github_readme_listings=x["github_hosted"].get("readme_listings", []),
-            gitlab_readme_listings=x["gitlab_hosted"].get("readme_listings", []),
-            webpage_html=x["webpages"].get("html", []),
-            fault_urls=x["faults"].get("urls", []),
-            fault_invalid_urls=x["faults"].get("invalid_urls", []),
+            github_readme_listings=x.get("github_hosted", {}).get(
+                "readme_listings", []
+            ),
+            gitlab_readme_listings=x.get("gitlab_hosted", {}).get(
+                "readme_listings", []
+            ),
+            webpage_html=x.get("webpages", {}).get("html", []),
+            website=x.get("websites", {}).get("html", []),
+            fault_urls=x.get("faults", {}).get("urls", []),
+            fault_invalid_urls=x.get("faults", {}).get("invalid_urls", []),
         )
 
     def to_toml(self, toml_file_path: str) -> None:
@@ -620,6 +633,9 @@ class ResourceListing:
             },
             "webpages": {
                 "html": self.webpage_html,
+            },
+            "websites": {
+                "html": self.website,
             },
             "faults": {
                 "urls": self.fault_urls,
@@ -645,8 +661,8 @@ class ResourceListing:
             "gitlab_hosted": {
                 "readme_listings": self.gitlab_readme_listings,
             },
-            "webpages": {
-                "html": self.webpage_html,
+            "websites": {
+                "html": self.website,
             },
             "faults": {
                 "urls": self.fault_urls,
