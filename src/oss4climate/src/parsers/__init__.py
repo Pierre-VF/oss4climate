@@ -512,8 +512,11 @@ class ResourceListing:
     # For compatibility, all these repo must have data in the README
     gitlab_readme_listings: list[_type_listing_entry] = field(default_factory=list)
 
-    # For the links must be given as hrefs in "a" tags
+    # For where the links must be given as hrefs in "a" tags
     webpage_html: list[_type_listing_entry] = field(default_factory=list)
+
+    # For the websites to be scraped fully
+    website: list[_type_listing_entry] = field(default_factory=list)
 
     # Faults
     fault_urls: list[_type_listing_entry] = field(default_factory=list)
@@ -585,6 +588,7 @@ class ResourceListing:
             github_readme_listings=x["github_hosted"].get("readme_listings", []),
             gitlab_readme_listings=x["gitlab_hosted"].get("readme_listings", []),
             webpage_html=x["webpages"].get("html", []),
+            website=x["websites"].get("html", []),
             fault_urls=x["faults"].get("urls", []),
             fault_invalid_urls=x["faults"].get("invalid_urls", []),
         )
@@ -601,6 +605,7 @@ class ResourceListing:
             github_readme_listings=x["github_hosted"].get("readme_listings", []),
             gitlab_readme_listings=x["gitlab_hosted"].get("readme_listings", []),
             webpage_html=x["webpages"].get("html", []),
+            website=x["websites"].get("html", []),
             fault_urls=x["faults"].get("urls", []),
             fault_invalid_urls=x["faults"].get("invalid_urls", []),
         )
@@ -620,6 +625,9 @@ class ResourceListing:
             },
             "webpages": {
                 "html": self.webpage_html,
+            },
+            "websites": {
+                "html": self.website,
             },
             "faults": {
                 "urls": self.fault_urls,
@@ -645,8 +653,8 @@ class ResourceListing:
             "gitlab_hosted": {
                 "readme_listings": self.gitlab_readme_listings,
             },
-            "webpages": {
-                "html": self.webpage_html,
+            "websites": {
+                "html": self.website,
             },
             "faults": {
                 "urls": self.fault_urls,
