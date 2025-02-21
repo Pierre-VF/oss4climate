@@ -585,12 +585,16 @@ class ResourceListing:
             x = tomllib.load(f)
 
         return ResourceListing(
-            github_readme_listings=x["github_hosted"].get("readme_listings", []),
-            gitlab_readme_listings=x["gitlab_hosted"].get("readme_listings", []),
-            webpage_html=x["webpages"].get("html", []),
-            website=x["websites"].get("html", []),
-            fault_urls=x["faults"].get("urls", []),
-            fault_invalid_urls=x["faults"].get("invalid_urls", []),
+            github_readme_listings=x.get("github_hosted", {}).get(
+                "readme_listings", []
+            ),
+            gitlab_readme_listings=x.get("gitlab_hosted", {}).get(
+                "readme_listings", []
+            ),
+            webpage_html=x.get("webpages", {}).get("html", []),
+            website=x.get("websites", {}).get("html", []),
+            fault_urls=x.get("faults", {}).get("urls", []),
+            fault_invalid_urls=x.get("faults", {}).get("invalid_urls", []),
         )
 
     @staticmethod
@@ -602,12 +606,16 @@ class ResourceListing:
             x = json.load(f)
 
         return ResourceListing(
-            github_readme_listings=x["github_hosted"].get("readme_listings", []),
-            gitlab_readme_listings=x["gitlab_hosted"].get("readme_listings", []),
-            webpage_html=x["webpages"].get("html", []),
-            website=x["websites"].get("html", []),
-            fault_urls=x["faults"].get("urls", []),
-            fault_invalid_urls=x["faults"].get("invalid_urls", []),
+            github_readme_listings=x.get("github_hosted", {}).get(
+                "readme_listings", []
+            ),
+            gitlab_readme_listings=x.get("gitlab_hosted", {}).get(
+                "readme_listings", []
+            ),
+            webpage_html=x.get("webpages", {}).get("html", []),
+            website=x.get("websites", {}).get("html", []),
+            fault_urls=x.get("faults", {}).get("urls", []),
+            fault_invalid_urls=x.get("faults", {}).get("invalid_urls", []),
         )
 
     def to_toml(self, toml_file_path: str) -> None:
