@@ -17,4 +17,4 @@ RUN uv run spacy download en_core_web_sm
 # Run app
 LABEL organisation="oss4climate"
 EXPOSE 8080
-CMD ["uv", "run", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD uv run uvicorn app:app --port 8080
