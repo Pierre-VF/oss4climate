@@ -109,10 +109,11 @@ async def search_results(
         df_out = df_out[df_out["last_commit"] >= t_limit]
 
     # Refining output
-    df_out.drop(
-        columns=["score"],  # Dropping scores, as it's not informative to the user
-        inplace=True,
-    )
+    if "score" in df_out.keys():
+        df_out.drop(
+            columns=["score"],  # Dropping scores, as it's not informative to the user
+            inplace=True,
+        )
     for i in ["license", "last_commit"]:
         df_out.loc[:, i] = df_out[i].apply(_f_none_to_unknown)
 

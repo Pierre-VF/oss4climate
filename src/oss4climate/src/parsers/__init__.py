@@ -661,6 +661,9 @@ class ResourceListing:
             "gitlab_hosted": {
                 "readme_listings": self.gitlab_readme_listings,
             },
+            "webpages": {
+                "html": self.webpage_html,
+            },
             "websites": {
                 "html": self.website,
             },
