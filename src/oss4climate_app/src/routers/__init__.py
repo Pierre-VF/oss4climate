@@ -53,7 +53,7 @@ def listing_credits(html: bool = True) -> str:
     else:
 
         def _f_clean_text(i: dict) -> str:
-            x = f'{f_clean_name(i["url"])} ({i["url"]})'
+            x = f"{f_clean_name(i['url'])} ({i['url']})"
             license = i.get("license")
             license_url = i.get("license_url")
             if license not in [None, "?", "Other"]:

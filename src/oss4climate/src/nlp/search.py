@@ -23,9 +23,9 @@ def _lower_str(x: str, *args, **kwargs):
 
 def _documents_loader(documents: pd.DataFrame | str | None, limit: int | None = None):
     if isinstance(documents, str):
-        assert documents.endswith(
-            ".feather"
-        ), f"Only accepting .feather files (not {documents})"
+        assert documents.endswith(".feather"), (
+            f"Only accepting .feather files (not {documents})"
+        )
         # This line and the usage of pandas is part of an explicit optimisation scheme (for <512 MB in operations)
         new_docs = pd.read_feather(
             documents,
@@ -104,7 +104,7 @@ class SearchResults:
                     yield r
                 else:
                     log_warning(
-                        f"Truncating readme of {r['url']} as it would occupy {n_size/1e6} MB in memory"
+                        f"Truncating readme of {r['url']} as it would occupy {n_size / 1e6} MB in memory"
                     )
                     # TODO : this is a quickfix
                     # Cutting the readme as it's likely to overflow memory
