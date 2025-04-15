@@ -523,17 +523,7 @@
             }
         ]
     },
-    "webpages": {
-        "html": [
-            {
-                "license": "?",
-                "url": "https://energy.acm.org/resources/"
-            },
-            {
-                "license": "Creative Commons Attribution 4.0 International",
-                "target_count": 2205,
-                "url": "https://opensustain.tech/"
-            }
-        ]
+    "websites": {
+        "html": []
     }
 }
