@@ -10,7 +10,9 @@ class Settings(pydantic_settings.BaseSettings):
     LOCAL_FOLDER: str = ".data"
     SCRAPING_SQLITE_DB: str = "db.sqlite"
     APP_SQLITE_DB: str = "app_db.sqlite"
-    # Identifiants du FTP pour l'export
+    # For usage analytics
+    UMAMI_SITE_ID: str = ""
+    # Identifiants of FTP for export
     EXPORT_FTP_URL: Optional[str] = None
     EXPORT_FTP_USER: Optional[str] = None
     EXPORT_FTP_PASSWORD: Optional[str] = None

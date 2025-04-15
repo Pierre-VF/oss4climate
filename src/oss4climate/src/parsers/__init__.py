@@ -180,6 +180,11 @@ class ParsingTargets:
     github_organisations: list[str] = field(default_factory=list)
     gitlab_projects: list[str] = field(default_factory=list)
     gitlab_groups: list[str] = field(default_factory=list)
+    bitbucket_projects: list[str] = field(default_factory=list)
+    bitbucket_repositories: list[str] = field(default_factory=list)
+    codeberg_organisations: list[str] = field(default_factory=list)
+    codeberg_repositories: list[str] = field(default_factory=list)
+
     unknown: list[str] = field(default_factory=list)
     invalid: list[str] = field(default_factory=list)
 
@@ -187,10 +192,17 @@ class ParsingTargets:
         return ParsingTargets(
             github_organisations=self.github_organisations + other.github_organisations,
             github_repositories=self.github_repositories + other.github_repositories,
+            bitbucket_projects=self.bitbucket_projects + other.bitbucket_projects,
+            bitbucket_repositories=self.bitbucket_repositories
+            + other.bitbucket_repositories,
             gitlab_groups=self.gitlab_groups + other.gitlab_groups,
             gitlab_projects=self.gitlab_projects + other.gitlab_projects,
             unknown=self.unknown + other.unknown,
             invalid=self.invalid + other.invalid,
+            codeberg_organisations=self.codeberg_organisations
+            + other.codeberg_organisations,
+            codeberg_repositories=self.codeberg_repositories
+            + other.codeberg_repositories,
         )
 
     def __iadd__(self, other: "ParsingTargets") -> "ParsingTargets":
@@ -198,8 +210,12 @@ class ParsingTargets:
         self.github_organisations += other.github_organisations
         self.gitlab_groups += other.gitlab_groups
         self.gitlab_projects += other.gitlab_projects
+        self.bitbucket_projects += other.bitbucket_projects
+        self.bitbucket_repositories += other.bitbucket_repositories
         self.unknown += other.unknown
         self.invalid += other.invalid
+        self.codeberg_organisations += other.codeberg_organisations
+        self.codeberg_repositories += other.codeberg_repositories
         return self
 
     def __len__(self) -> int:
@@ -208,16 +224,27 @@ class ParsingTargets:
             + len(self.github_organisations)
             + len(self.gitlab_projects)
             + len(self.gitlab_groups)
+            + len(self.bitbucket_projects)
+            + len(self.bitbucket_repositories)
+            + len(self.codeberg_organisations)
+            + len(self.codeberg_repositories)
             + len(self.unknown)
             + len(self.invalid)
         )
 
     def as_url_list(self, known_repositories_only: bool = True) -> list[str]:
-        out = self.github_repositories + self.gitlab_projects
+        out = (
+            self.github_repositories
+            + self.gitlab_projects
+            + self.bitbucket_repositories
+            + self.codeberg_repositories
+        )
         if not known_repositories_only:
             out += (
                 self.github_organisations
                 + self.gitlab_groups
+                + self.bitbucket_projects
+                + self.codeberg_organisations
                 + self.unknown
                 + self.invalid
             )
@@ -233,6 +260,16 @@ class ParsingTargets:
         )
         self.gitlab_groups = sorted_list_of_cleaned_urls(self.gitlab_groups)
         self.gitlab_projects = sorted_list_of_cleaned_urls(self.gitlab_projects)
+        self.bitbucket_projects = sorted_list_of_cleaned_urls(self.bitbucket_projects)
+        self.bitbucket_repositories = sorted_list_of_cleaned_urls(
+            self.bitbucket_repositories
+        )
+        self.codeberg_organisations = sorted_list_of_cleaned_urls(
+            self.codeberg_organisations
+        )
+        self.codeberg_repositories = sorted_list_of_cleaned_urls(
+            self.codeberg_repositories
+        )
         self.unknown = sorted_list_of_cleaned_urls(self.unknown)
         self.invalid = sorted_list_of_cleaned_urls(self.invalid)
 
@@ -243,6 +280,10 @@ class ParsingTargets:
             + self.github_repositories
             + self.gitlab_groups
             + self.gitlab_projects
+            + self.bitbucket_projects
+            + self.bitbucket_repositories
+            + self.codeberg_organisations
+            + self.codeberg_repositories
         )
 
     def _target_is_valid(self, url: str) -> bool:
@@ -269,6 +310,16 @@ class ParsingTargets:
         )
         self.gitlab_groups = self._check_targets_validity(self.gitlab_groups)
         self.gitlab_projects = self._check_targets_validity(self.gitlab_projects)
+        self.bitbucket_projects = self._check_targets_validity(self.bitbucket_projects)
+        self.bitbucket_repositories = self._check_targets_validity(
+            self.bitbucket_repositories
+        )
+        self.codeberg_organisations = self._check_targets_validity(
+            self.codeberg_organisations
+        )
+        self.codeberg_repositories = self._check_targets_validity(
+            self.codeberg_repositories
+        )
 
     def cleanup(self) -> None:
         """
@@ -283,6 +334,14 @@ class ParsingTargets:
         ]
         self.gitlab_projects = [
             i for i in self.gitlab_projects if i not in self.gitlab_groups
+        ]
+        self.bitbucket_repositories = [
+            i for i in self.bitbucket_repositories if i not in self.bitbucket_projects
+        ]
+        self.codeberg_repositories = [
+            i
+            for i in self.codeberg_repositories
+            if i not in self.codeberg_organisations
         ]
         # Removing unknown repos
         self.unknown = [
@@ -300,11 +359,24 @@ class ParsingTargets:
         with open(toml_file_path, "rb") as f:
             x = tomllib.load(f)
 
+        for i in [
+            "github_hosted",
+            "gitlab_hosted",
+            "bitbucket_hosted",
+            "codeberg_hosted",
+        ]:
+            if x.get(i) is None:
+                x[i] = {}
+
         return ParsingTargets(
             github_organisations=x["github_hosted"].get("organisations", []),
             github_repositories=x["github_hosted"].get("repositories", []),
             gitlab_groups=x["gitlab_hosted"].get("groups", []),
             gitlab_projects=x["gitlab_hosted"].get("projects", []),
+            bitbucket_projects=x["bitbucket_hosted"].get("projects", []),
+            bitbucket_repositories=x["bitbucket_hosted"].get("repositories", []),
+            codeberg_organisations=x["codeberg_hosted"].get("organisations", []),
+            codeberg_repositories=x["codeberg_hosted"].get("repositories", []),
             unknown=x["dropped_targets"].get("urls", []),
             invalid=x["dropped_targets"].get("invalid_urls", []),
         )
@@ -316,6 +388,14 @@ class ParsingTargets:
         # Outputting to a new TOML
         doc = document()
         toml_ready_dict = {
+            "bitbucket_hosted": {
+                "projects": self.bitbucket_projects,
+                "repositories": self.bitbucket_repositories,
+            },
+            "codeberg_hosted": {
+                "organisations": self.codeberg_organisations,
+                "repositories": self.codeberg_repositories,
+            },
             "github_hosted": {
                 "organisations": self.github_organisations,
                 "repositories": self.github_repositories,
@@ -338,22 +418,35 @@ class ParsingTargets:
 
 
 def identify_parsing_targets(x: list[str]) -> ParsingTargets:
-    from oss4climate.src.parsers import github_data_io, gitlab_data_io
+    from oss4climate.src.parsers import (
+        bitbucket_data_io,
+        codeberg_data_io,
+        github_data_io,
+        gitlab_data_io,
+    )
 
     out_github = github_data_io.split_across_target_sets(x)
     out_gitlab = gitlab_data_io.split_across_target_sets(out_github.unknown)
     out_github.unknown = []
+    out_bitbucket = bitbucket_data_io.split_across_target_sets(out_gitlab.unknown)
+    out_gitlab.unknown = []
+    out_codeberg = codeberg_data_io.split_across_target_sets(out_bitbucket.unknown)
+    out_bitbucket.unknown = []
 
-    out = out_github + out_gitlab
+    out = out_bitbucket + out_github + out_gitlab + out_codeberg
     return out
 
 
 def isolate_relevant_urls(urls: list[str]) -> list[str]:
-    from oss4climate.src.parsers.github_data_io import GITHUB_URL_BASE
-    from oss4climate.src.parsers.gitlab_data_io import GITLAB_ANY_URL_PREFIX
+    from oss4climate.src.parsers import (
+        bitbucket_data_io,
+        codeberg_data_io,
+        github_data_io,
+        gitlab_data_io,
+    )
 
     def __f(i) -> bool:
-        if i.startswith(GITHUB_URL_BASE):
+        if github_data_io.is_github_url(i):
             if (
                 ("/tree/" in i)
                 or ("/blob/" in i)
@@ -364,7 +457,11 @@ def isolate_relevant_urls(urls: list[str]) -> list[str]:
                 return False
             else:
                 return True
-        elif i.startswith(GITLAB_ANY_URL_PREFIX):
+        elif gitlab_data_io.is_gitlab_url(i):
+            return True
+        elif bitbucket_data_io.is_bitbucket_url(i):
+            return True
+        elif codeberg_data_io.is_codeberg_url(i):
             return True
         else:
             return False
@@ -415,8 +512,11 @@ class ResourceListing:
     # For compatibility, all these repo must have data in the README
     gitlab_readme_listings: list[_type_listing_entry] = field(default_factory=list)
 
-    # For the links must be given as hrefs in "a" tags
+    # For where the links must be given as hrefs in "a" tags
     webpage_html: list[_type_listing_entry] = field(default_factory=list)
+
+    # For the websites to be scraped fully
+    website: list[_type_listing_entry] = field(default_factory=list)
 
     # Faults
     fault_urls: list[_type_listing_entry] = field(default_factory=list)
@@ -485,11 +585,16 @@ class ResourceListing:
             x = tomllib.load(f)
 
         return ResourceListing(
-            github_readme_listings=x["github_hosted"].get("readme_listings", []),
-            gitlab_readme_listings=x["gitlab_hosted"].get("readme_listings", []),
-            webpage_html=x["webpages"].get("html", []),
-            fault_urls=x["faults"].get("urls", []),
-            fault_invalid_urls=x["faults"].get("invalid_urls", []),
+            github_readme_listings=x.get("github_hosted", {}).get(
+                "readme_listings", []
+            ),
+            gitlab_readme_listings=x.get("gitlab_hosted", {}).get(
+                "readme_listings", []
+            ),
+            webpage_html=x.get("webpages", {}).get("html", []),
+            website=x.get("websites", {}).get("html", []),
+            fault_urls=x.get("faults", {}).get("urls", []),
+            fault_invalid_urls=x.get("faults", {}).get("invalid_urls", []),
         )
 
     @staticmethod
@@ -501,11 +606,16 @@ class ResourceListing:
             x = json.load(f)
 
         return ResourceListing(
-            github_readme_listings=x["github_hosted"].get("readme_listings", []),
-            gitlab_readme_listings=x["gitlab_hosted"].get("readme_listings", []),
-            webpage_html=x["webpages"].get("html", []),
-            fault_urls=x["faults"].get("urls", []),
-            fault_invalid_urls=x["faults"].get("invalid_urls", []),
+            github_readme_listings=x.get("github_hosted", {}).get(
+                "readme_listings", []
+            ),
+            gitlab_readme_listings=x.get("gitlab_hosted", {}).get(
+                "readme_listings", []
+            ),
+            webpage_html=x.get("webpages", {}).get("html", []),
+            website=x.get("websites", {}).get("html", []),
+            fault_urls=x.get("faults", {}).get("urls", []),
+            fault_invalid_urls=x.get("faults", {}).get("invalid_urls", []),
         )
 
     def to_toml(self, toml_file_path: str) -> None:
@@ -523,6 +633,9 @@ class ResourceListing:
             },
             "webpages": {
                 "html": self.webpage_html,
+            },
+            "websites": {
+                "html": self.website,
             },
             "faults": {
                 "urls": self.fault_urls,
@@ -550,6 +663,9 @@ class ResourceListing:
             },
             "webpages": {
                 "html": self.webpage_html,
+            },
+            "websites": {
+                "html": self.website,
             },
             "faults": {
                 "urls": self.fault_urls,
