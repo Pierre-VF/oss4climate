@@ -57,11 +57,17 @@ async def search(
         number_of_results=n_total_found,
         view_offset=None,
     )
-    json_txt = (
-        df_out.reset_index(inplace=False)
-        .drop(columns=["score"])
-        .T.to_json(date_format="iso", indent=None)
-    )
+    if "score" in df_out.keys():
+        json_txt = (
+            df_out.reset_index(inplace=False)
+            .drop(columns=["score"])
+            .T.to_json(date_format="iso", indent=None)
+        )
+    else:
+        json_txt = df_out.reset_index(inplace=False).T.to_json(
+            date_format="iso", indent=None
+        )
+
     return PlainTextResponse(json_txt, media_type="text/json")
 
 
