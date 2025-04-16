@@ -38,6 +38,7 @@ organisations = [
     "https://github.com/EVerest",
     "https://github.com/Electa-Git",
     "https://github.com/EnAccess",
+    "https://github.com/Future-Energy-Associates",
     "https://github.com/GENeSYS-MOD",
     "https://github.com/GeoStat-Framework",
     "https://github.com/GoFlexH2020",
@@ -3790,7 +3791,5 @@ invalid_urls = [
     "https://github.com/settings/tokens",
     "https://github.com/swcarpentry/good-enough-practices-in-scientific-computing/blob/gh-pages/good-enough-practices-for-scientific-computing.pdf",
     "https://gitlab.com/-/user_settings/personal_access_tokens",
-    "https://gitlab.com/geoharmonizer_inea/eumap/blob/master/LICENSE",
-    "https://github.com/energy-modelling-ireland/wiki",
     "https://gitlab.com/geoharmonizer_inea/eumap/blob/master/LICENSE",
 ]
