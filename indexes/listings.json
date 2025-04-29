@@ -133,6 +133,11 @@
                 "url": "https://github.com/EDIorg/ecocomDP"
             },
             {
+                "license": "Other",
+                "license_url": "https://raw.githubusercontent.com/EMODnet/EMODnetWCS/main/LICENSE.md",
+                "url": "https://github.com/EMODnet/EMODnetWCS"
+            },
+            {
                 "license": "Creative Commons Zero v1.0 Universal",
                 "license_url": "https://raw.githubusercontent.com/ESIPFed/Awesome-Earth-Artificial-Intelligence/refs/heads/master/LICENSE",
                 "target_count": 56,
@@ -535,5 +540,8 @@
                 "url": "https://opensustain.tech/"
             }
         ]
+    },
+    "websites": {
+        "html": []
     }
 }
