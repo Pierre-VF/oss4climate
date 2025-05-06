@@ -158,7 +158,7 @@ def url_qualifies(x: str) -> bool:
             return False
         else:
             return True
-    elif x.startswith("https://gitlab.com/"):
+    elif x.startswith("https://gitlab.com"):
         if (
             ("/-/" in x)
             or ("/blob/" in x)
@@ -166,6 +166,8 @@ def url_qualifies(x: str) -> bool:
             or x.endswith("/examples")
         ):
             return False
+        # Else ensure that there's at least an organisation or project in the URL
+        return len(x.replace("https://gitlab.com", "")) > 1
     # If hit nothing up thil here, then it's valid
     return True
 
