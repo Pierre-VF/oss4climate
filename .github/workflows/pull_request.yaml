@@ -18,11 +18,6 @@ jobs:
       contents: write
 
     steps:
-      - name: "Create UV installation"
-        uses: astral-sh/setup-uv@v5
-        with:
-          version: "0.8.0"
-
       - name: "Checkout code"
         uses: actions/checkout@v4
         with:
@@ -30,6 +25,11 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
       
+      - name: "Create UV installation"
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.8.0"
+          
       # Check and fix the code
       - name: Defining Git identity 
         run: | 
