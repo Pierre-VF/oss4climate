@@ -119,9 +119,7 @@ def get_top_urls(scores_dict: dict, n: int):
 @app.get("/")
 async def base_landing(request: Request, channel: Optional[str] = None):
     log_landing(request=request, channel=channel)
-    return ui.ui_base_search_page(
-        request=request,
-    )
+    return RedirectResponse("ui/search")
 
 
 @app.head("/", include_in_schema=False, status_code=204)
