@@ -29,7 +29,7 @@ class Settings(pydantic_settings.BaseSettings):
 
     @property
     def full_url_base(self) -> str:
-        if self.APP_PROXY_PATH is not None:
+        if self.APP_PROXY_PATH is None:
             return self.APP_URL_BASE
         else:
             return f"{self.APP_URL_BASE}{self.APP_PROXY_PATH}"
