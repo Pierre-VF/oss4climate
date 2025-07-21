@@ -19,7 +19,6 @@ APP_VERSION = str(uuid.uuid4())
 
 # Configuration (for avoidance of information duplication)
 URL_CODE_REPOSITORY = "https://github.com/Pierre-VF/oss4climate"
-APP_URL_BASE = SETTINGS.APP_URL_BASE
 URL_FEEDBACK_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSeei-0V5CobVNX-qOX3lI11FuvTBv1JV77fcUZOideeDtcEhA/viewform?usp=sf_link"
 
 URL_DATA_LISTINGS_JSON = URL_LISTINGS_INDEX

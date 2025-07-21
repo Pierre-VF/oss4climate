@@ -13,8 +13,8 @@ from oss4climate.src.parsers.licenses import (
 )
 
 from oss4climate_app.config import (
-    APP_URL_BASE,
     FORCE_HTTPS,
+    SETTINGS,
     URL_CODE_REPOSITORY,
     URL_FEEDBACK_FORM,
     umami_site_id,
@@ -51,7 +51,7 @@ def _render_ui_template(
         "UMAMI_SITE_ID": umami_site_id(),
         "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
         "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
-        "URL_BASE": APP_URL_BASE,
+        "URL_BASE": SETTINGS.full_url_base,
         "credits_text": f"With contributions from manually curated listings: {listing_credits()}",
         "canonical_url": canonical_url,
     }

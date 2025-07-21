@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from oss4climate.src.config import FILE_OUTPUT_OPTIMISED_LISTING_FEATHER, SETTINGS
 from oss4climate.src.log import log_info, log_warning
 
-from oss4climate_app.config import APP_URL_BASE, STATIC_FILES_PATH, URL_FAVICON
+from oss4climate_app.config import STATIC_FILES_PATH, URL_FAVICON
 from oss4climate_app.src.data_io import (
     SEARCH_ENGINE_DESCRIPTIONS,
     SEARCH_ENGINE_READMES,
@@ -91,6 +91,12 @@ async def lifespan(app: FastAPI):
     log_info("Exiting app")
 
 
+if SETTINGS.APP_PROXY_PATH is not None:
+    kwargs = dict(root_path=SETTINGS.APP_PROXY_PATH)
+else:
+    kwargs = dict()
+
+
 app = FastAPI(
     title="OSS4climate",
     description="""
@@ -99,6 +105,7 @@ A search engine for open-source code for climate applications
     lifespan=lifespan,
     openapi_url=None,
     redoc_url=None,
+    **kwargs,
 )
 
 
@@ -136,7 +143,7 @@ def _favicon():
 @app.get("/sitemap.xml")
 def _sitemap_xml(request: Request):
     content = dict(
-        BASE_URL=APP_URL_BASE,
+        BASE_URL=SETTINGS.full_url_base,
         UPDATE_FREQUENCY="weekly",
         UI_ENDPOINTS=["ui/search", "ui/about", "ui/results"],
         LAST_UPDATE=str(datetime.now().date()),
@@ -151,7 +158,7 @@ def _sitemap_xml(request: Request):
 @app.get("/robots.txt")
 def _robots_txt(request: Request):
     content = dict(
-        BASE_URL=APP_URL_BASE,
+        BASE_URL=SETTINGS.full_url_base,
     )
     return render_template(
         request,
