@@ -6,10 +6,10 @@ from typing import Optional
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-
 from oss4climate.src.config import FILE_OUTPUT_OPTIMISED_LISTING_FEATHER, SETTINGS
 from oss4climate.src.log import log_info, log_warning
-from oss4climate_app.config import STATIC_FILES_PATH, URL_APP, URL_FAVICON
+
+from oss4climate_app.config import APP_URL_BASE, STATIC_FILES_PATH, URL_FAVICON
 from oss4climate_app.src.data_io import (
     SEARCH_ENGINE_DESCRIPTIONS,
     SEARCH_ENGINE_READMES,
@@ -136,7 +136,7 @@ def _favicon():
 @app.get("/sitemap.xml")
 def _sitemap_xml(request: Request):
     content = dict(
-        BASE_URL=URL_APP,
+        BASE_URL=APP_URL_BASE,
         UPDATE_FREQUENCY="weekly",
         UI_ENDPOINTS=["ui/search", "ui/about", "ui/results"],
         LAST_UPDATE=str(datetime.now().date()),
@@ -151,7 +151,7 @@ def _sitemap_xml(request: Request):
 @app.get("/robots.txt")
 def _robots_txt(request: Request):
     content = dict(
-        BASE_URL=URL_APP,
+        BASE_URL=APP_URL_BASE,
     )
     return render_template(
         request,

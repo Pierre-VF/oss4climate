@@ -8,11 +8,13 @@ from typing import Optional
 import pandas as pd
 from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import HTMLResponse
-
 from oss4climate.src.parsers.licenses import (
     LicenseCategoriesEnum,
 )
+
 from oss4climate_app.config import (
+    FORCE_HTTPS,
+    URL_BASE,
     URL_CODE_REPOSITORY,
     URL_FEEDBACK_FORM,
     umami_site_id,
@@ -41,11 +43,15 @@ def _render_ui_template(
     request: Request, template_file: str, content: dict | None = None
 ):
     url = request.url.components
-    canonical_url = f"{url.scheme}://{url.netloc}{url.path}"
+    if FORCE_HTTPS:
+        canonical_url = f"https://{url.netloc}{url.path}"
+    else:
+        canonical_url = f"{url.scheme}://{url.netloc}{url.path}"
     resp = {
         "UMAMI_SITE_ID": umami_site_id(),
         "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
         "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
+        "URL_BASE": URL_BASE,
         "credits_text": f"With contributions from manually curated listings: {listing_credits()}",
         "canonical_url": canonical_url,
     }
