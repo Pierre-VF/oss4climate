@@ -14,13 +14,13 @@ from oss4climate.src.log import log_info
 from oss4climate.src.parsers import (
     ParsingTargets,
     ResourceListing,
-    github_data_io,
     identify_parsing_targets,
     listings,
 )
+from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
 from oss4climate.src.parsers.lfenergy import (
     fetch_all_project_urls_from_lfe_webpage,
-    fetch_project_github_urls_from_lfe_energy_project_webpage,
+    fetch_project_urls_from_lfe_energy_project_webpage,
     get_open_source_energy_projects_from_landscape,
 )
 from oss4climate.src.parsers.opensustain_tech import (
@@ -47,9 +47,9 @@ def _add_projects_to_listing_file(
     new_targets = existing_targets + parsing_targets
 
     # Cleaning Github repositories links
+    ghs = GithubScraper()
     new_targets.github_repositories = [
-        github_data_io.clean_github_repository_url(i)
-        for i in new_targets.github_repositories
+        ghs.minimalise_resource_url(i) for i in new_targets.github_repositories
     ]
 
     # Ensuring uniqueness in new targets and cleaning up redundancies
@@ -76,7 +76,7 @@ def discover_projects(
     dropped_urls = []
     rs0 = fetch_all_project_urls_from_lfe_webpage(cache_lifetime=cache_lifetime)
     for r in rs0:
-        new_targets += fetch_project_github_urls_from_lfe_energy_project_webpage(
+        new_targets += fetch_project_urls_from_lfe_energy_project_webpage(
             r, cache_lifetime=cache_lifetime
         )
 

@@ -1,5 +1,5 @@
 """
-Module containing the API code
+Module containing the UI code
 """
 
 from datetime import date, timedelta
@@ -8,10 +8,10 @@ from typing import Optional
 import pandas as pd
 from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import HTMLResponse
-from oss4climate.src.parsers.licenses import (
-    LicenseCategoriesEnum,
-)
 
+from oss4climate.src.models import (
+    EnumLicenseCategories,
+)
 from oss4climate_app.config import (
     FORCE_HTTPS,
     SETTINGS,
@@ -25,9 +25,8 @@ from oss4climate_app.src.data_io import (
     unique_license_categories,
 )
 from oss4climate_app.src.log_activity import log_search
+from oss4climate_app.src.routers import listing_credits
 from oss4climate_app.src.templates import render_template
-
-from . import listing_credits
 
 app = APIRouter(include_in_schema=False)
 
@@ -102,7 +101,7 @@ async def search_results(
         df_out = df_out[df_out["language"] == language]
     if license_category and (license_category != "*"):
         try:
-            enum_license_category = LicenseCategoriesEnum[license_category]
+            enum_license_category = EnumLicenseCategories[license_category]
         except KeyError:
             raise ValueError("Invalid license category")
 

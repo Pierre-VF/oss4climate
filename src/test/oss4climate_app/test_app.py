@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from . import app, mark_test_mode
+from oss4climate_app import app, mark_test_mode
 
 
 def test_app():

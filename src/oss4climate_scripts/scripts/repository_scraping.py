@@ -1,7 +1,6 @@
 import pandas as pd
 from tomlkit import document, dump
 
-from oss4climate import scripts
 from oss4climate.src.config import (
     FILE_INPUT_INDEX,
     FILE_OUTPUT_DIR,
@@ -12,7 +11,7 @@ from oss4climate.src.config import (
 )
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
-from oss4climate.src.model import EnumDocumentationFileType
+from oss4climate.src.models import EnumDocumentationFileType
 from oss4climate.src.nlp import html_io, markdown_io, rst_io
 from oss4climate.src.nlp.plaintext import (
     get_spacy_english_model,
@@ -21,9 +20,10 @@ from oss4climate.src.nlp.plaintext import (
 from oss4climate.src.parsers import (
     ParsingTargets,
     RateLimitError,
-    github_data_io,
-    gitlab_data_io,
 )
+from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
+from oss4climate_scripts import scripts
 
 
 def scrape_all(
@@ -53,6 +53,9 @@ def scrape_all(
     bad_organisations = []
     bad_repositories = []
 
+    gitlab_s = GitlabScraper()
+    github_s = GithubScraper()
+
     log_info("Fetching data for all organisations in Github")
     for org_url in targets.github_organisations:
         url2check = org_url.replace("https://", "")
@@ -64,7 +67,7 @@ def scrape_all(
             continue  # Skip
 
         try:
-            x = github_data_io.fetch_repositories_in_organisation(org_url)
+            x = github_s.fetch_repositories_in_organisation(org_url)
             [targets.github_repositories.append(i) for i in x.values()]
         except Exception as e:
             scrape_failures["GITHUB_ORGANISATION:" + org_url] = e
@@ -82,7 +85,7 @@ def scrape_all(
             continue  # Skip
 
         try:
-            x = gitlab_data_io.fetch_repositories_in_group(org_url)
+            x = gitlab_s.fetch_repositories_in_group(org_url)
             [targets.gitlab_projects.append(i) for i in x.values()]
         except Exception as e:
             scrape_failures["GITLAB_GROUP:" + org_url] = e
@@ -96,7 +99,7 @@ def scrape_all(
     for i in targets.gitlab_projects:
         try:
             screening_results.append(
-                gitlab_data_io.fetch_repository_details(i, fail_on_issue=fail_on_issue)
+                gitlab_s.fetch_project_details(i, fail_on_issue=fail_on_issue)
             )
         except Exception as e:
             scrape_failures["GITLAB_PROJECT:" + i] = e
@@ -111,9 +114,7 @@ def scrape_all(
                 if i.endswith("/.github"):
                     continue
                 screening_results.append(
-                    github_data_io.fetch_repository_details(
-                        i, fail_on_issue=fail_on_issue
-                    )
+                    github_s.fetch_project_details(i, fail_on_issue=fail_on_issue)
                 )
             except Exception as e:
                 if isinstance(e, RateLimitError):
@@ -200,9 +201,9 @@ def scrape_all(
 
     print(
         f"""
-        
+
     >>> Data was exported to: {target_output_file}
-        
+
     """
     )
 
@@ -231,9 +232,9 @@ def scrape_all(
 
     print(
         f"""
-        
+
     >>> Types were exported to: {FILE_OUTPUT_SUMMARY_TOML}
-        
+
     """
     )
     scripts.format_all_files()

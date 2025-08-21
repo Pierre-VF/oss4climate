@@ -11,9 +11,8 @@ from oss4climate.src.parsers import (
     ParsingTargets,
     cached_web_get_text,
     identify_parsing_targets,
+    isolate_relevant_urls,
 )
-from oss4climate.src.parsers.github_data_io import GITHUB_URL_BASE
-from oss4climate.src.parsers.gitlab_data_io import GITLAB_ANY_URL_PREFIX
 
 _PROJECT_PAGE_URL_BASE = "https://lfenergy.org/projects/"
 
@@ -34,7 +33,7 @@ def fetch_all_project_urls_from_lfe_webpage(
     return list(set(shortlisted_urls))
 
 
-def fetch_project_github_urls_from_lfe_energy_project_webpage(
+def fetch_project_urls_from_lfe_energy_project_webpage(
     project_url: str,
     cache_lifetime: timedelta | None = None,
 ) -> ParsingTargets:
@@ -45,18 +44,10 @@ def fetch_project_github_urls_from_lfe_energy_project_webpage(
 
     rs = b.findAll(name="a", attrs={"class": "projects-icon"})
 
-    # Github URLs
-    github_urls = [
-        i for i in [x.get("href") for x in rs] if i.startswith(GITHUB_URL_BASE)
-    ]
-    github_urls = [i for i in github_urls if not i.endswith(".md")]
-    # Gitlab URLs
-    gitlab_urls = [
-        i for i in [x.get("href") for x in rs] if i.startswith(GITLAB_ANY_URL_PREFIX)
-    ]
-    gitlab_urls = [i for i in gitlab_urls if not i.endswith(".md")]
+    all_urls = [x.get("href") for x in rs]
+    relevant_urls = isolate_relevant_urls(all_urls)
 
-    return identify_parsing_targets(github_urls + gitlab_urls)
+    return identify_parsing_targets(relevant_urls)
 
 
 def get_open_source_energy_projects_from_landscape(

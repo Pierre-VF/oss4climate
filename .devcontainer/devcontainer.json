@@ -3,7 +3,7 @@
 {
 	"name": "OSS4climate",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "ghcr.io/astral-sh/uv:0.6.14-bookworm",
+	"dockerFile": "Dockerfile",
 	"customizations": {
 		"vscode": {
 			"extensions": [
@@ -76,6 +76,6 @@
 	"forwardPorts": [8080],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "apt update && apt install -y git && make install"
+	"postCreateCommand": "make install"
 
 }

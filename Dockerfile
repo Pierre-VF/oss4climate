@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:0.8.0-bookworm-slim
+FROM ghcr.io/astral-sh/uv:0.8.4-bookworm-slim
 WORKDIR /home
 # Copying files over
 # Index folder creation is required for operation when the indexes aren't present

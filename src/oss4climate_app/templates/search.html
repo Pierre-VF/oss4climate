@@ -11,7 +11,7 @@
             <input type="text" id="query" name="query" class="search_term" placeholder="What is your application focus?">
             <!-- <input hidden id="license" value="*">
             <input hidden id="language" value="*"> -->
-            <button type="submit" class="search_button" data-umami-event="search-click"> 
+            <button type="submit" class="search_button" data-umami-event="search-click">
                 <i class="fa fa-search">Search</i>
             </button>
         </div>
@@ -20,23 +20,23 @@
             <label>Refine your search</label><br/>
             <label for="license_category">License:</label>
             <select name="license_category" id="license_category">
-                <option value="*">(Any)</option>                
+                <option value="*">(Any)</option>
                 {% for i in unique_license_categories %}
                 <option value="{{ i.name }}">{{ i.value }}</option>
                 {% endfor %}
             </select>
             <br/>
-            
+
             <label for="language">Language:</label>
             <select name="language" id="language">
-                <option value="*">(Any)</option>                
+                <option value="*">(Any)</option>
                 {% for i in languages %}
                 <option value="{{ i }}">{{ i }}</option>
                 {% endfor %}
             </select>
             <br/>
 
-            <label>Exclude:</label> 
+            <label>Exclude:</label>
             <br/>
             <input type="checkbox" id="exclude_forks" name="exclude_forks" />
             <label for="exclude_forks">forks</label>
@@ -48,7 +48,7 @@
 </div>
 
 
-        
+
 <div class="search_stats center">
     <b>{{ n_repositories_indexed }}</b> open-source repositories in the climate space
 </div>
@@ -62,10 +62,10 @@
         var excludeForks = document.getElementById("exclude_forks").checked;
         var excludeInactive = document.getElementById("exclude_inactive").checked;
         window.location.href = "results?"
-            + "query=" + encodeURIComponent(queryValue) 
-            + "&license_category=" + encodeURIComponent(licenseValue) 
-            + "&language=" + encodeURIComponent(languageValue) 
-            + "&exclude_forks=" + encodeURIComponent(excludeForks) 
+            + "query=" + encodeURIComponent(queryValue)
+            + "&license_category=" + encodeURIComponent(licenseValue)
+            + "&language=" + encodeURIComponent(languageValue)
+            + "&exclude_forks=" + encodeURIComponent(excludeForks)
             + "&exclude_inactive=" + encodeURIComponent(excludeInactive);
     });
 </script>

@@ -1,17 +1,15 @@
 """
-Module parsing https://github.com/github/GreenSoftwareDirectory
+Module parsing https://github.com/github/GreenSoftwareDirectory and other listings
 """
 
 from datetime import timedelta
 from enum import Enum
 
 from oss4climate.src.log import log_warning
-from oss4climate.src.model import EnumDocumentationFileType
+from oss4climate.src.models import EnumDocumentationFileType
 from oss4climate.src.parsers import (
     ParsingTargets,
     ResourceListing,
-    github_data_io,
-    gitlab_data_io,
 )
 from oss4climate.src.parsers import (
     fetch_all_project_urls_from_html_webpage as __fetch_from_webpage,
@@ -22,6 +20,8 @@ from oss4climate.src.parsers import (
 from oss4climate.src.parsers import (
     fetch_all_project_urls_from_rst_str as __fetch_from_rst_str,
 )
+from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
 
 def _parse_readme(readme: str, readme_type: EnumDocumentationFileType) -> str | None:
@@ -58,14 +58,14 @@ def parse_listing(
 ) -> ParsingTargets:
     i = _flexible_url_parse(url)
     if listing_type == EnumListingType.GITHUB:
-        readme_i, readme_type_i = github_data_io.fetch_repository_readme(
-            i, cache_lifetime=cache_lifetime
-        )
+        readme_i, readme_type_i = GithubScraper(
+            cache_lifetime=cache_lifetime
+        ).fetch_repository_readme(i)
         out = _parse_readme(readme_i, readme_type_i)
     elif listing_type == EnumListingType.GITLAB:
-        readme_i, readme_type_i = gitlab_data_io.fetch_repository_readme(
-            i, cache_lifetime=cache_lifetime
-        )
+        readme_i, readme_type_i = GitlabScraper(
+            cache_lifetime=cache_lifetime
+        ).fetch_repository_readme(i)
         out = _parse_readme(readme_i, readme_type_i)
     elif listing_type == EnumListingType.HTML:
         out = __fetch_from_webpage(i, cache_lifetime=cache_lifetime)

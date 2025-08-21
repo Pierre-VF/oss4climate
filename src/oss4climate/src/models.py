@@ -27,6 +27,19 @@ class EnumDocumentationFileType(Enum):
             return EnumDocumentationFileType.UNKNOWN
 
 
+class EnumLicenseCategories(Enum):
+    APACHE = "Apache"
+    BSD = "BSD"
+    CREATIVE_COMMON = "Creative Common"
+    ECLIPSE = "Eclipse"
+    GNU_AGPL = "GNU AGPL"
+    GNU_GPL = "GNU GPL"
+    GNU_LGPL = "GNU LGPL"
+    MIT = "MIT"
+    OTHER = "Other"
+    UNKNOWN = "Unknown"
+
+
 class ProjectDetails(BaseModel):
     id: str
     name: str

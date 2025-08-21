@@ -323,7 +323,7 @@ class ParsingTargets:
             self.codeberg_repositories
         )
 
-    def cleanup(self) -> None:
+    def cleanup(self, drop_invalid: bool = False, drop_unknown: bool = False) -> None:
         """
         Method to cleanup the object (removing obsolete entries and redundancies)
         """
@@ -345,13 +345,19 @@ class ParsingTargets:
             for i in self.codeberg_repositories
             if i not in self.codeberg_organisations
         ]
-        # Removing unknown repos
-        self.unknown = [
-            i for i in self.unknown if not self.__included_in_valid_targets(i)
-        ]
-        self.invalid = [
-            i for i in self.invalid if not self.__included_in_valid_targets(i)
-        ]
+        if drop_invalid:
+            self.invalid = []
+        else:
+            self.invalid = [
+                i for i in self.invalid if not self.__included_in_valid_targets(i)
+            ]
+        if drop_unknown:
+            self.unknown = []
+        else:
+            # Removing unknown repos
+            self.unknown = [
+                i for i in self.unknown if not self.__included_in_valid_targets(i)
+            ]
 
     @staticmethod
     def from_toml(toml_file_path: str) -> "ParsingTargets":
@@ -420,19 +426,17 @@ class ParsingTargets:
 
 
 def identify_parsing_targets(x: list[str]) -> ParsingTargets:
-    from oss4climate.src.parsers import (
-        bitbucket_data_io,
-        codeberg_data_io,
-        github_data_io,
-        gitlab_data_io,
-    )
+    from oss4climate.src.parsers.git_platforms.bitbucket_io import BitbucketScraper
+    from oss4climate.src.parsers.git_platforms.codeberg_io import CodebergScraper
+    from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+    from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
-    out_github = github_data_io.split_across_target_sets(x)
-    out_gitlab = gitlab_data_io.split_across_target_sets(out_github.unknown)
+    out_github = GithubScraper().split_across_target_sets(x)
+    out_gitlab = GitlabScraper().split_across_target_sets(out_github.unknown)
     out_github.unknown = []
-    out_bitbucket = bitbucket_data_io.split_across_target_sets(out_gitlab.unknown)
+    out_bitbucket = BitbucketScraper().split_across_target_sets(out_gitlab.unknown)
     out_gitlab.unknown = []
-    out_codeberg = codeberg_data_io.split_across_target_sets(out_bitbucket.unknown)
+    out_codeberg = CodebergScraper().split_across_target_sets(out_bitbucket.unknown)
     out_bitbucket.unknown = []
 
     out = out_bitbucket + out_github + out_gitlab + out_codeberg
@@ -440,15 +444,18 @@ def identify_parsing_targets(x: list[str]) -> ParsingTargets:
 
 
 def isolate_relevant_urls(urls: list[str]) -> list[str]:
-    from oss4climate.src.parsers import (
-        bitbucket_data_io,
-        codeberg_data_io,
-        github_data_io,
-        gitlab_data_io,
-    )
+    from oss4climate.src.parsers.git_platforms.bitbucket_io import BitbucketScraper
+    from oss4climate.src.parsers.git_platforms.codeberg_io import CodebergScraper
+    from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+    from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
+
+    ghs = GithubScraper()
+    gls = GitlabScraper()
+    cbs = CodebergScraper()
+    bbs = BitbucketScraper()
 
     def __f(i) -> bool:
-        if github_data_io.is_github_url(i):
+        if ghs.is_relevant_url(i):
             if (
                 ("/tree/" in i)
                 or ("/blob/" in i)
@@ -459,11 +466,11 @@ def isolate_relevant_urls(urls: list[str]) -> list[str]:
                 return False
             else:
                 return True
-        elif gitlab_data_io.is_gitlab_url(i):
+        elif gls.is_relevant_url(i):
             return True
-        elif bitbucket_data_io.is_bitbucket_url(i):
+        elif bbs.is_relevant_url(i):
             return True
-        elif codeberg_data_io.is_codeberg_url(i):
+        elif cbs.is_relevant_url(i):
             return True
         else:
             return False
@@ -689,7 +696,11 @@ class ResourceListing:
         return df
 
     def fetch_all_licenses(self, force_update: bool = False) -> None:
-        from . import github_data_io, gitlab_data_io
+        from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+        from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
+
+        gitlab_s = GitlabScraper()
+        github_s = GithubScraper()
 
         def _f_license_missing(i):
             return i.get("license") in ["?", None] or (i.get("license_url") is None)
@@ -698,7 +709,7 @@ class ResourceListing:
             if isinstance(i, dict):
                 if force_update or _f_license_missing(i):
                     try:
-                        x = github_data_io.fetch_repository_details(i["url"])
+                        x = github_s.fetch_project_details(i["url"])
                         if x.license:
                             i["license"] = x.license
                         if x.license_url:
@@ -710,7 +721,7 @@ class ResourceListing:
             if isinstance(i, dict):
                 if force_update or _f_license_missing(i):
                     try:
-                        x = gitlab_data_io.fetch_repository_details(i["url"])
+                        x = gitlab_s.fetch_project_details(i["url"])
                         if x.license:
                             i["license"] = x.license
                         if x.license_url:
@@ -719,7 +730,7 @@ class ResourceListing:
                         pass
 
     def fetch_all_target_counts(self, force_update: bool = False) -> None:
-        from . import listings
+        from oss4climate.src.parsers import listings
 
         def f_get_target_counts(
             i, listing_type: listings.EnumListingType

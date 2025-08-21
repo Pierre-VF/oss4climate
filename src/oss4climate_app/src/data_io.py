@@ -11,13 +11,13 @@ from oss4climate.src.config import (
 )
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
+from oss4climate.src.models import EnumLicenseCategories
 from oss4climate.src.nlp.plaintext import (
     get_spacy_english_model,
     reduce_to_informative_lemmas,
 )
 from oss4climate.src.nlp.search import SearchResults
 from oss4climate.src.nlp.search_engine import SearchEngine
-from oss4climate.src.parsers.licenses import LicenseCategoriesEnum
 
 SEARCH_ENGINE_DESCRIPTIONS = SearchEngine()
 SEARCH_ENGINE_READMES = SearchEngine()
@@ -69,8 +69,8 @@ def repository_index_characteristics_from_documents(
 
 
 @lru_cache(maxsize=1)
-def unique_license_categories() -> list[LicenseCategoriesEnum]:
-    return [i for i in LicenseCategoriesEnum]
+def unique_license_categories() -> list[EnumLicenseCategories]:
+    return [i for i in EnumLicenseCategories]
 
 
 @lru_cache(maxsize=1)
@@ -154,7 +154,7 @@ def clear_cache():
 
 def refresh_data(force_refresh: bool = False):
     if force_refresh or not os.path.exists(FILE_OUTPUT_OPTIMISED_LISTING_FEATHER):
-        from oss4climate.scripts import listing_search
+        from oss4climate_scripts.scripts import listing_search
 
         log_warning("- Listing not found, downloading again")
         listing_search.download_listing_data_for_app()

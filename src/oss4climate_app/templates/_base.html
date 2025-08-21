@@ -6,11 +6,11 @@
             {% block title %}
                 OSS4Climate - Open-source search for climate applications
             {% endblock %}</title>
-        <link href="{{ URL_BASE }}/static/css/styles.css?version={{ APP_VERSION }}" rel="stylesheet">    
+        <link href="{{ URL_BASE }}/static/css/styles.css?version={{ APP_VERSION }}" rel="stylesheet">
         {% if UMAMI_SITE_ID != "" %}
             <script defer src="https://cloud.umami.is/script.js" data-website-id="{{ UMAMI_SITE_ID }}"></script>
         {% endif %}
-        
+
         <link rel="canonical" href="{{ canonical_url }}">
     </head>
     <body>
@@ -30,10 +30,10 @@
             <p class="center">{{ credits_text | safe }}</p>
             <p class="center">-</p>
             <p class="center">
-                Maintained by <a href="https://pierrevf.consulting/">PierreVF Consulting</a> 
-                | 
-                <a href="{{ URL_CODE_REPOSITORY }}" data-umami-event="check-source-code">Source code</a> 
-                | 
+                Maintained by <a href="https://pierrevf.consulting/">PierreVF Consulting</a>
+                |
+                <a href="{{ URL_CODE_REPOSITORY }}" data-umami-event="check-source-code">Source code</a>
+                |
                 <a href="privacy">Privacy policy</a></p>
         </div>
     </body>

@@ -32,8 +32,8 @@ class ForbiddenError(RuntimeError):
 app = FastAPI(
     title="OSS4climate API",
     description="""
-    API to access the oss4climate service. Please note that this is currently an **experimental proof-of-concept**  
-    so that stability is not guaranteed and that any integration with it might therefore break in case of updates. 
+    API to access the oss4climate service. Please note that this is currently an **experimental proof-of-concept**
+    so that stability is not guaranteed and that any integration with it might therefore break in case of updates.
 
     The service is provided without any guarantee and no liability will be accepted.
               """,
