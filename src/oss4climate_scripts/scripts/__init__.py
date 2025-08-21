@@ -14,10 +14,10 @@ from oss4climate.src.log import log_info
 from oss4climate.src.parsers import (
     ParsingTargets,
     ResourceListing,
-    github_data_io,
     identify_parsing_targets,
     listings,
 )
+from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
 from oss4climate.src.parsers.lfenergy import (
     fetch_all_project_urls_from_lfe_webpage,
     fetch_project_github_urls_from_lfe_energy_project_webpage,
@@ -48,7 +48,7 @@ def _add_projects_to_listing_file(
 
     # Cleaning Github repositories links
     new_targets.github_repositories = [
-        github_data_io.clean_github_repository_url(i)
+        GithubScraper.minimalise_resource_url(i)
         for i in new_targets.github_repositories
     ]
 

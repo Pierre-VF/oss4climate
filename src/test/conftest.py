@@ -7,6 +7,10 @@ def github_repo_url() -> str:
     return "https://github.com/Pierre-VF/oss4climate"
 
 
+def github_repo_url_with_organisation() -> str:
+    "https://github.com/DTUWindEnergy/WindEnergyToolbox"
+
+
 @pytest.fixture
 def github_repo_url_2() -> str:
     return "https://github.com/Pierre-VF/oss4climate2"

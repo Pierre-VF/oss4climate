@@ -20,9 +20,9 @@ from oss4climate.src.nlp.plaintext import (
 from oss4climate.src.parsers import (
     ParsingTargets,
     RateLimitError,
-    github_data_io,
     gitlab_data_io,
 )
+from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
 from oss4climate_scripts import scripts
 
 
@@ -64,7 +64,7 @@ def scrape_all(
             continue  # Skip
 
         try:
-            x = github_data_io.fetch_repositories_in_organisation(org_url)
+            x = GithubScraper().fetch_repositories_in_organisation(org_url)
             [targets.github_repositories.append(i) for i in x.values()]
         except Exception as e:
             scrape_failures["GITHUB_ORGANISATION:" + org_url] = e
@@ -106,14 +106,13 @@ def scrape_all(
     log_info("Fetching data for all repositories in Github")
     try:
         forbidden_for_api_limit_counter = 0
+        ghs = GithubScraper()
         for i in targets.github_repositories:
             try:
                 if i.endswith("/.github"):
                     continue
                 screening_results.append(
-                    github_data_io.fetch_repository_details(
-                        i, fail_on_issue=fail_on_issue
-                    )
+                    ghs.fetch_repository_details(i, fail_on_issue=fail_on_issue)
                 )
             except Exception as e:
                 if isinstance(e, RateLimitError):

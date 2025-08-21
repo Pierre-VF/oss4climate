@@ -423,11 +423,11 @@ def identify_parsing_targets(x: list[str]) -> ParsingTargets:
     from oss4climate.src.parsers import (
         bitbucket_data_io,
         codeberg_data_io,
-        github_data_io,
         gitlab_data_io,
     )
+    from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
 
-    out_github = github_data_io.split_across_target_sets(x)
+    out_github = GithubScraper().split_across_target_sets(x)
     out_gitlab = gitlab_data_io.split_across_target_sets(out_github.unknown)
     out_github.unknown = []
     out_bitbucket = bitbucket_data_io.split_across_target_sets(out_gitlab.unknown)
@@ -443,12 +443,12 @@ def isolate_relevant_urls(urls: list[str]) -> list[str]:
     from oss4climate.src.parsers import (
         bitbucket_data_io,
         codeberg_data_io,
-        github_data_io,
         gitlab_data_io,
     )
+    from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
 
     def __f(i) -> bool:
-        if github_data_io.is_github_url(i):
+        if GithubScraper.is_relevant_url(i):
             if (
                 ("/tree/" in i)
                 or ("/blob/" in i)
@@ -689,7 +689,8 @@ class ResourceListing:
         return df
 
     def fetch_all_licenses(self, force_update: bool = False) -> None:
-        from . import github_data_io, gitlab_data_io
+        from . import gitlab_data_io
+        from .git_platforms.github_io import GithubScraper
 
         def _f_license_missing(i):
             return i.get("license") in ["?", None] or (i.get("license_url") is None)
@@ -698,7 +699,7 @@ class ResourceListing:
             if isinstance(i, dict):
                 if force_update or _f_license_missing(i):
                     try:
-                        x = github_data_io.fetch_repository_details(i["url"])
+                        x = GithubScraper().fetch_repository_details(i["url"])
                         if x.license:
                             i["license"] = x.license
                         if x.license_url:

@@ -12,7 +12,7 @@ from oss4climate.src.parsers import (
     cached_web_get_text,
     identify_parsing_targets,
 )
-from oss4climate.src.parsers.github_data_io import GITHUB_URL_BASE
+from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
 from oss4climate.src.parsers.gitlab_data_io import GITLAB_ANY_URL_PREFIX
 
 _PROJECT_PAGE_URL_BASE = "https://lfenergy.org/projects/"
@@ -47,7 +47,7 @@ def fetch_project_github_urls_from_lfe_energy_project_webpage(
 
     # Github URLs
     github_urls = [
-        i for i in [x.get("href") for x in rs] if i.startswith(GITHUB_URL_BASE)
+        i for i in [x.get("href") for x in rs] if GithubScraper.is_relevant_url(i)
     ]
     github_urls = [i for i in github_urls if not i.endswith(".md")]
     # Gitlab URLs

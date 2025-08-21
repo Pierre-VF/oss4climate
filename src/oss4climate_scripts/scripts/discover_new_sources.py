@@ -19,9 +19,9 @@ from oss4climate.src.parsers import (
     ParsingTargets,
     fetch_all_project_urls_from_markdown_str,
     fetch_all_project_urls_from_rst_str,
-    github_data_io,
     url_qualifies,
 )
+from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
 
 
 def discover_repositories_in_existing_organisations(output_file: str) -> None:
@@ -30,7 +30,7 @@ def discover_repositories_in_existing_organisations(output_file: str) -> None:
 
     # Extract organisation to screen for new repositories
     orgs = [
-        github_data_io.extract_repository_organisation(i)
+        GithubScraper.extract_repository_organisation(i)
         for i in targets.github_repositories
     ]
 
