@@ -423,12 +423,12 @@ def identify_parsing_targets(x: list[str]) -> ParsingTargets:
     from oss4climate.src.parsers import (
         bitbucket_data_io,
         codeberg_data_io,
-        gitlab_data_io,
     )
     from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+    from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
     out_github = GithubScraper().split_across_target_sets(x)
-    out_gitlab = gitlab_data_io.split_across_target_sets(out_github.unknown)
+    out_gitlab = GitlabScraper().split_across_target_sets(out_github.unknown)
     out_github.unknown = []
     out_bitbucket = bitbucket_data_io.split_across_target_sets(out_gitlab.unknown)
     out_gitlab.unknown = []
@@ -443,12 +443,15 @@ def isolate_relevant_urls(urls: list[str]) -> list[str]:
     from oss4climate.src.parsers import (
         bitbucket_data_io,
         codeberg_data_io,
-        gitlab_data_io,
     )
     from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+    from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
+
+    ghs = GithubScraper()
+    gls = GitlabScraper()
 
     def __f(i) -> bool:
-        if GithubScraper.is_relevant_url(i):
+        if ghs.is_relevant_url(i):
             if (
                 ("/tree/" in i)
                 or ("/blob/" in i)
@@ -459,7 +462,7 @@ def isolate_relevant_urls(urls: list[str]) -> list[str]:
                 return False
             else:
                 return True
-        elif gitlab_data_io.is_gitlab_url(i):
+        elif gls.is_relevant_url(i):
             return True
         elif bitbucket_data_io.is_bitbucket_url(i):
             return True
@@ -689,8 +692,11 @@ class ResourceListing:
         return df
 
     def fetch_all_licenses(self, force_update: bool = False) -> None:
-        from . import gitlab_data_io
         from .git_platforms.github_io import GithubScraper
+        from .git_platforms.gitlab_io import GitlabScraper
+
+        gitlab_s = GitlabScraper()
+        github_s = GithubScraper()
 
         def _f_license_missing(i):
             return i.get("license") in ["?", None] or (i.get("license_url") is None)
@@ -699,7 +705,7 @@ class ResourceListing:
             if isinstance(i, dict):
                 if force_update or _f_license_missing(i):
                     try:
-                        x = GithubScraper().fetch_repository_details(i["url"])
+                        x = github_s.fetch_project_details(i["url"])
                         if x.license:
                             i["license"] = x.license
                         if x.license_url:
@@ -711,7 +717,7 @@ class ResourceListing:
             if isinstance(i, dict):
                 if force_update or _f_license_missing(i):
                     try:
-                        x = gitlab_data_io.fetch_repository_details(i["url"])
+                        x = gitlab_s.fetch_project_details(i["url"])
                         if x.license:
                             i["license"] = x.license
                         if x.license_url:

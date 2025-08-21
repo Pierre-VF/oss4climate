@@ -10,7 +10,6 @@ from oss4climate.src.parsers import (
     ParsingTargets,
     ResourceListing,
     cached_web_get_text,
-    gitlab_data_io,
     isolate_relevant_urls,
 )
 from oss4climate.src.parsers import (
@@ -81,6 +80,7 @@ def fetch_categorised_projects_from_opensustain_webpage(
 
 def fetch_listing_of_listings_from_opensustain_webpage() -> ResourceListing:
     from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+    from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
     x = fetch_categorised_projects_from_opensustain_webpage(relevant_urls_only=False)
     listing_urls = x.get("Sustainable Development").get("Curated Lists") + x.get(
@@ -88,8 +88,10 @@ def fetch_listing_of_listings_from_opensustain_webpage() -> ResourceListing:
     ).get("Data Catalogs and Interfaces")
     gits = isolate_relevant_urls(listing_urls)
     others = [i for i in listing_urls if i not in gits]
+    ghs = GithubScraper()
+    gls = GitlabScraper()
     return ResourceListing(
-        github_readme_listings=[i for i in gits if GithubScraper.is_relevant_url(i)],
-        gitlab_readme_listings=[i for i in gits if gitlab_data_io.is_gitlab_url(i)],
+        github_readme_listings=[i for i in gits if ghs.is_relevant_url(i)],
+        gitlab_readme_listings=[i for i in gits if gls.is_gitlab_url(i)],
         fault_urls=others,
     )

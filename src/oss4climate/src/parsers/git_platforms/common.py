@@ -18,8 +18,14 @@ class GitPlatformScraper:
 
     @abstractmethod
     def is_relevant_url(
+        self,
         url: str,
+        **kwargs,
     ) -> bool:
+        pass
+
+    @classmethod
+    def minimalise_resource_url(cls, url: str) -> str:
         pass
 
     @abstractmethod

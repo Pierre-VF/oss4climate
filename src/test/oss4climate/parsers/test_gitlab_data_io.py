@@ -1,9 +1,8 @@
-from oss4climate.src.parsers import ParsingTargets
-from oss4climate.src.parsers.gitlab_data_io import (
+from oss4climate.src.models import (
     ProjectDetails,
-    fetch_repositories_in_group,
-    fetch_repository_details,
 )
+from oss4climate.src.parsers import ParsingTargets
+from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
 
 def test_parsing_target_set(
@@ -59,10 +58,11 @@ def test_parsing_target_set(
 
 
 def test_fetch_functions(gitlab_repo_url, gitlab_group_url):
-    res_repo = fetch_repository_details(gitlab_repo_url)
+    gls = GitlabScraper()
+    res_repo = gls.fetch_project_details(gitlab_repo_url)
     assert isinstance(res_repo, ProjectDetails)
 
-    res_org = fetch_repositories_in_group(gitlab_group_url)
+    res_org = gls.fetch_repositories_in_organisation(gitlab_group_url)
     assert isinstance(res_org, dict)
 
     print("ok")

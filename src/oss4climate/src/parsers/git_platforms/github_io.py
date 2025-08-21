@@ -22,6 +22,7 @@ from oss4climate.src.parsers import (
     cached_web_get_json,
     cached_web_get_text,
 )
+from oss4climate.src.parsers.git_platforms.common import GitPlatformScraper
 
 _GITHUB_DOMAIN = "github.com"
 _GITHUB_URL_BASE = f"https://{_GITHUB_DOMAIN}/"
@@ -29,7 +30,7 @@ _GITHUB_URL_BASE = f"https://{_GITHUB_DOMAIN}/"
 
 def _extract_organisation_and_repository_as_url_block(x: str) -> str:
     # Cleaning up Github prefix
-    if GithubScraper.is_relevant_url(x):
+    if GithubScraper().is_relevant_url(x):
         x = x.replace(_GITHUB_URL_BASE, "")
     fixed_x = "/".join(x.split("/")[:2])
     # Removing eventual extra information in URL
@@ -49,7 +50,7 @@ class _GithubTargetType(Enum):
 
     @staticmethod
     def identify(url: str) -> "_GithubTargetType":
-        if not GithubScraper.is_relevant_url(url):
+        if not GithubScraper().is_relevant_url(url):
             return _GithubTargetType.UNKNOWN
         processed = _extract_organisation_and_repository_as_url_block(url)
         n_slashes = processed.count("/")
@@ -149,10 +150,6 @@ def extract_repository_organisation(repo_path: str) -> str:
     return organisation
 
 
-# -----
-from oss4climate.src.parsers.git_platforms.common import GitPlatformScraper
-
-
 class GithubScraper(GitPlatformScraper):
     def __init__(
         self,
@@ -161,11 +158,8 @@ class GithubScraper(GitPlatformScraper):
         super().__init__(cache_lifetime=cache_lifetime)
 
     @classmethod
-    def is_relevant_url(
-        cls,
-        url: str,
-    ) -> bool:
-        return url_base_matches_domain(url, _GITHUB_DOMAIN)
+    def minimalise_resource_url(cls, url: str) -> str:
+        return _GITHUB_URL_BASE + _extract_organisation_and_repository_as_url_block(url)
 
     @classmethod
     def split_across_target_sets(
@@ -186,6 +180,13 @@ class GithubScraper(GitPlatformScraper):
         return ParsingTargets(
             github_organisations=orgs, github_repositories=repos, unknown=others
         )
+
+    def is_relevant_url(
+        self,
+        url: str,
+        **kwargs,
+    ) -> bool:
+        return url_base_matches_domain(url, _GITHUB_DOMAIN)
 
     def fetch_repository_readme(
         self,
@@ -456,10 +457,6 @@ class GithubScraper(GitPlatformScraper):
         repo_path = _extract_organisation_and_repository_as_url_block(repo_path)
         organisation = repo_path.split("/")[0]
         return organisation
-
-    @classmethod
-    def minimalise_resource_url(cls, url) -> str:
-        return _GITHUB_URL_BASE + _extract_organisation_and_repository_as_url_block(url)
 
     # --------------------------------------------------------------------------------
     # --------------------------------------------------------------------------------

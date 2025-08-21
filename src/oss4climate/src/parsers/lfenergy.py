@@ -13,7 +13,7 @@ from oss4climate.src.parsers import (
     identify_parsing_targets,
 )
 from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
-from oss4climate.src.parsers.gitlab_data_io import GITLAB_ANY_URL_PREFIX
+from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
 _PROJECT_PAGE_URL_BASE = "https://lfenergy.org/projects/"
 
@@ -46,13 +46,15 @@ def fetch_project_github_urls_from_lfe_energy_project_webpage(
     rs = b.findAll(name="a", attrs={"class": "projects-icon"})
 
     # Github URLs
-    github_urls = [
-        i for i in [x.get("href") for x in rs] if GithubScraper.is_relevant_url(i)
-    ]
+    ghs = GithubScraper()
+    github_urls = [i for i in [x.get("href") for x in rs] if ghs.is_relevant_url(i)]
     github_urls = [i for i in github_urls if not i.endswith(".md")]
     # Gitlab URLs
+    gls = GitlabScraper()
     gitlab_urls = [
-        i for i in [x.get("href") for x in rs] if i.startswith(GITLAB_ANY_URL_PREFIX)
+        i
+        for i in [x.get("href") for x in rs]
+        if gls.is_relevant_url(i, include_self_hosted=False)
     ]
     gitlab_urls = [i for i in gitlab_urls if not i.endswith(".md")]
 

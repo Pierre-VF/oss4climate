@@ -20,9 +20,9 @@ from oss4climate.src.nlp.plaintext import (
 from oss4climate.src.parsers import (
     ParsingTargets,
     RateLimitError,
-    gitlab_data_io,
 )
 from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 from oss4climate_scripts import scripts
 
 
@@ -53,6 +53,9 @@ def scrape_all(
     bad_organisations = []
     bad_repositories = []
 
+    gitlab_s = GitlabScraper()
+    github_s = GithubScraper()
+
     log_info("Fetching data for all organisations in Github")
     for org_url in targets.github_organisations:
         url2check = org_url.replace("https://", "")
@@ -64,7 +67,7 @@ def scrape_all(
             continue  # Skip
 
         try:
-            x = GithubScraper().fetch_repositories_in_organisation(org_url)
+            x = github_s.fetch_repositories_in_organisation(org_url)
             [targets.github_repositories.append(i) for i in x.values()]
         except Exception as e:
             scrape_failures["GITHUB_ORGANISATION:" + org_url] = e
@@ -82,7 +85,7 @@ def scrape_all(
             continue  # Skip
 
         try:
-            x = gitlab_data_io.fetch_repositories_in_group(org_url)
+            x = gitlab_s.fetch_repositories_in_group(org_url)
             [targets.gitlab_projects.append(i) for i in x.values()]
         except Exception as e:
             scrape_failures["GITLAB_GROUP:" + org_url] = e
@@ -96,7 +99,7 @@ def scrape_all(
     for i in targets.gitlab_projects:
         try:
             screening_results.append(
-                gitlab_data_io.fetch_repository_details(i, fail_on_issue=fail_on_issue)
+                gitlab_s.fetch_project_details(i, fail_on_issue=fail_on_issue)
             )
         except Exception as e:
             scrape_failures["GITLAB_PROJECT:" + i] = e
@@ -106,13 +109,12 @@ def scrape_all(
     log_info("Fetching data for all repositories in Github")
     try:
         forbidden_for_api_limit_counter = 0
-        ghs = GithubScraper()
         for i in targets.github_repositories:
             try:
                 if i.endswith("/.github"):
                     continue
                 screening_results.append(
-                    ghs.fetch_repository_details(i, fail_on_issue=fail_on_issue)
+                    github_s.fetch_project_details(i, fail_on_issue=fail_on_issue)
                 )
             except Exception as e:
                 if isinstance(e, RateLimitError):
