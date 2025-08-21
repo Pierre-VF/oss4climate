@@ -420,9 +420,7 @@ class ParsingTargets:
 
 
 def identify_parsing_targets(x: list[str]) -> ParsingTargets:
-    from oss4climate.src.parsers import (
-        bitbucket_data_io,
-    )
+    from oss4climate.src.parsers.git_platforms.bitbucket_io import BitbucketScraper
     from oss4climate.src.parsers.git_platforms.codeberg_io import CodebergScraper
     from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
     from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
@@ -430,7 +428,7 @@ def identify_parsing_targets(x: list[str]) -> ParsingTargets:
     out_github = GithubScraper().split_across_target_sets(x)
     out_gitlab = GitlabScraper().split_across_target_sets(out_github.unknown)
     out_github.unknown = []
-    out_bitbucket = bitbucket_data_io.split_across_target_sets(out_gitlab.unknown)
+    out_bitbucket = BitbucketScraper().split_across_target_sets(out_gitlab.unknown)
     out_gitlab.unknown = []
     out_codeberg = CodebergScraper().split_across_target_sets(out_bitbucket.unknown)
     out_bitbucket.unknown = []
@@ -440,9 +438,7 @@ def identify_parsing_targets(x: list[str]) -> ParsingTargets:
 
 
 def isolate_relevant_urls(urls: list[str]) -> list[str]:
-    from oss4climate.src.parsers import (
-        bitbucket_data_io,
-    )
+    from oss4climate.src.parsers.git_platforms.bitbucket_io import BitbucketScraper
     from oss4climate.src.parsers.git_platforms.codeberg_io import CodebergScraper
     from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
     from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
@@ -450,6 +446,7 @@ def isolate_relevant_urls(urls: list[str]) -> list[str]:
     ghs = GithubScraper()
     gls = GitlabScraper()
     cbs = CodebergScraper()
+    bbs = BitbucketScraper()
 
     def __f(i) -> bool:
         if ghs.is_relevant_url(i):
@@ -465,7 +462,7 @@ def isolate_relevant_urls(urls: list[str]) -> list[str]:
                 return True
         elif gls.is_relevant_url(i):
             return True
-        elif bitbucket_data_io.is_bitbucket_url(i):
+        elif bbs.is_bitbucket_url(i):
             return True
         elif cbs.is_codeberg_url(i):
             return True
