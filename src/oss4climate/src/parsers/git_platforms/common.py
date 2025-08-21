@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from datetime import timedelta
+from enum import Enum
 
 from oss4climate.src.models import EnumDocumentationFileType, ProjectDetails
 from oss4climate.src.parsers import (
@@ -24,12 +25,12 @@ class GitPlatformScraper:
     ) -> bool:
         pass
 
-    @classmethod
-    def minimalise_resource_url(cls, url: str) -> str:
+    def minimalise_resource_url(self, url: str) -> str:
         pass
 
     @abstractmethod
     def split_across_target_sets(
+        self,
         x: list[str],
     ) -> ParsingTargets:
         pass
@@ -84,4 +85,8 @@ class GitPlatformScraper:
 
     @abstractmethod
     def extract_repository_organisation(self, repo_path: str) -> str:
+        pass
+
+    @abstractmethod
+    def identify_target_type(self, url: str) -> Enum:
         pass

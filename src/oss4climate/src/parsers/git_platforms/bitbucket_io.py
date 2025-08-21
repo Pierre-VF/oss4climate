@@ -43,19 +43,6 @@ class BitbucketTargetType(Enum):
     REPOSITORY = "REPOSITORY"
     UNKNOWN = "UNKNOWN"
 
-    @staticmethod
-    def identify(url: str) -> "BitbucketTargetType":
-        if not BitbucketScraper().is_relevant_url(url):
-            return BitbucketTargetType.UNKNOWN
-        processed = _extract_organisation_and_repository_as_url_block(url)
-        n_slashes = processed.count("/")
-        if n_slashes < 1:
-            return BitbucketTargetType.PROJECT
-        elif n_slashes == 1:
-            return BitbucketTargetType.REPOSITORY
-        else:
-            return BitbucketTargetType.UNKNOWN
-
 
 class BitbucketScraper(_GPScraper):
     """This is the basic structure of the scraper for a Git-hosting platform"""
@@ -73,9 +60,8 @@ class BitbucketScraper(_GPScraper):
     ) -> bool:
         return url_base_matches_domain(url, BITBUCKET_DOMAIN)
 
-    @classmethod
-    def minimalise_resource_url(cls, url: str) -> str:
-        pass
+    def minimalise_resource_url(self, url: str) -> str:
+        raise NotImplementedError()
 
     def split_across_target_sets(
         self,
@@ -85,7 +71,7 @@ class BitbucketScraper(_GPScraper):
         repos = []
         others = []
         for i in x:
-            tt_i = BitbucketTargetType.identify(i)
+            tt_i = self.identify_target_type(i)
             if tt_i is BitbucketTargetType.PROJECT:
                 projs.append(i)
             elif tt_i is BitbucketTargetType.REPOSITORY:
@@ -145,6 +131,18 @@ class BitbucketScraper(_GPScraper):
         repo_path = _extract_organisation_and_repository_as_url_block(repo_path)
         organisation = repo_path.split("/")[0]
         return organisation
+
+    def identify_target_type(self, url: str) -> BitbucketTargetType:
+        if not self.is_relevant_url(url):
+            return BitbucketTargetType.UNKNOWN
+        processed = _extract_organisation_and_repository_as_url_block(url)
+        n_slashes = processed.count("/")
+        if n_slashes < 1:
+            return BitbucketTargetType.PROJECT
+        elif n_slashes == 1:
+            return BitbucketTargetType.REPOSITORY
+        else:
+            return BitbucketTargetType.UNKNOWN
 
 
 BITBUCKET_DOMAIN = "bitbucket.org"

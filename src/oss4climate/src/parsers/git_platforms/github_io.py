@@ -30,38 +30,10 @@ _GITHUB_DOMAIN = "github.com"
 _GITHUB_URL_BASE = f"https://{_GITHUB_DOMAIN}/"
 
 
-def _extract_organisation_and_repository_as_url_block(x: str) -> str:
-    # Cleaning up Github prefix
-    if GithubScraper().is_relevant_url(x):
-        x = x.replace(_GITHUB_URL_BASE, "")
-    fixed_x = "/".join(x.split("/")[:2])
-    # Removing eventual extra information in URL
-    for i in ["#", "&"]:
-        if i in fixed_x:
-            fixed_x = fixed_x.split(i)[0]
-    # Removing trailing "/", if any
-    while fixed_x.endswith("/"):
-        fixed_x = fixed_x[:-1]
-    return fixed_x
-
-
 class _GithubTargetType(Enum):
     ORGANISATION = "ORGANISATION"
     REPOSITORY = "REPOSITORY"
     UNKNOWN = "UNKNOWN"
-
-    @staticmethod
-    def identify(url: str) -> "_GithubTargetType":
-        if not GithubScraper().is_relevant_url(url):
-            return _GithubTargetType.UNKNOWN
-        processed = _extract_organisation_and_repository_as_url_block(url)
-        n_slashes = processed.count("/")
-        if n_slashes < 1:
-            return _GithubTargetType.ORGANISATION
-        elif n_slashes == 1:
-            return _GithubTargetType.REPOSITORY
-        else:
-            return _GithubTargetType.UNKNOWN
 
 
 @lru_cache(maxsize=1)
@@ -146,12 +118,6 @@ def _master_branch_name(
     return branch2use
 
 
-def extract_repository_organisation(repo_path: str) -> str:
-    repo_path = _extract_organisation_and_repository_as_url_block(repo_path)
-    organisation = repo_path.split("/")[0]
-    return organisation
-
-
 class GithubScraper(_GPScraper):
     def __init__(
         self,
@@ -159,20 +125,36 @@ class GithubScraper(_GPScraper):
     ):
         super().__init__(cache_lifetime=cache_lifetime)
 
-    @classmethod
-    def minimalise_resource_url(cls, url: str) -> str:
-        return _GITHUB_URL_BASE + _extract_organisation_and_repository_as_url_block(url)
+    # Private methods first
+    def _extract_organisation_and_repository_as_url_block(self, x: str) -> str:
+        # Cleaning up Github prefix
+        if self.is_relevant_url(x):
+            x = x.replace(_GITHUB_URL_BASE, "")
+        fixed_x = "/".join(x.split("/")[:2])
+        # Removing eventual extra information in URL
+        for i in ["#", "&"]:
+            if i in fixed_x:
+                fixed_x = fixed_x.split(i)[0]
+        # Removing trailing "/", if any
+        while fixed_x.endswith("/"):
+            fixed_x = fixed_x[:-1]
+        return fixed_x
 
-    @classmethod
+    def minimalise_resource_url(self, url: str) -> str:
+        return (
+            _GITHUB_URL_BASE
+            + self._extract_organisation_and_repository_as_url_block(url)
+        )
+
     def split_across_target_sets(
-        cls,
+        self,
         x: list[str],
     ) -> ParsingTargets:
         orgs = []
         repos = []
         others = []
         for i in x:
-            tt_i = _GithubTargetType.identify(i)
+            tt_i = self.identify_target_type(i)
             if tt_i is _GithubTargetType.ORGANISATION:
                 orgs.append(i)
             elif tt_i is _GithubTargetType.REPOSITORY:
@@ -180,7 +162,9 @@ class GithubScraper(_GPScraper):
             else:
                 others.append(i)
         return ParsingTargets(
-            github_organisations=orgs, github_repositories=repos, unknown=others
+            github_organisations=orgs,
+            github_repositories=repos,
+            unknown=others,
         )
 
     def is_relevant_url(
@@ -197,7 +181,7 @@ class GithubScraper(_GPScraper):
         fail_on_issue: bool = True,
     ) -> tuple[str | None, EnumDocumentationFileType]:
         cache_lifetime = self.cache_lifetime
-        repo_name = _extract_organisation_and_repository_as_url_block(repo_id)
+        repo_name = self._extract_organisation_and_repository_as_url_block(repo_id)
 
         if branch is None:
             branch = _master_branch_name(repo_name, cache_lifetime=cache_lifetime)
@@ -250,7 +234,7 @@ class GithubScraper(_GPScraper):
         fail_on_issue: bool = True,
     ) -> ProjectDetails:
         cache_lifetime = self.cache_lifetime
-        repo_path = _extract_organisation_and_repository_as_url_block(repo_id)
+        repo_path = self._extract_organisation_and_repository_as_url_block(repo_id)
 
         r = _web_get(
             f"https://api.github.com/repos/{repo_path}",
@@ -349,7 +333,7 @@ class GithubScraper(_GPScraper):
         self,
         repo_id: str,
     ) -> ProjectDetails:
-        repo_path = _extract_organisation_and_repository_as_url_block(repo_id)
+        repo_path = self._extract_organisation_and_repository_as_url_block(repo_id)
         r = _web_get(
             f"https://api.github.com/repos/{repo_path}/languages",
             cache_lifetime=self.cache_lifetime,
@@ -361,7 +345,7 @@ class GithubScraper(_GPScraper):
         organisation_name: str,
     ) -> dict[str, str]:
         cache_lifetime = self.cache_lifetime
-        organisation_name = _extract_organisation_and_repository_as_url_block(
+        organisation_name = self._extract_organisation_and_repository_as_url_block(
             organisation_name
         )
 
@@ -404,7 +388,7 @@ class GithubScraper(_GPScraper):
         repo_id: str,
         fail_on_issue: bool = True,
     ) -> list[str] | str:
-        repo_name = _extract_organisation_and_repository_as_url_block(repo_id)
+        repo_name = self._extract_organisation_and_repository_as_url_block(repo_id)
         branch = _master_branch_name(repo_name)
         if branch is None:
             return "ERROR with file tree (unclear master branch)"
@@ -423,9 +407,21 @@ class GithubScraper(_GPScraper):
         return file_tree
 
     def extract_repository_organisation(self, repo_path: str) -> str:
-        repo_path = _extract_organisation_and_repository_as_url_block(repo_path)
+        repo_path = self._extract_organisation_and_repository_as_url_block(repo_path)
         organisation = repo_path.split("/")[0]
         return organisation
+
+    def identify_target_type(self, url: str) -> "_GithubTargetType":
+        if not self.is_relevant_url(url):
+            return _GithubTargetType.UNKNOWN
+        processed = self._extract_organisation_and_repository_as_url_block(url)
+        n_slashes = processed.count("/")
+        if n_slashes < 1:
+            return _GithubTargetType.ORGANISATION
+        elif n_slashes == 1:
+            return _GithubTargetType.REPOSITORY
+        else:
+            return _GithubTargetType.UNKNOWN
 
     # --------------------------------------------------------------------------------
     # Not part of the abstract class
@@ -437,7 +433,7 @@ class GithubScraper(_GPScraper):
         fail_on_issue: bool = True,
     ) -> str | None:
         cache_lifetime = self.cache_lifetime
-        repo_id = _extract_organisation_and_repository_as_url_block(repo_id)
+        repo_id = self._extract_organisation_and_repository_as_url_block(repo_id)
 
         if branch is None:
             branch = _master_branch_name(repo_id, cache_lifetime=cache_lifetime)

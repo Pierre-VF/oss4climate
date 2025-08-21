@@ -47,9 +47,9 @@ def _add_projects_to_listing_file(
     new_targets = existing_targets + parsing_targets
 
     # Cleaning Github repositories links
+    ghs = GithubScraper()
     new_targets.github_repositories = [
-        GithubScraper.minimalise_resource_url(i)
-        for i in new_targets.github_repositories
+        ghs.minimalise_resource_url(i) for i in new_targets.github_repositories
     ]
 
     # Ensuring uniqueness in new targets and cleaning up redundancies

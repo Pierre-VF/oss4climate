@@ -46,19 +46,6 @@ class CodebergTargetType(Enum):
     REPOSITORY = "REPOSITORY"
     UNKNOWN = "UNKNOWN"
 
-    @staticmethod
-    def identify(url: str) -> "CodebergTargetType":
-        if not CodebergScraper().is_relevant_url(url):
-            return CodebergTargetType.UNKNOWN
-        processed = _extract_organisation_and_repository_as_url_block(url)
-        n_slashes = processed.count("/")
-        if n_slashes < 1:
-            return CodebergTargetType.ORGANISATION
-        elif n_slashes == 1:
-            return CodebergTargetType.REPOSITORY
-        else:
-            return CodebergTargetType.UNKNOWN
-
 
 class CodebergScraper(_GPScraper):
     """This is the basic structure of the scraper for a Git-hosting platform"""
@@ -76,8 +63,7 @@ class CodebergScraper(_GPScraper):
     ) -> bool:
         return url_base_matches_domain(url, CODEBERG_DOMAIN)
 
-    @classmethod
-    def minimalise_resource_url(cls, url: str) -> str:
+    def minimalise_resource_url(self, url: str) -> str:
         return CODEBERG_URL_BASE + _extract_organisation_and_repository_as_url_block(
             url
         )
@@ -90,7 +76,7 @@ class CodebergScraper(_GPScraper):
         repos = []
         others = []
         for i in x:
-            tt_i = CodebergTargetType.identify(i)
+            tt_i = self.identify_target_type(i)
             if tt_i is CodebergTargetType.ORGANISATION:
                 orgs.append(i)
             elif tt_i is CodebergTargetType.REPOSITORY:
@@ -150,3 +136,15 @@ class CodebergScraper(_GPScraper):
         repo_path = _extract_organisation_and_repository_as_url_block(repo_path)
         organisation = repo_path.split("/")[0]
         return organisation
+
+    def identify_target_type(self, url: str) -> CodebergTargetType:
+        if not self.is_relevant_url(url):
+            return CodebergTargetType.UNKNOWN
+        processed = _extract_organisation_and_repository_as_url_block(url)
+        n_slashes = processed.count("/")
+        if n_slashes < 1:
+            return CodebergTargetType.ORGANISATION
+        elif n_slashes == 1:
+            return CodebergTargetType.REPOSITORY
+        else:
+            return CodebergTargetType.UNKNOWN

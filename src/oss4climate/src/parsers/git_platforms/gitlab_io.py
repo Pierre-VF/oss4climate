@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from datetime import datetime, timedelta  # noqa
 from enum import Enum
 from functools import lru_cache
@@ -104,22 +103,6 @@ class GitlabTargetType(Enum):
     PROJECT = "PROJECT"
     UNKNOWN = "UNKNOWN"
 
-    @staticmethod
-    def identify(url: str) -> tuple["GitlabTargetType", str]:
-        gls = GitlabScraper()
-        if not gls.is_relevant_url(url):
-            return GitlabTargetType.UNKNOWN, url
-        host, repo_path = _extract_host_organisation_and_repository_as_url_block(url)
-        clean_url = gls.minimalise_resource_url(url)  # To remove trees and the like
-        n_slashes = repo_path.count("/")
-        if n_slashes < 1:
-            return GitlabTargetType.GROUP, clean_url
-        elif n_slashes >= 1:
-            # TODO : this is not good enough for sub-projects (but best quick fix for now)
-            return GitlabTargetType.PROJECT, clean_url
-        else:
-            return GitlabTargetType.UNKNOWN, clean_url
-
 
 class GitlabScraper(_GPScraper):
     """Gitlab-focused scraper"""
@@ -151,8 +134,7 @@ class GitlabScraper(_GPScraper):
         else:
             return url_base_matches_domain(url, GITLAB_DOMAIN)
 
-    @classmethod
-    def minimalise_resource_url(cls, url: str) -> str:
+    def minimalise_resource_url(self, url: str) -> str:
         x = url.split("/-/")[0]  # To remove trees and the like
         # Removing eventual extra information in URL
         for i in ["#", "&"]:
@@ -163,15 +145,15 @@ class GitlabScraper(_GPScraper):
             x = x[:-1]
         return x
 
-    @abstractmethod
     def split_across_target_sets(
+        self,
         x: list[str],
     ) -> ParsingTargets:
         groups = []
         projects = []
         others = []
         for i in x:
-            tt_i, clean_url_i = GitlabTargetType.identify(i)
+            tt_i, clean_url_i = self.identify_target_type_and_repo_url(i)
             if tt_i is GitlabTargetType.GROUP:
                 groups.append(clean_url_i)
             elif tt_i is GitlabTargetType.PROJECT:
@@ -316,23 +298,25 @@ class GitlabScraper(_GPScraper):
         )
         return {r["name"]: r["web_url"] for r in res}
 
-    @abstractmethod
     def fetch_master_branch_name(
         self,
         repo_id: str,
     ) -> str | None:
-        pass
+        raise NotImplementedError()
 
-    @abstractmethod
     def fetch_repository_file_tree(
         self,
         repo_id: str,
         fail_on_issue: bool = True,
     ) -> list[str] | str:
-        pass
+        raise NotImplementedError()
 
     def extract_repository_organisation(self, repo_path: str) -> str:
         raise NotImplementedError()
+
+    def identify_target_type(self, url: str) -> GitlabTargetType:
+        x, __ = self.identify_target_type_and_repo_url(url)
+        return x
 
     # --------------------------------------------------------------------------------
     # Not part of the abstract class
@@ -346,6 +330,21 @@ class GitlabScraper(_GPScraper):
         return self.fetch_repositories_in_organisation(
             organisation_name,
         )
+
+    def identify_target_type_and_repo_url(url: str) -> tuple["GitlabTargetType", str]:
+        gls = GitlabScraper()
+        if not gls.is_relevant_url(url):
+            return GitlabTargetType.UNKNOWN, url
+        host, repo_path = _extract_host_organisation_and_repository_as_url_block(url)
+        clean_url = gls.minimalise_resource_url(url)  # To remove trees and the like
+        n_slashes = repo_path.count("/")
+        if n_slashes < 1:
+            return GitlabTargetType.GROUP, clean_url
+        elif n_slashes >= 1:
+            # TODO : this is not good enough for sub-projects (but best quick fix for now)
+            return GitlabTargetType.PROJECT, clean_url
+        else:
+            return GitlabTargetType.UNKNOWN, clean_url
 
     # --------------------------------------------------------------------------------
     # --------------------------------------------------------------------------------
