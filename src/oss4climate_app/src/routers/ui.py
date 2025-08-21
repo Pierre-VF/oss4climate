@@ -8,10 +8,10 @@ from typing import Optional
 import pandas as pd
 from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import HTMLResponse
-from oss4climate.src.parsers.licenses import (
-    LicenseCategoriesEnum,
-)
 
+from oss4climate.src.models import (
+    EnumLicenseCategories,
+)
 from oss4climate_app.config import (
     FORCE_HTTPS,
     SETTINGS,
@@ -102,7 +102,7 @@ async def search_results(
         df_out = df_out[df_out["language"] == language]
     if license_category and (license_category != "*"):
         try:
-            enum_license_category = LicenseCategoriesEnum[license_category]
+            enum_license_category = EnumLicenseCategories[license_category]
         except KeyError:
             raise ValueError("Invalid license category")
 

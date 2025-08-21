@@ -16,7 +16,7 @@ import requests
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.helpers import get_key_of_maximum_value, url_base_matches_domain
 from oss4climate.src.log import log_info
-from oss4climate.src.model import EnumDocumentationFileType, ProjectDetails
+from oss4climate.src.models import EnumDocumentationFileType, ProjectDetails
 from oss4climate.src.parsers import (
     ParsingTargets,
     cached_web_get_json,

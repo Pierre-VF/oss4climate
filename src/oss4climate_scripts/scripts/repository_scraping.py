@@ -11,7 +11,7 @@ from oss4climate.src.config import (
 )
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
-from oss4climate.src.model import EnumDocumentationFileType
+from oss4climate.src.models import EnumDocumentationFileType
 from oss4climate.src.nlp import html_io, markdown_io, rst_io
 from oss4climate.src.nlp.plaintext import (
     get_spacy_english_model,

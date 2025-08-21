@@ -2,23 +2,8 @@
 Module to manage licenses
 """
 
-from enum import Enum
-
 from oss4climate.src.log import log_warning
-
-
-class LicenseCategoriesEnum(Enum):
-    APACHE = "Apache"
-    BSD = "BSD"
-    CREATIVE_COMMON = "Creative Common"
-    ECLIPSE = "Eclipse"
-    GNU_AGPL = "GNU AGPL"
-    GNU_GPL = "GNU GPL"
-    GNU_LGPL = "GNU LGPL"
-    MIT = "MIT"
-    OTHER = "Other"
-    UNKNOWN = "Unknown"
-
+from oss4climate.src.models import EnumLicenseCategories
 
 # Using https://opensource.org/license/ to determine canonical URLs
 _url_by_license = {
@@ -58,45 +43,45 @@ def licence_url_from_license_name(name: str) -> str | None:
     return _url_by_license.get(name)
 
 
-def license_category_from_license_name(name: str) -> LicenseCategoriesEnum:
+def license_category_from_license_name(name: str) -> EnumLicenseCategories:
     if not isinstance(name, str):
-        out = LicenseCategoriesEnum.UNKNOWN
+        out = EnumLicenseCategories.UNKNOWN
     elif name in ["Apache License 2.0"]:
-        out = LicenseCategoriesEnum.APACHE
+        out = EnumLicenseCategories.APACHE
     elif name in [
         'BSD 2-Clause "Simplified" License',
         "BSD 3-Clause Clear License",
         'BSD 3-Clause "New" or "Revised" License',
     ]:
-        out = LicenseCategoriesEnum.BSD
+        out = EnumLicenseCategories.BSD
     elif name in [
         "Creative Commons Attribution 4.0 International",
         "Creative Commons Attribution Share Alike 4.0 International",
         "Creative Commons Attribution Non Commercial No Derivatives 4.0 International",
         "Creative Commons Zero v1.0 Universal",
     ]:
-        out = LicenseCategoriesEnum.CREATIVE_COMMON
+        out = EnumLicenseCategories.CREATIVE_COMMON
     elif name in ["Eclipse Public License 1.0", "Eclipse Public License 2.0"]:
-        out = LicenseCategoriesEnum.ECLIPSE
+        out = EnumLicenseCategories.ECLIPSE
     elif name in [
         "GNU Affero General Public License v3.0",
     ]:
-        out = LicenseCategoriesEnum.GNU_AGPL
+        out = EnumLicenseCategories.GNU_AGPL
     elif name in [
         "GNU General Public License v2.0",
         "GNU General Public License v3.0",
         "GNU General Public License v3.0 only",
         "GNU General Public License v3.0 or later",
     ]:
-        out = LicenseCategoriesEnum.GNU_GPL
+        out = EnumLicenseCategories.GNU_GPL
     elif name in [
         "GNU Lesser General Public License v2.1",
         "GNU Lesser General Public License v2.1 only",
         "GNU Lesser General Public License v3.0",
     ]:
-        out = LicenseCategoriesEnum.GNU_LGPL
+        out = EnumLicenseCategories.GNU_LGPL
     elif name in ["MIT License", "MIT No Attribution"]:
-        out = LicenseCategoriesEnum.MIT
+        out = EnumLicenseCategories.MIT
     elif name in [
         None,
         "Academic Free License v3.0",
@@ -109,8 +94,8 @@ def license_category_from_license_name(name: str) -> LicenseCategoriesEnum:
         "Other",
         "The Unlicense",
     ]:
-        out = LicenseCategoriesEnum.OTHER
+        out = EnumLicenseCategories.OTHER
     else:
         log_warning(f"License not covered by enum classification ({name})")
-        out = LicenseCategoriesEnum.UNKNOWN
+        out = EnumLicenseCategories.UNKNOWN
     return out

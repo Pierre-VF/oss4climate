@@ -13,7 +13,7 @@ from oss4climate.src.config import (
 from oss4climate.src.log import (
     log_info,
 )
-from oss4climate.src.model import EnumDocumentationFileType
+from oss4climate.src.models import EnumDocumentationFileType
 from oss4climate.src.nlp.search import SearchResults
 from oss4climate.src.parsers import (
     ParsingTargets,

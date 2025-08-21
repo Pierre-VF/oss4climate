@@ -6,7 +6,7 @@ from datetime import timedelta
 from enum import Enum
 
 from oss4climate.src.log import log_warning
-from oss4climate.src.model import EnumDocumentationFileType
+from oss4climate.src.models import EnumDocumentationFileType
 from oss4climate.src.parsers import (
     ParsingTargets,
     ResourceListing,

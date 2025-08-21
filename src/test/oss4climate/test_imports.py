@@ -1,3 +1,6 @@
+from oss4climate.src import models
+
+
 def test_import():
     # The most basic test to at least ensure that all dependencies imported work out
 
@@ -14,7 +17,7 @@ def test_import():
 
 def test_import_src():
     from oss4climate import src
-    from oss4climate.src import config, database, helpers, log, model, nlp, parsers
+    from oss4climate.src import config, database, helpers, log, nlp, parsers
 
     assert isinstance(src.__name__, str)
 
@@ -24,4 +27,4 @@ def test_import_src():
     assert isinstance(config.__name__, str)
     assert isinstance(helpers.__name__, str)
     assert isinstance(log.__name__, str)
-    assert isinstance(model.__name__, str)
+    assert isinstance(models.__name__, str)
