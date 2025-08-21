@@ -331,8 +331,7 @@ class GitlabScraper(_GPScraper):
     ) -> list[str] | str:
         pass
 
-    @classmethod
-    def extract_repository_organisation(cls, repo_path: str) -> str:
+    def extract_repository_organisation(self, repo_path: str) -> str:
         raise NotImplementedError()
 
     # --------------------------------------------------------------------------------

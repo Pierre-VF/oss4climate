@@ -141,8 +141,7 @@ class BitbucketScraper(_GPScraper):
     ) -> list[str] | str:
         pass
 
-    @classmethod
-    def extract_repository_organisation(cls, repo_path: str) -> str:
+    def extract_repository_organisation(self, repo_path: str) -> str:
         repo_path = _extract_organisation_and_repository_as_url_block(repo_path)
         organisation = repo_path.split("/")[0]
         return organisation

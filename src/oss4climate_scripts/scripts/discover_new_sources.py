@@ -29,10 +29,8 @@ def discover_repositories_in_existing_organisations(output_file: str) -> None:
     targets = ParsingTargets.from_toml(FILE_INPUT_INDEX)
 
     # Extract organisation to screen for new repositories
-    orgs = [
-        GithubScraper.extract_repository_organisation(i)
-        for i in targets.github_repositories
-    ]
+    ghs = GithubScraper()
+    orgs = [ghs.extract_repository_organisation(i) for i in targets.github_repositories]
 
     extended_targets = ParsingTargets(
         github_organisations=orgs,

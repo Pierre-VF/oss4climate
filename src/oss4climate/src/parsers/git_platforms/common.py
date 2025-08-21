@@ -82,7 +82,6 @@ class GitPlatformScraper:
     ) -> list[str] | str:
         pass
 
-    @classmethod
     @abstractmethod
-    def extract_repository_organisation(cls, repo_path: str) -> str:
+    def extract_repository_organisation(self, repo_path: str) -> str:
         pass
