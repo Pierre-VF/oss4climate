@@ -150,7 +150,7 @@ class SearchResults:
         # Ensuring that the required columns exist
         available_columns = self.__documents.keys()
         for i in ["language", "description", "readme", "latest_update"]:
-            assert i in available_columns
+            assert i in available_columns, f"Missing column {i}"
 
         self._fix_documents()
 

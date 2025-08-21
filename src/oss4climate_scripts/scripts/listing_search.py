@@ -51,7 +51,8 @@ def search_in_listing() -> None:
             "The dataset is not available locally - make sure to download it prior to running this"
         )
 
-    x = SearchResults(FILE_OUTPUT_LISTING_FEATHER)
+    print(f"Loading listing from {FILE_OUTPUT_OPTIMISED_LISTING_FEATHER}")
+    x = SearchResults(FILE_OUTPUT_OPTIMISED_LISTING_FEATHER)
     print("Initial number of documents")
     print(x.n_documents)
 
