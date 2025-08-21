@@ -1,12 +1,12 @@
-from datetime import datetime, timedelta  # noqa
+from datetime import datetime, timedelta
 from enum import Enum
 from functools import lru_cache
-from typing import Any  # noqa
-from urllib.parse import quote_plus, urlparse  # noqa
+from typing import Any
+from urllib.parse import quote_plus, urlparse
 
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.helpers import (
-    get_key_of_maximum_value,  # noqa
+    get_key_of_maximum_value,
     url_base_matches_domain,
 )
 from oss4climate.src.log import log_info

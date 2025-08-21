@@ -1,5 +1,5 @@
 """
-Module containing the API code
+Module containing the UI code
 """
 
 from datetime import date, timedelta
@@ -25,9 +25,8 @@ from oss4climate_app.src.data_io import (
     unique_license_categories,
 )
 from oss4climate_app.src.log_activity import log_search
+from oss4climate_app.src.routers import listing_credits
 from oss4climate_app.src.templates import render_template
-
-from . import listing_credits
 
 app = APIRouter(include_in_schema=False)
 

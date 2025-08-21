@@ -690,8 +690,8 @@ class ResourceListing:
         return df
 
     def fetch_all_licenses(self, force_update: bool = False) -> None:
-        from .git_platforms.github_io import GithubScraper
-        from .git_platforms.gitlab_io import GitlabScraper
+        from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+        from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
         gitlab_s = GitlabScraper()
         github_s = GithubScraper()
@@ -724,7 +724,7 @@ class ResourceListing:
                         pass
 
     def fetch_all_target_counts(self, force_update: bool = False) -> None:
-        from . import listings
+        from oss4climate.src.parsers import listings
 
         def f_get_target_counts(
             i, listing_type: listings.EnumListingType

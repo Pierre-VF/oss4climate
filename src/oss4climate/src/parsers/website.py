@@ -3,9 +3,10 @@ Tool to scrape a website and extract the relevant links
 """
 
 from datetime import timedelta
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
+from requests.exceptions import HTTPError
 
 from oss4climate.src.log import log_info
 from oss4climate.src.parsers import (
@@ -75,14 +76,14 @@ def crawl_website(
     ignore_path_regex: str | None = None,
 ) -> ParsingTargets:
     try:
-        if url.endswith("/"):
-            url_x = url[:-1]
-        else:
-            url_x = url
-        _web_get(f"{url_x}/robots.txt")
+        url_raw = urlparse(url)
+        _web_get(f"{url_raw.scheme}://{url_raw.hostname}/robots.txt")
         has_robots_txt = True
-    except:
-        has_robots_txt = False
+    except HTTPError as e:
+        if "404" in e.args[0]:
+            has_robots_txt = False
+        else:
+            raise e
 
     if has_robots_txt:
         raise NotImplementedError(
