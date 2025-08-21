@@ -133,10 +133,10 @@ def crawl_website(
 
 
 if __name__ == "__main__":
-    from oss4climate.scripts import format_individual_file
     from oss4climate.src.config import FILE_INPUT_INDEX
     from oss4climate.src.log import log_info
     from oss4climate.src.parsers import ParsingTargets
+    from oss4climate_scripts.scripts import format_individual_file
 
     log_info("Loading organisations and repositories to be indexed")
     targets = ParsingTargets.from_toml(FILE_INPUT_INDEX)

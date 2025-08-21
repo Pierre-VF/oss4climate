@@ -1,7 +1,6 @@
 import pandas as pd
 from tomlkit import document, dump
 
-from oss4climate import scripts
 from oss4climate.src.config import (
     FILE_INPUT_INDEX,
     FILE_OUTPUT_DIR,
@@ -24,6 +23,7 @@ from oss4climate.src.parsers import (
     github_data_io,
     gitlab_data_io,
 )
+from oss4climate_scripts import scripts
 
 
 def scrape_all(

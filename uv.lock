@@ -547,23 +547,23 @@ dependencies = [
     { name = "sqlmodel" },
     { name = "tomlkit" },
     { name = "tqdm" },
-    { name = "typer" },
 ]
 
 [package.dev-dependencies]
-scripts = [
-    { name = "black" },
-    { name = "ruff" },
-]
-test = [
-    { name = "httpx" },
-    { name = "pytest" },
-]
-web = [
+app = [
     { name = "fastapi" },
     { name = "gunicorn" },
     { name = "sentry-sdk", extra = ["fastapi"] },
     { name = "uvicorn" },
+]
+scripts = [
+    { name = "black" },
+    { name = "ruff" },
+    { name = "typer" },
+]
+test = [
+    { name = "httpx" },
+    { name = "pytest" },
 ]
 
 [package.metadata]
@@ -583,23 +583,23 @@ requires-dist = [
     { name = "sqlmodel", specifier = ">=0.0.22" },
     { name = "tomlkit", specifier = ">=0.13.2" },
     { name = "tqdm", specifier = ">=4.67.1" },
-    { name = "typer", specifier = ">=0.15.1" },
 ]
 
 [package.metadata.requires-dev]
-scripts = [
-    { name = "black", specifier = ">=24.10.0" },
-    { name = "ruff", specifier = ">=0.9.1" },
-]
-test = [
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "pytest", specifier = ">=8.4.1" },
-]
-web = [
+app = [
     { name = "fastapi", specifier = ">=0.115.6" },
     { name = "gunicorn", specifier = ">=23.0.0" },
     { name = "sentry-sdk", extras = ["fastapi"], specifier = ">=2.19.2" },
     { name = "uvicorn", specifier = ">=0.34.0" },
+]
+scripts = [
+    { name = "black", specifier = ">=24.10.0" },
+    { name = "ruff", specifier = ">=0.9.1" },
+    { name = "typer", specifier = ">=0.15.1" },
+]
+test = [
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "pytest", specifier = ">=8.4.1" },
 ]
 
 [[package]]

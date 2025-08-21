@@ -1,5 +1,5 @@
 
-CLI_NAME := "oss4climate.cli"
+CLI_NAME := "oss4climate_scripts.cli"
 
 .PHONY: install
 install:

@@ -2,7 +2,7 @@ def test_import():
     # The most basic test to at least ensure that all dependencies imported work out
 
     import oss4climate
-    from oss4climate import cli, scripts
+    from oss4climate_scripts import cli, scripts
 
     # Package
     assert isinstance(oss4climate.__name__, str)
