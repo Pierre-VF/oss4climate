@@ -1,5 +1,5 @@
 """
-Module parsing https://github.com/github/GreenSoftwareDirectory
+Module parsing https://github.com/github/GreenSoftwareDirectory and other listings
 """
 
 from datetime import timedelta

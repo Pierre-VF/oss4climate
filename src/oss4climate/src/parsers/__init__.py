@@ -323,7 +323,7 @@ class ParsingTargets:
             self.codeberg_repositories
         )
 
-    def cleanup(self) -> None:
+    def cleanup(self, drop_invalid: bool = False, drop_unknown: bool = False) -> None:
         """
         Method to cleanup the object (removing obsolete entries and redundancies)
         """
@@ -345,13 +345,19 @@ class ParsingTargets:
             for i in self.codeberg_repositories
             if i not in self.codeberg_organisations
         ]
-        # Removing unknown repos
-        self.unknown = [
-            i for i in self.unknown if not self.__included_in_valid_targets(i)
-        ]
-        self.invalid = [
-            i for i in self.invalid if not self.__included_in_valid_targets(i)
-        ]
+        if drop_invalid:
+            self.invalid = []
+        else:
+            self.invalid = [
+                i for i in self.invalid if not self.__included_in_valid_targets(i)
+            ]
+        if drop_unknown:
+            self.unknown = []
+        else:
+            # Removing unknown repos
+            self.unknown = [
+                i for i in self.unknown if not self.__included_in_valid_targets(i)
+            ]
 
     @staticmethod
     def from_toml(toml_file_path: str) -> "ParsingTargets":
