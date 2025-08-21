@@ -21,21 +21,8 @@ from oss4climate.src.parsers.git_platforms.common import (
     GitPlatformScraper as _GPScraper,
 )
 
-
-def _extract_organisation_and_repository_as_url_block(x: str) -> str:
-    # Cleaning up Bitbucket prefix
-    if BitbucketScraper().is_relevant_url(x):
-        x = x.replace(BITBUCKET_URL_BASE, "")
-    # Not keeping more than 2 slashes
-    fixed_x = "/".join(x.split("/")[:2])
-    # Removing eventual extra information in URL
-    for i in ["#", "&"]:
-        if i in fixed_x:
-            fixed_x = fixed_x.split(i)[0]
-    # Removing trailing "/", if any
-    while fixed_x.endswith("/"):
-        fixed_x = fixed_x[:-1]
-    return fixed_x
+BITBUCKET_DOMAIN = "bitbucket.org"
+BITBUCKET_URL_BASE = f"https://{BITBUCKET_DOMAIN}/"
 
 
 class BitbucketTargetType(Enum):
@@ -53,6 +40,21 @@ class BitbucketScraper(_GPScraper):
     ):
         super().__init__(cache_lifetime=cache_lifetime)
 
+    def _extract_organisation_and_repository_as_url_block(self, x: str) -> str:
+        # Cleaning up Bitbucket prefix
+        if self.is_relevant_url(x):
+            x = x.replace(BITBUCKET_URL_BASE, "")
+        # Not keeping more than 2 slashes
+        fixed_x = "/".join(x.split("/")[:2])
+        # Removing eventual extra information in URL
+        for i in ["#", "&"]:
+            if i in fixed_x:
+                fixed_x = fixed_x.split(i)[0]
+        # Removing trailing "/", if any
+        while fixed_x.endswith("/"):
+            fixed_x = fixed_x[:-1]
+        return fixed_x
+
     def is_relevant_url(
         self,
         url: str,
@@ -61,7 +63,7 @@ class BitbucketScraper(_GPScraper):
         return url_base_matches_domain(url, BITBUCKET_DOMAIN)
 
     def minimalise_resource_url(self, url: str) -> str:
-        raise NotImplementedError()
+        return f"{BITBUCKET_URL_BASE}{self._extract_organisation_and_repository_as_url_block(url)}"
 
     def split_across_target_sets(
         self,
@@ -128,14 +130,14 @@ class BitbucketScraper(_GPScraper):
         pass
 
     def extract_repository_organisation(self, repo_path: str) -> str:
-        repo_path = _extract_organisation_and_repository_as_url_block(repo_path)
+        repo_path = self._extract_organisation_and_repository_as_url_block(repo_path)
         organisation = repo_path.split("/")[0]
         return organisation
 
     def identify_target_type(self, url: str) -> BitbucketTargetType:
         if not self.is_relevant_url(url):
             return BitbucketTargetType.UNKNOWN
-        processed = _extract_organisation_and_repository_as_url_block(url)
+        processed = self._extract_organisation_and_repository_as_url_block(url)
         n_slashes = processed.count("/")
         if n_slashes < 1:
             return BitbucketTargetType.PROJECT
@@ -143,7 +145,3 @@ class BitbucketScraper(_GPScraper):
             return BitbucketTargetType.REPOSITORY
         else:
             return BitbucketTargetType.UNKNOWN
-
-
-BITBUCKET_DOMAIN = "bitbucket.org"
-BITBUCKET_URL_BASE = f"https://{BITBUCKET_DOMAIN}/"

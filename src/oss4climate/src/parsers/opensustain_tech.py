@@ -92,6 +92,6 @@ def fetch_listing_of_listings_from_opensustain_webpage() -> ResourceListing:
     gls = GitlabScraper()
     return ResourceListing(
         github_readme_listings=[i for i in gits if ghs.is_relevant_url(i)],
-        gitlab_readme_listings=[i for i in gits if gls.is_gitlab_url(i)],
+        gitlab_readme_listings=[i for i in gits if gls.is_relevant_url(i)],
         fault_urls=others,
     )

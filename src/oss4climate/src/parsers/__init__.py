@@ -462,9 +462,9 @@ def isolate_relevant_urls(urls: list[str]) -> list[str]:
                 return True
         elif gls.is_relevant_url(i):
             return True
-        elif bbs.is_bitbucket_url(i):
+        elif bbs.is_relevant_url(i):
             return True
-        elif cbs.is_codeberg_url(i):
+        elif cbs.is_relevant_url(i):
             return True
         else:
             return False

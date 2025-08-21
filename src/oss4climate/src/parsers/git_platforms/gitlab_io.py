@@ -331,12 +331,13 @@ class GitlabScraper(_GPScraper):
             organisation_name,
         )
 
-    def identify_target_type_and_repo_url(url: str) -> tuple["GitlabTargetType", str]:
-        gls = GitlabScraper()
-        if not gls.is_relevant_url(url):
+    def identify_target_type_and_repo_url(
+        self, url: str
+    ) -> tuple["GitlabTargetType", str]:
+        if not self.is_relevant_url(url):
             return GitlabTargetType.UNKNOWN, url
         host, repo_path = _extract_host_organisation_and_repository_as_url_block(url)
-        clean_url = gls.minimalise_resource_url(url)  # To remove trees and the like
+        clean_url = self.minimalise_resource_url(url)  # To remove trees and the like
         n_slashes = repo_path.count("/")
         if n_slashes < 1:
             return GitlabTargetType.GROUP, clean_url
