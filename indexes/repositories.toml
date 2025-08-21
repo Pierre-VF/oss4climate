@@ -3967,5 +3967,4 @@ invalid_urls = [
     "https://github.com/settings/codespaces",
     "https://github.com/settings/tokens",
     "https://gitlab.com",
-    "https://gitlab.com/geoharmonizer_inea/eumap/blob/master/LICENSE",
 ]
