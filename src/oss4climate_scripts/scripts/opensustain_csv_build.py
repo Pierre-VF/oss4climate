@@ -10,7 +10,9 @@ all_projs = fetch_all_project_urls_from_opensustain_webpage()
 
 tgs = ParsingTargets(
     # github_repositories=all_projs.github_repositories[:5],
-    gitlab_projects=all_projs.gitlab_projects[:5],
+    # gitlab_projects=all_projs.gitlab_projects[:5],
+    codeberg_repositories=all_projs.codeberg_repositories[:2],
+    bitbucket_repositories=all_projs.bitbucket_repositories[:2],
 )
 
 res = scrape_all_targets(tgs)

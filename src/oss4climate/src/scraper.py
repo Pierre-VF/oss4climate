@@ -3,6 +3,7 @@ Module taking care of scraping a set of targets
 """
 
 from dataclasses import dataclass
+from datetime import timedelta
 
 import pandas as pd
 
@@ -13,6 +14,8 @@ from oss4climate.src.parsers import (
     ParsingTargets,
     RateLimitError,
 )
+from oss4climate.src.parsers.git_platforms.bitbucket_io import BitbucketScraper
+from oss4climate.src.parsers.git_platforms.codeberg_io import CodebergScraper
 from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
 from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
@@ -29,6 +32,7 @@ class ScrapeResult:
 def scrape_all_targets(
     targets: ParsingTargets,
     fail_on_issue: bool = False,
+    cache_lifetime: timedelta | None = None,
 ) -> ScrapeResult:
     """
     Script to run fetching of the data from the repositories
@@ -50,8 +54,10 @@ def scrape_all_targets(
     bad_organisations = []
     bad_repositories = []
 
-    gitlab_s = GitlabScraper()
-    github_s = GithubScraper()
+    gitlab_s = GitlabScraper(cache_lifetime=cache_lifetime)
+    github_s = GithubScraper(cache_lifetime=cache_lifetime)
+    codeberg_s = CodebergScraper(cache_lifetime=cache_lifetime)
+    bitbucket_s = BitbucketScraper(cache_lifetime=cache_lifetime)
 
     log_info("Fetching data for all organisations in Github")
     for org_url in targets.github_organisations:
@@ -86,6 +92,44 @@ def scrape_all_targets(
             [targets.gitlab_projects.append(i) for i in x.values()]
         except Exception as e:
             scrape_failures["GITLAB_GROUP:" + org_url] = e
+            log_warning(f" > Error with organisation ({e})")
+            bad_organisations.append(org_url)
+
+    log_info("Fetching data for all organisations in Codeberg")
+    for org_url in targets.bitbucket_projects:
+        url2check = org_url.replace("https://", "")
+        if url2check.endswith("/"):
+            url2check = url2check[:-1]
+        if url2check.count("/") > 1:
+            log_info(f"SKIPPING repo {org_url}")
+            targets.bitbucket_repositories.append(
+                org_url
+            )  # Mapping it to repos instead
+            continue  # Skip
+
+        try:
+            x = bitbucket_s.fetch_repositories_in_group(org_url)
+            [targets.bitbucket_repositories.append(i) for i in x.values()]
+        except Exception as e:
+            scrape_failures["BITBUCKET_ORGANISATION:" + org_url] = e
+            log_warning(f" > Error with organisation ({e})")
+            bad_organisations.append(org_url)
+
+    log_info("Fetching data for all organisations in Codeberg")
+    for org_url in targets.codeberg_organisations:
+        url2check = org_url.replace("https://", "")
+        if url2check.endswith("/"):
+            url2check = url2check[:-1]
+        if url2check.count("/") > 1:
+            log_info(f"SKIPPING repo {org_url}")
+            targets.codeberg_repositories.append(org_url)  # Mapping it to repos instead
+            continue  # Skip
+
+        try:
+            x = codeberg_s.fetch_repositories_in_group(org_url)
+            [targets.codeberg_repositories.append(i) for i in x.values()]
+        except Exception as e:
+            scrape_failures["CODEBERG_GROUP:" + org_url] = e
             log_warning(f" > Error with organisation ({e})")
             bad_organisations.append(org_url)
 
@@ -129,6 +173,37 @@ def scrape_all_targets(
         scrape_failures["SCRAPING"] = e
         log_warning("Rate limit hit for Github - STOPPING Github scraping")
 
+    log_info("Fetching data for all repositories in Bitbucket")
+    for i in targets.bitbucket_repositories:
+        try:
+            screening_results.append(
+                bitbucket_s.fetch_project_details(i, fail_on_issue=fail_on_issue)
+            )
+        except Exception as e:
+            scrape_failures["BITBUCKET_REPOSITORY:" + i] = e
+            log_warning(f" > Error with repo ({e})")
+            bad_repositories.append(i)
+
+    log_info("Fetching data for all repositories in Codeberg")
+    for i in targets.codeberg_repositories:
+        try:
+            screening_results.append(
+                codeberg_s.fetch_project_details(i, fail_on_issue=fail_on_issue)
+            )
+        except Exception as e:
+            scrape_failures["CODEBERG_REPOSITORY:" + i] = e
+            log_warning(f" > Error with repo ({e})")
+            bad_repositories.append(i)
+
+    if len(screening_results) < 1:
+        return ScrapeResult(
+            targets=targets,
+            results_as_df=pd.DataFrame(),
+            errors=scrape_failures,
+            failing_organisations=bad_organisations,
+            failing_repositories=bad_repositories,
+        )
+
     def _f_fix(x):
         out = x.__dict__
         if isinstance(out["readme_type"], EnumDocumentationFileType):
@@ -138,8 +213,11 @@ def scrape_all_targets(
 
         return out
 
-    df = pd.DataFrame([_f_fix(i) for i in screening_results])
-    df2export = df.set_index("id").drop(columns=["raw_details"])
+    df = (
+        pd.DataFrame([_f_fix(i) for i in screening_results])
+        .set_index("id")
+        .drop(columns=["raw_details"])
+    )
 
     # Cleaning up markdown
     def _f_readme_cleanup(r):
@@ -174,14 +252,14 @@ def scrape_all_targets(
             out = x
         return out
 
-    df2export["readme"] = df2export.apply(_f_readme_cleanup, axis=1)
+    df["readme"] = df.apply(_f_readme_cleanup, axis=1)
 
     # Dropping duplicates, if any
-    df2export.drop_duplicates(subset=["url"], inplace=True)
+    df.drop_duplicates(subset=["url"], inplace=True)
 
     return ScrapeResult(
         targets=targets,
-        results_as_df=df2export,
+        results_as_df=df,
         errors=scrape_failures,
         failing_organisations=bad_organisations,
         failing_repositories=bad_repositories,
