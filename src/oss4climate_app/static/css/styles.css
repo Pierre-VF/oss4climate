@@ -46,7 +46,7 @@ nav.right {
 nav {
     background-origin: padding-box;
 }
-a.nav_link {    
+a.nav_link {
     font-size: 25px;
     /* font-weight: bold; */
     vertical-align: top;
@@ -157,7 +157,7 @@ details[open] {
 }
 
 table {
-    border-collapse: collapse; 
+    border-collapse: collapse;
     border: 1px solid;
 }
 table, th, td {

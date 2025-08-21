@@ -19,7 +19,7 @@ However, in the current stage it is indeed not providing all of these features y
 
 ## Do you just want to carry out a search for open-source matching your needs?
 
-To carry out a search without installing anything, you can just use the **web-app** here: https://oss4climate.pierrevf.consulting/ 
+To carry out a search without installing anything, you can just use the **web-app** here: https://oss4climate.pierrevf.consulting/
 
 ## What is the license of the code and the data?
 
@@ -33,7 +33,7 @@ The underlying listing data comes from a variety of repositories, some of which 
 Input to the discovery process are given in the files in the **indexes** folder (you are welcome to add your own contribution):
 
 - the listings scraped are listed in **[listings.json](indexes/listings.json)** (if you are interested in project listings, you should check all URLs in this file)
-- repositories found in the listings and added manually are found in **[repositories.toml](indexes/repositories.toml)**  
+- repositories found in the listings and added manually are found in **[repositories.toml](indexes/repositories.toml)**
 - the associated scrapers in the folder **"src/oss4climate/src/parsers"**
 
 
@@ -73,7 +73,7 @@ You have 2 options:
 2. Development-oriented installation (with Poetry), which only works on Unix systems. Run the makefile command:
     > make install
 
-It is highly recommended to operate with a Github token (which you can create [here](https://github.com/settings/tokens/new)) 
+It is highly recommended to operate with a Github token (which you can create [here](https://github.com/settings/tokens/new))
 in order to avoid being blocked by Github's rate limit on the API. The same consideration applies to Gitlab (token generation [here](https://gitlab.com/-/user_settings/personal_access_tokens)). These are much lower for unauthenticated accounts.
 
 Make sure to generate this token with permissions to access public repositories.

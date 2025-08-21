@@ -22,8 +22,8 @@ __ x1_
     assert (
         find_all_links_in_markdown(
             f"""
-    [repo]({github_organisation_url}) 
-    and 
+    [repo]({github_organisation_url})
+    and
     [org]({github_repo_url})
             """
         )
@@ -36,12 +36,12 @@ __ x1_
 <html>
     <body>
         <p>
-            <a href="{github_organisation_url}">A</a> 
-            and 
+            <a href="{github_organisation_url}">A</a>
+            and
             <a href="{github_repo_url}">B</a>
         </p>
     </body>
-</html>                              
+</html>
             """
         )
         == res

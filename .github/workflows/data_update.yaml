@@ -5,8 +5,8 @@
 #
 name: Updating the data
 
-on: 
-  workflow_dispatch:      
+on:
+  workflow_dispatch:
     logLevel:
       description: 'Log level'
       required: true
@@ -30,30 +30,30 @@ jobs:
 
     concurrency:
       group: ${{ github.workflow }}-discovery
-      cancel-in-progress: true   
+      cancel-in-progress: true
 
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: "Create UV installation"
         uses: astral-sh/setup-uv@v5
         with:
           version: "0.8.0"
 
-      - name: Installing packages 
+      - name: Installing packages
         run: make install
-        
+
       - name: Running discovery
         run: make discover
-        
-      - name: Defining Git identity 
-        run: | 
+
+      - name: Defining Git identity
+        run: |
           git config user.name github_actions
           git config user.email github_actions@pierrevf.consulting
-      
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:

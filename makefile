@@ -25,7 +25,7 @@ discover:
 .PHONY: generate_listing
 generate_listing:
 	# Note: typer processes "_" as "-"
-	uv run typer $(CLI_NAME) run generate-listing	
+	uv run typer $(CLI_NAME) run generate-listing
 
 .PHONY: publish
 publish:
@@ -50,3 +50,10 @@ help:
 .PHONY: test
 test:
 	uv run pytest src/.
+
+.PHONY: test_with_coverage
+test_with_coverage:
+	uv run coverage run -m pytest src/test/.
+	uv run coverage html --omit=src/test/* --omit=notebooks/*
+	echo "Exposing on http://localhost:9001/"
+	uv run python -m http.server 9001 --directory htmlcov/

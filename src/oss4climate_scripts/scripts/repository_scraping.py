@@ -201,9 +201,9 @@ def scrape_all(
 
     print(
         f"""
-        
+
     >>> Data was exported to: {target_output_file}
-        
+
     """
     )
 
@@ -232,9 +232,9 @@ def scrape_all(
 
     print(
         f"""
-        
+
     >>> Types were exported to: {FILE_OUTPUT_SUMMARY_TOML}
-        
+
     """
     )
     scripts.format_all_files()

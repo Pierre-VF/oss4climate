@@ -1,8 +1,8 @@
 {% extends "_base.html" %}
-{% block heading %} 
+{% block heading %}
     {% if query %}
         Search results for "{{ query }}"
-    {% else %}    
+    {% else %}
         All repositories indexed (sorted by alphabetical name)
     {% endif %}
 {% endblock %}
@@ -10,24 +10,24 @@
 {% block content %}
     {% if n_total_found < 1 %}
         <p>
-            No results found matching your query (this might be due to the restrictions of the methodology, 
-            see <a href="about">details here</a>). 
+            No results found matching your query (this might be due to the restrictions of the methodology,
+            see <a href="about">details here</a>).
             If you specified a license or language, you might also want to rerun the query without these filters.
         </p>
 
-    {% else %}    
+    {% else %}
         <p>{{n_total_found}} results found:</p>
 
         <p>
-            (Filter current page: 
+            (Filter current page:
             <input type="text" id="focusLanguage" onkeyup="filterTable()" placeholder="Language">
-            <input type="text" id="focusLicense" onkeyup="filterTable()" placeholder="License"> 
+            <input type="text" id="focusLicense" onkeyup="filterTable()" placeholder="License">
             or reorder current page by clicking on the column to sort)
         </p>
 
         {% if query %}
         <table id="results_table" data-umami-event="search_result_display" data-umami-event-searchterm="{{ query }}">
-        {% else %}    
+        {% else %}
         <table id="results_table" data-umami-event="search_result_display_all">
         {% endif %}
             <tr>
@@ -40,10 +40,10 @@
             {% for i, r in results.iterrows() %}
                 <tr>
                     <td class="left">
-                        <a 
-                            href="{{ r.url }}" 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
+                        <a
+                            href="{{ r.url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             data-umami-event="redirect-to-solution-page"
                             data-umami-event-url="{{ r.url }}"
                             data-umami-event-keyword="{{ query }}"
@@ -58,7 +58,7 @@
 
         <p>Not finding what you were looking for? Please give us <b><a href="{{ URL_FEEDBACK_FORM }}">your feedback</a></b>.</p>
     {% endif %}
-    
+
     <script>
         function contentFits(td, filter) {
             var res, txtValue;
@@ -85,7 +85,7 @@
                 filterLanguage = inputLanguage.value.toUpperCase();
             } else {
                 filterLanguage = null
-            }            
+            }
             if (inputLicense){
                 filterLicense = inputLicense.value.toUpperCase();
             } else {
