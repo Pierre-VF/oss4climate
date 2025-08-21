@@ -49,6 +49,10 @@ jobs:
       - name: Running discovery
         run: make discover
 
+      - name: Cleaning up the code
+        run: |
+          make check_code || echo "Precommits modified the files"
+
       - name: Defining Git identity
         run: |
           git config user.name github_actions
