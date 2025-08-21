@@ -55,7 +55,7 @@ jobs:
 
       - name: Cleaning up the code
         run: |
-          make check_code || echo "Precommits modified the files"
+          make code_cleanup || echo "Precommits modified the files"
 
       - name: Defining Git identity
         run: |

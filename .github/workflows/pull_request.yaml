@@ -37,7 +37,8 @@ jobs:
           git config user.email github_actions@pierrevf.consulting
 
       - name: Run code cleanup
-        run: make check_code
+        run: |
+          make code_cleanup || echo "Precommits modified the files"
 
       - name: Commit changes back
         uses: EndBug/add-and-commit@v9

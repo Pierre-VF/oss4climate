@@ -52,7 +52,7 @@ def _extract_host_organisation_and_repository_as_url_block(x: str) -> tuple[str,
     if gls.is_relevant_url(x, include_self_hosted=False):
         x = x.replace(GITLAB_URL_BASE, "")
     else:
-        x = x.replace("https://", "").replace("http://", "")
+        x = x.replace("https://", "").replace("http://", "").replace(f"{host}/", "")
 
     fixed_x = "/".join(
         x.split("/")[:2]

@@ -13,10 +13,10 @@ add:
 build:
 	uv lock
 
-.PHONY: check_code
-check_code:
-	uvx pre-commit install
-	uvx pre-commit run --all
+.PHONY: code_cleanup
+code_cleanup:
+	uv tool run pre-commit install
+	uv tool run pre-commit run --all
 
 .PHONY: discover
 discover:
@@ -57,3 +57,10 @@ test_with_coverage:
 	uv run coverage html --omit=src/test/* --omit=notebooks/*
 	echo "Exposing on http://localhost:9001/"
 	uv run python -m http.server 9001 --directory htmlcov/
+
+# ----------------------------------------------------------------------------
+# Kept for legacy reasons (backwards compatibility)
+# ----------------------------------------------------------------------------
+.PHONY: check_code
+check_code:
+	make code_cleanup
