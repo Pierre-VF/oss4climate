@@ -3,7 +3,7 @@ CLI_NAME := "oss4climate.cli"
 
 .PHONY: install
 install:
-	uv sync
+	uv sync --all-groups
 
 .PHONY: add
 add:
