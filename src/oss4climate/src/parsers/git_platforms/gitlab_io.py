@@ -26,15 +26,6 @@ GITLAB_DOMAIN = "gitlab.com"
 GITLAB_URL_BASE = f"https://{GITLAB_DOMAIN}/"
 
 
-def _extract_gitlab_host(url: str) -> str:
-    parsed_url = urlparse(url)
-    host = parsed_url.hostname
-    if host is None:
-        # If no host is found, then use Gitlab as default
-        host = GITLAB_DOMAIN
-    return host
-
-
 def _get_from_dict_with_default(d: dict, key: str, default: Any) -> Any:
     out = d.get(key)
     if out is None:
@@ -43,22 +34,30 @@ def _get_from_dict_with_default(d: dict, key: str, default: Any) -> Any:
         return out
 
 
-def _extract_organisation_and_repository_as_url_block(x: str) -> str:
+def _extract_host_organisation_and_repository_as_url_block(x: str) -> tuple[str, str]:
     gls = GitlabScraper()
     x = gls.minimalise_resource_url(x)
 
+    # First, isolate the host
+    url = x
+    parsed_url = urlparse(url)
+    host = parsed_url.hostname
+    if host is None:
+        # If no host is found, then use Gitlab as default
+        host = GITLAB_DOMAIN
+
+    # Then focus on the project
     # Cleaning up Gitlab prefix
     if gls.is_relevant_url(x, include_self_hosted=False):
         x = x.replace(GITLAB_URL_BASE, "")
     else:
-        h = _extract_gitlab_host(url=x)
-        x = x.replace(f"https://{h}/", "")
+        x = x.replace("https://", "").replace("http://", "")
 
     fixed_x = "/".join(
         x.split("/")[:2]
     )  # For complex multiple projects nested, this might not work well
 
-    return fixed_x
+    return host, fixed_x
 
 
 @lru_cache(maxsize=1)
@@ -108,9 +107,9 @@ class GitlabTargetType(Enum):
         gls = GitlabScraper()
         if not gls.is_relevant_url(url):
             return GitlabTargetType.UNKNOWN, url
-        processed = _extract_organisation_and_repository_as_url_block(url)
+        host, repo_path = _extract_host_organisation_and_repository_as_url_block(url)
         clean_url = gls.minimalise_resource_url(url)  # To remove trees and the like
-        n_slashes = processed.count("/")
+        n_slashes = repo_path.count("/")
         if n_slashes < 1:
             return GitlabTargetType.GROUP, clean_url
         elif n_slashes >= 1:
@@ -191,10 +190,9 @@ class GitlabScraper(GitPlatformScraper):
     ) -> tuple[str | None, EnumDocumentationFileType]:
         if branch:
             raise NotImplementedError()
-        gitlab_host = _extract_gitlab_host(url=repo_id)
-        repo_id = _extract_organisation_and_repository_as_url_block(repo_id)
+        host, repo_id = _extract_host_organisation_and_repository_as_url_block(repo_id)
         r = _web_get(
-            f"https://{gitlab_host}/api/v4/projects/{quote_plus(repo_id)}?license=yes",
+            f"https://{host}/api/v4/projects/{quote_plus(repo_id)}?license=yes",
             is_json=True,
             cache_lifetime=self.cache_lifetime,
         )
@@ -220,10 +218,9 @@ class GitlabScraper(GitPlatformScraper):
         fail_on_issue: bool = True,
     ) -> ProjectDetails:
         cache_lifetime = self.cache_lifetime
-        gitlab_host = _extract_gitlab_host(url=repo_id)
-        repo_id = _extract_organisation_and_repository_as_url_block(repo_id)
+        host, repo_id = _extract_host_organisation_and_repository_as_url_block(repo_id)
         r = _web_get(
-            f"https://{gitlab_host}/api/v4/projects/{quote_plus(repo_id)}?license=yes",
+            f"https://{host}/api/v4/projects/{quote_plus(repo_id)}?license=yes",
             is_json=True,
             cache_lifetime=cache_lifetime,
         )
@@ -297,10 +294,9 @@ class GitlabScraper(GitPlatformScraper):
         self,
         repo_id: str,
     ) -> ProjectDetails:
-        gitlab_host = _extract_gitlab_host(url=repo_id)
-        repo_id = _extract_organisation_and_repository_as_url_block(repo_id)
+        host, repo_id = _extract_host_organisation_and_repository_as_url_block(repo_id)
         r = _web_get(
-            f"https://{gitlab_host}/api/v4/projects/{quote_plus(repo_id)}/languages",
+            f"https://{host}/api/v4/projects/{quote_plus(repo_id)}/languages",
             cache_lifetime=self.cache_lifetime,
         )
         return r
@@ -309,10 +305,11 @@ class GitlabScraper(GitPlatformScraper):
         self,
         organisation_name: str,
     ) -> dict[str, str]:
-        gitlab_host = _extract_gitlab_host(url=organisation_name)
-        group_id = _extract_organisation_and_repository_as_url_block(organisation_name)
+        host, group_id = _extract_host_organisation_and_repository_as_url_block(
+            organisation_name
+        )
         res = _web_get(
-            f"https://{gitlab_host}/api/v4/groups/{group_id}/projects",
+            f"https://{host}/api/v4/groups/{group_id}/projects",
             cache_lifetime=self.cache_lifetime,
         )
         return {r["name"]: r["web_url"] for r in res}
