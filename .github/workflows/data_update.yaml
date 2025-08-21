@@ -50,7 +50,8 @@ jobs:
         run: make discover
         env:
           GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITLAB_ACCESS_TOKEN: ${{ secrets.GITLAB_ACCESS_TOKEN }}
+          # Skipping authentication on Gitlab for now
+          # GITLAB_ACCESS_TOKEN: ${{ secrets.GITLAB_ACCESS_TOKEN }}
 
       - name: Cleaning up the code
         run: |
