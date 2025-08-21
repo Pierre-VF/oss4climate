@@ -44,7 +44,7 @@ jobs:
           version: "0.8.0"
 
       - name: Installing packages
-        run: make install
+        run: uv sync --group=scripts
 
       - name: Running discovery
         run: make discover
