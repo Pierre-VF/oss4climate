@@ -17,7 +17,9 @@ from oss4climate.src.parsers import (
     cached_web_get_json,
     cached_web_get_text,
 )
-from oss4climate.src.parsers.git_platforms.common import GitPlatformScraper
+from oss4climate.src.parsers.git_platforms.common import (
+    GitPlatformScraper as _GPScraper,
+)
 
 GITLAB_ANY_URL_PREFIX = (
     "https://gitlab."  # Since Gitlabs can be self-hosted on another domain
@@ -119,7 +121,7 @@ class GitlabTargetType(Enum):
             return GitlabTargetType.UNKNOWN, clean_url
 
 
-class GitlabScraper(GitPlatformScraper):
+class GitlabScraper(_GPScraper):
     """Gitlab-focused scraper"""
 
     def __init__(
@@ -328,6 +330,10 @@ class GitlabScraper(GitPlatformScraper):
         fail_on_issue: bool = True,
     ) -> list[str] | str:
         pass
+
+    @classmethod
+    def extract_repository_organisation(cls, repo_path: str) -> str:
+        raise NotImplementedError()
 
     # --------------------------------------------------------------------------------
     # Not part of the abstract class

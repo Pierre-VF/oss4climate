@@ -422,8 +422,8 @@ class ParsingTargets:
 def identify_parsing_targets(x: list[str]) -> ParsingTargets:
     from oss4climate.src.parsers import (
         bitbucket_data_io,
-        codeberg_data_io,
     )
+    from oss4climate.src.parsers.git_platforms.codeberg_io import CodebergScraper
     from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
     from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
@@ -432,7 +432,7 @@ def identify_parsing_targets(x: list[str]) -> ParsingTargets:
     out_github.unknown = []
     out_bitbucket = bitbucket_data_io.split_across_target_sets(out_gitlab.unknown)
     out_gitlab.unknown = []
-    out_codeberg = codeberg_data_io.split_across_target_sets(out_bitbucket.unknown)
+    out_codeberg = CodebergScraper().split_across_target_sets(out_bitbucket.unknown)
     out_bitbucket.unknown = []
 
     out = out_bitbucket + out_github + out_gitlab + out_codeberg
@@ -442,13 +442,14 @@ def identify_parsing_targets(x: list[str]) -> ParsingTargets:
 def isolate_relevant_urls(urls: list[str]) -> list[str]:
     from oss4climate.src.parsers import (
         bitbucket_data_io,
-        codeberg_data_io,
     )
+    from oss4climate.src.parsers.git_platforms.codeberg_io import CodebergScraper
     from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
     from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
     ghs = GithubScraper()
     gls = GitlabScraper()
+    cbs = CodebergScraper()
 
     def __f(i) -> bool:
         if ghs.is_relevant_url(i):
@@ -466,7 +467,7 @@ def isolate_relevant_urls(urls: list[str]) -> list[str]:
             return True
         elif bitbucket_data_io.is_bitbucket_url(i):
             return True
-        elif codeberg_data_io.is_codeberg_url(i):
+        elif cbs.is_codeberg_url(i):
             return True
         else:
             return False

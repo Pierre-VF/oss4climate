@@ -81,3 +81,8 @@ class GitPlatformScraper:
         fail_on_issue: bool = True,
     ) -> list[str] | str:
         pass
+
+    @classmethod
+    @abstractmethod
+    def extract_repository_organisation(cls, repo_path: str) -> str:
+        pass

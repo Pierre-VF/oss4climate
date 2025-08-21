@@ -22,7 +22,9 @@ from oss4climate.src.parsers import (
     cached_web_get_json,
     cached_web_get_text,
 )
-from oss4climate.src.parsers.git_platforms.common import GitPlatformScraper
+from oss4climate.src.parsers.git_platforms.common import (
+    GitPlatformScraper as _GPScraper,
+)
 
 _GITHUB_DOMAIN = "github.com"
 _GITHUB_URL_BASE = f"https://{_GITHUB_DOMAIN}/"
@@ -150,7 +152,7 @@ def extract_repository_organisation(repo_path: str) -> str:
     return organisation
 
 
-class GithubScraper(GitPlatformScraper):
+class GithubScraper(_GPScraper):
     def __init__(
         self,
         cache_lifetime: timedelta | None = None,
@@ -420,6 +422,12 @@ class GithubScraper(GitPlatformScraper):
             file_tree = f"ERROR with file tree ({e})"
         return file_tree
 
+    @classmethod
+    def extract_repository_organisation(cls, repo_path: str) -> str:
+        repo_path = _extract_organisation_and_repository_as_url_block(repo_path)
+        organisation = repo_path.split("/")[0]
+        return organisation
+
     # --------------------------------------------------------------------------------
     # Not part of the abstract class
     # --------------------------------------------------------------------------------
@@ -451,12 +459,6 @@ class GithubScraper(GitPlatformScraper):
                 else:
                     license_url = f"https://raw.githubusercontent.com/{repo_id}/refs/heads/{branch}/{i}"
         return license_url
-
-    @classmethod
-    def extract_repository_organisation(cls, repo_path: str) -> str:
-        repo_path = _extract_organisation_and_repository_as_url_block(repo_path)
-        organisation = repo_path.split("/")[0]
-        return organisation
 
     # --------------------------------------------------------------------------------
     # --------------------------------------------------------------------------------
