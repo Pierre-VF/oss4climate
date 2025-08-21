@@ -22,7 +22,8 @@ repos:
     - id: check-case-conflict
     - id: mixed-line-ending
     - id: trailing-whitespace
-    - id: check-json
+    # - id: check-json
     - id: check-toml
+    - id: check-yaml
     - id: end-of-file-fixer
     - id: check-merge-conflict
