@@ -10,7 +10,6 @@ import pandas as pd
 from tqdm import tqdm
 
 from oss4climate.src.log import log_warning
-from oss4climate.src.nlp.classifiers import tf_idf
 from oss4climate.src.parsers.licenses import license_category_from_license_name
 
 
@@ -185,15 +184,6 @@ class SearchResults:
             k_selected = k_selected + df_i[df_i["readme"].apply(f)].index.to_list()
         k_selected_unique = list(set(k_selected))
         self.__documents = df_i.iloc[k_selected_unique].copy()
-        self.__reindex()
-
-    def order_by_relevance(self, keyword: str) -> None:
-        r_tfidf = tf_idf([_lower_str(i) for i in self.__documents])
-        keyword = keyword.lower()
-        if keyword not in r_tfidf.keys():
-            raise ValueError(f"Keyword ({keyword}) not found in documents")
-        ordered_results = r_tfidf[keyword].sort_values(ascending=False)
-        self.__documents = self.__documents.iloc[ordered_results.index]
         self.__reindex()
 
     def refine_by_active_in_past_year(self) -> None:

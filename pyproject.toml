@@ -19,7 +19,6 @@ dependencies = [
     "pydantic-settings>=2.7.1",
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
-    "scikit-learn>=1.6.1",
     "spacy>=3.8.3",
     "sqlmodel>=0.0.22",
     "tomlkit>=0.13.2",
@@ -50,4 +49,7 @@ app = [
     "gunicorn>=23.0.0",
     "sentry-sdk[fastapi]>=2.19.2",
     "uvicorn>=0.34.0",
+]
+notebooks = [
+    "scikit-learn>=1.6.1",
 ]

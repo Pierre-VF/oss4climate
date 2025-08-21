@@ -542,7 +542,6 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "pyyaml" },
     { name = "requests" },
-    { name = "scikit-learn" },
     { name = "spacy" },
     { name = "sqlmodel" },
     { name = "tomlkit" },
@@ -555,6 +554,9 @@ app = [
     { name = "gunicorn" },
     { name = "sentry-sdk", extra = ["fastapi"] },
     { name = "uvicorn" },
+]
+notebooks = [
+    { name = "scikit-learn" },
 ]
 scripts = [
     { name = "black" },
@@ -578,7 +580,6 @@ requires-dist = [
     { name = "pydantic-settings", specifier = ">=2.7.1" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "requests", specifier = ">=2.32.3" },
-    { name = "scikit-learn", specifier = ">=1.6.1" },
     { name = "spacy", specifier = ">=3.8.3" },
     { name = "sqlmodel", specifier = ">=0.0.22" },
     { name = "tomlkit", specifier = ">=0.13.2" },
@@ -592,6 +593,7 @@ app = [
     { name = "sentry-sdk", extras = ["fastapi"], specifier = ">=2.19.2" },
     { name = "uvicorn", specifier = ">=0.34.0" },
 ]
+notebooks = [{ name = "scikit-learn", specifier = ">=1.6.1" }]
 scripts = [
     { name = "black", specifier = ">=24.10.0" },
     { name = "ruff", specifier = ">=0.9.1" },

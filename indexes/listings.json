@@ -184,6 +184,7 @@
             {
                 "license": "GNU Affero General Public License v3.0",
                 "license_url": "https://raw.githubusercontent.com/NEONScience/NEON-utilities/main/LICENSE.txt",
+                "target_count": 1,
                 "url": "https://github.com/NEONScience/NEON-utilities"
             },
             {
