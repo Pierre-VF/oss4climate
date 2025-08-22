@@ -15,7 +15,6 @@ build:
 
 .PHONY: code_cleanup
 code_cleanup:
-	uv tool install pre-commit
 	uv tool run pre-commit install
 	uv tool run pre-commit run --all
 
