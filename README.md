@@ -2,6 +2,8 @@
 
 TLDR; if you're just looking for the search engine, you will find it here: https://oss4climate.pierrevf.consulting/ .
 
+**WARNING: the project is in active development and still an initial stage, therefore the structure may change without prior notice. If you depend on the code as a dependency to your application, please ensure to pin the specific commits in all your usages.**
+
 
 ## What is the vision of this project, is it just yet another listing?
 
