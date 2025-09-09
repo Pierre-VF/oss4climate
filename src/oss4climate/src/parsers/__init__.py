@@ -424,14 +424,18 @@ class ParsingTargets:
         with open(toml_file_path, "w") as fp:
             dump(doc, fp, sort_keys=True)
 
+    @staticmethod
+    def from_list_of_urls(urls: list[str]) -> "ParsingTargets":
+        return identify_parsing_targets(urls)
 
-def identify_parsing_targets(x: list[str]) -> ParsingTargets:
+
+def identify_parsing_targets(urls: list[str]) -> ParsingTargets:
     from oss4climate.src.parsers.git_platforms.bitbucket_io import BitbucketScraper
     from oss4climate.src.parsers.git_platforms.codeberg_io import CodebergScraper
     from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
     from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
-    out_github = GithubScraper().split_across_target_sets(x)
+    out_github = GithubScraper().split_across_target_sets(urls)
     out_gitlab = GitlabScraper().split_across_target_sets(out_github.unknown)
     out_github.unknown = []
     out_bitbucket = BitbucketScraper().split_across_target_sets(out_gitlab.unknown)
