@@ -456,5 +456,20 @@ class GithubScraper(_GPScraper):
                     license_url = f"https://raw.githubusercontent.com/{repo_id}/refs/heads/{branch}/{i}"
         return license_url
 
+    def fetch_organisation_details(
+        self,
+        organisation_id: str,
+    ) -> Any:
+        organisation_id = self._extract_organisation_and_repository_as_url_block(
+            organisation_id
+        ).split("/")[0]
+        r = _web_get(
+            url=f"https://api.github.com/orgs/{organisation_id}",
+            with_headers=True,
+            is_json=True,
+            cache_lifetime=self.cache_lifetime,
+        )
+        return r
+
     # --------------------------------------------------------------------------------
     # --------------------------------------------------------------------------------

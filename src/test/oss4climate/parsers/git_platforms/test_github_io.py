@@ -60,6 +60,8 @@ def test_parsing_target_set(
 def test_fetch_functions(github_repo_url, github_organisation_url):
     ghs = GithubScraper()
 
+    org_details = ghs.fetch_organisation_details(github_organisation_url)
+
     res_repo = ghs.fetch_project_details(github_repo_url)
     assert isinstance(res_repo, ProjectDetails)
 
