@@ -18,7 +18,7 @@ from oss4climate.src.parsers import (
     listings,
 )
 from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
-from oss4climate.src.parsers.lfenergy import (
+from oss4climate.src.parsers.listings.lfenergy import (
     fetch_all_project_urls_from_lfe_webpage,
     fetch_project_urls_from_lfe_energy_project_webpage,
     get_open_source_energy_projects_from_landscape,
