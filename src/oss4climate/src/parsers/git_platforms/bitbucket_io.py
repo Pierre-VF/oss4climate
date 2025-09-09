@@ -11,6 +11,7 @@ This will implements:
 
 from datetime import timedelta
 from enum import Enum
+from typing import Any
 
 from oss4climate.src.helpers import url_base_matches_domain
 from oss4climate.src.models import EnumDocumentationFileType, ProjectDetails
@@ -106,7 +107,7 @@ class BitbucketScraper(_GPScraper):
     def fetch_repository_language_details(
         self,
         repo_id: str,
-    ) -> ProjectDetails:
+    ) -> dict[Any, float | int]:
         raise NotImplementedError()
 
     def fetch_repositories_in_organisation(

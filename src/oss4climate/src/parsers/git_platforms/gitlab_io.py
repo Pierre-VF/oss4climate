@@ -279,7 +279,7 @@ class GitlabScraper(_GPScraper):
     def fetch_repository_language_details(
         self,
         repo_id: str,
-    ) -> ProjectDetails:
+    ) -> dict[Any, float | int]:
         host, repo_id = _extract_host_organisation_and_repository_as_url_block(repo_id)
         r = _web_get(
             f"https://{host}/api/v4/projects/{quote_plus(repo_id)}/languages",

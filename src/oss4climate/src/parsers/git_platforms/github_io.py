@@ -10,6 +10,7 @@ This implements:
 from datetime import datetime, timedelta
 from enum import Enum
 from functools import lru_cache
+from typing import Any
 
 import requests
 
@@ -332,7 +333,7 @@ class GithubScraper(_GPScraper):
     def fetch_repository_language_details(
         self,
         repo_id: str,
-    ) -> ProjectDetails:
+    ) -> dict[Any, float | int]:
         repo_path = self._extract_organisation_and_repository_as_url_block(repo_id)
         r = _web_get(
             f"https://api.github.com/repos/{repo_path}/languages",
