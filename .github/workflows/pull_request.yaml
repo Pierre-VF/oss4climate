@@ -28,7 +28,7 @@ jobs:
       - name: "Create UV installation"
         uses: astral-sh/setup-uv@v5
         with:
-          version: "0.8.0"
+          version: "0.8.17"
 
       # Check and fix the code
       - name: Defining Git identity
