@@ -46,10 +46,10 @@ test = [
     "coverage>=7.10.4",
 ]
 app = [
-    "fastapi>=0.115.6",
+    "fastapi>=0.116.1",
     "gunicorn>=23.0.0",
     "sentry-sdk[fastapi]>=2.19.2",
-    "uvicorn>=0.34.0",
+    "uvicorn[standard]>=0.34.0",
 ]
 notebooks = [
     "scikit-learn>=1.6.1",
