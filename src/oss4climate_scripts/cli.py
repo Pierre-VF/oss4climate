@@ -6,10 +6,10 @@ from datetime import timedelta
 
 import typer
 
+from oss4climate.src.search import listing_search
 from oss4climate_scripts import scripts
 from oss4climate_scripts.scripts import (
     data_publication,
-    listing_search,
     repository_scraping,
 )
 

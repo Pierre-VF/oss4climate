@@ -6,13 +6,7 @@
 
 version: 2
 updates:
- - package-ecosystem: "devcontainers"
-   # For the development setup
-   directory: "/"
-   schedule:
-     interval: weekly
-
- - package-ecosystem: "pip"
+ - package-ecosystem: "uv"
    # For the production setup
    directory: "/"
    schedule:

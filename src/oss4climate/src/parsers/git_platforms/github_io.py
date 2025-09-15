@@ -10,6 +10,7 @@ This implements:
 from datetime import datetime, timedelta
 from enum import Enum
 from functools import lru_cache
+from typing import Any
 
 import requests
 
@@ -332,7 +333,7 @@ class GithubScraper(_GPScraper):
     def fetch_repository_language_details(
         self,
         repo_id: str,
-    ) -> ProjectDetails:
+    ) -> dict[Any, float | int]:
         repo_path = self._extract_organisation_and_repository_as_url_block(repo_id)
         r = _web_get(
             f"https://api.github.com/repos/{repo_path}/languages",
@@ -454,6 +455,21 @@ class GithubScraper(_GPScraper):
                 else:
                     license_url = f"https://raw.githubusercontent.com/{repo_id}/refs/heads/{branch}/{i}"
         return license_url
+
+    def fetch_organisation_details(
+        self,
+        organisation_id: str,
+    ) -> Any:
+        organisation_id = self._extract_organisation_and_repository_as_url_block(
+            organisation_id
+        ).split("/")[0]
+        r = _web_get(
+            url=f"https://api.github.com/orgs/{organisation_id}",
+            with_headers=True,
+            is_json=True,
+            cache_lifetime=self.cache_lifetime,
+        )
+        return r
 
     # --------------------------------------------------------------------------------
     # --------------------------------------------------------------------------------

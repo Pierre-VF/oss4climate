@@ -61,7 +61,7 @@ class GitPlatformScraper:
     def fetch_repository_language_details(
         self,
         repo_id: str,
-    ) -> ProjectDetails:
+    ) -> dict[Any, float | int]:
         pass
 
     @abstractmethod

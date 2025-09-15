@@ -64,7 +64,7 @@ async def lifespan(app: FastAPI):
     log_info("Starting app")
     if not os.path.exists(FILE_OUTPUT_OPTIMISED_LISTING_FEATHER):
         # Only importing this heavier part if needed
-        from oss4climate_scripts.scripts import listing_search
+        from oss4climate.src.search import listing_search
 
         log_warning("- Listing not found, downloading again")
         listing_search.download_listing_data_for_app()

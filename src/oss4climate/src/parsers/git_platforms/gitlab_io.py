@@ -52,7 +52,7 @@ def _extract_host_organisation_and_repository_as_url_block(x: str) -> tuple[str,
     if gls.is_relevant_url(x, include_self_hosted=False):
         x = x.replace(GITLAB_URL_BASE, "")
     else:
-        x = x.replace("https://", "").replace("http://", "")
+        x = x.replace("https://", "").replace("http://", "").replace(f"{host}/", "")
 
     fixed_x = "/".join(
         x.split("/")[:2]
@@ -202,14 +202,16 @@ class GitlabScraper(_GPScraper):
         fail_on_issue: bool = True,
     ) -> ProjectDetails:
         cache_lifetime = self.cache_lifetime
-        host, repo_id = _extract_host_organisation_and_repository_as_url_block(repo_id)
+        host, repo_id_min = _extract_host_organisation_and_repository_as_url_block(
+            repo_id
+        )
         r = _web_get(
-            f"https://{host}/api/v4/projects/{quote_plus(repo_id)}?license=yes",
+            f"https://{host}/api/v4/projects/{quote_plus(repo_id_min)}?license=yes",
             is_json=True,
             cache_lifetime=cache_lifetime,
         )
         # organisation_url = f"https://{gitlab_host}/{repo_id.split('/')[0]}"
-        organisation = repo_id.split("/")[0]
+        organisation = repo_id_min.split("/")[0]
         license = _get_from_dict_with_default(r, "license", {}).get("name")
         license_url = r.get("license_url")
         (
@@ -252,7 +254,7 @@ class GitlabScraper(_GPScraper):
                 n_open_prs = len([i for i in r_open_pr if i.get("state") == "open"])
 
         details = ProjectDetails(
-            id=repo_id,
+            id=repo_id_min,
             name=r["name"],
             organisation=organisation,
             url=r["web_url"],
@@ -277,7 +279,7 @@ class GitlabScraper(_GPScraper):
     def fetch_repository_language_details(
         self,
         repo_id: str,
-    ) -> ProjectDetails:
+    ) -> dict[Any, float | int]:
         host, repo_id = _extract_host_organisation_and_repository_as_url_block(repo_id)
         r = _web_get(
             f"https://{host}/api/v4/projects/{quote_plus(repo_id)}/languages",

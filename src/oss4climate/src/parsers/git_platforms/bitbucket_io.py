@@ -11,6 +11,7 @@ This will implements:
 
 from datetime import timedelta
 from enum import Enum
+from typing import Any
 
 from oss4climate.src.helpers import url_base_matches_domain
 from oss4climate.src.models import EnumDocumentationFileType, ProjectDetails
@@ -92,9 +93,8 @@ class BitbucketScraper(_GPScraper):
         repo_id: str,
         branch: str | None = None,
         fail_on_issue: bool = True,
-        cache_lifetime: timedelta | None = None,
     ) -> tuple[str | None, EnumDocumentationFileType]:
-        pass
+        raise NotImplementedError()
 
     def fetch_project_details(
         self,
@@ -102,32 +102,32 @@ class BitbucketScraper(_GPScraper):
         branch: str | None = None,
         fail_on_issue: bool = True,
     ) -> ProjectDetails:
-        pass
+        raise NotImplementedError()
 
     def fetch_repository_language_details(
         self,
         repo_id: str,
-    ) -> ProjectDetails:
-        pass
+    ) -> dict[Any, float | int]:
+        raise NotImplementedError()
 
     def fetch_repositories_in_organisation(
         self,
         organisation_name: str,
     ) -> dict[str, str]:
-        pass
+        raise NotImplementedError()
 
     def fetch_master_branch_name(
         self,
         repo_id: str,
     ) -> str | None:
-        pass
+        raise NotImplementedError()
 
     def fetch_repository_file_tree(
         self,
         repo_id: str,
         fail_on_issue: bool = True,
     ) -> list[str] | str:
-        pass
+        raise NotImplementedError()
 
     def extract_repository_organisation(self, repo_path: str) -> str:
         repo_path = self._extract_organisation_and_repository_as_url_block(repo_path)

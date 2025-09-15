@@ -41,7 +41,7 @@ jobs:
       - name: "Create UV installation"
         uses: astral-sh/setup-uv@v5
         with:
-          version: "0.8.0"
+          version: "0.8.17"
 
       - name: Installing packages
         run: uv sync --group=scripts
@@ -55,7 +55,7 @@ jobs:
 
       - name: Cleaning up the code
         run: |
-          make check_code || echo "Precommits modified the files"
+          make code_cleanup || echo "Precommits modified the files"
 
       - name: Defining Git identity
         run: |

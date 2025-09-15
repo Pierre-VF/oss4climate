@@ -9,20 +9,16 @@ from oss4climate.src.config import (
     FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
     FILE_OUTPUT_SUMMARY_TOML,
 )
+from oss4climate.src.crawler import scrape_all_targets
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
-from oss4climate.src.models import EnumDocumentationFileType
-from oss4climate.src.nlp import html_io, markdown_io, rst_io
 from oss4climate.src.nlp.plaintext import (
     get_spacy_english_model,
     reduce_to_informative_lemmas,
 )
 from oss4climate.src.parsers import (
     ParsingTargets,
-    RateLimitError,
 )
-from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
-from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 from oss4climate_scripts import scripts
 
 
@@ -44,150 +40,21 @@ def scrape_all(
 
     log_info("Loading organisations and repositories to be indexed")
     targets = ParsingTargets.from_toml(FILE_INPUT_INDEX)
-    targets.ensure_sorted_cleaned_and_unique_elements()
 
-    failure_during_scraping = False
+    scrape_result = scrape_all_targets(
+        targets=targets,
+        fail_on_issue=fail_on_issue,
+    )
+    df = scrape_result.results_as_df
+    scrape_failures = scrape_result.errors
 
-    scrape_failures = dict()
-
-    bad_organisations = []
-    bad_repositories = []
-
-    gitlab_s = GitlabScraper()
-    github_s = GithubScraper()
-
-    log_info("Fetching data for all organisations in Github")
-    for org_url in targets.github_organisations:
-        url2check = org_url.replace("https://", "")
-        if url2check.endswith("/"):
-            url2check = url2check[:-1]
-        if url2check.count("/") > 1:
-            log_info(f"SKIPPING repo {org_url}")
-            targets.github_repositories.append(org_url)  # Mapping it to repos instead
-            continue  # Skip
-
-        try:
-            x = github_s.fetch_repositories_in_organisation(org_url)
-            [targets.github_repositories.append(i) for i in x.values()]
-        except Exception as e:
-            scrape_failures["GITHUB_ORGANISATION:" + org_url] = e
-            log_warning(f" > Error with organisation ({e})")
-            bad_organisations.append(org_url)
-
-    log_info("Fetching data for all groups in Gitlab")
-    for org_url in targets.gitlab_groups:
-        url2check = org_url.replace("https://", "")
-        if url2check.endswith("/"):
-            url2check = url2check[:-1]
-        if url2check.count("/") > 1:
-            log_info(f"SKIPPING repo {org_url}")
-            targets.gitlab_projects.append(org_url)  # Mapping it to repos instead
-            continue  # Skip
-
-        try:
-            x = gitlab_s.fetch_repositories_in_group(org_url)
-            [targets.gitlab_projects.append(i) for i in x.values()]
-        except Exception as e:
-            scrape_failures["GITLAB_GROUP:" + org_url] = e
-            log_warning(f" > Error with organisation ({e})")
-            bad_organisations.append(org_url)
-
-    targets.ensure_sorted_cleaned_and_unique_elements()  # since elements were added
-    screening_results = []
-
-    log_info("Fetching data for all repositories in Gitlab")
-    for i in targets.gitlab_projects:
-        try:
-            screening_results.append(
-                gitlab_s.fetch_project_details(i, fail_on_issue=fail_on_issue)
-            )
-        except Exception as e:
-            scrape_failures["GITLAB_PROJECT:" + i] = e
-            log_warning(f" > Error with repo ({e})")
-            bad_repositories.append(i)
-
-    log_info("Fetching data for all repositories in Github")
-    try:
-        forbidden_for_api_limit_counter = 0
-        for i in targets.github_repositories:
-            try:
-                if i.endswith("/.github"):
-                    continue
-                screening_results.append(
-                    github_s.fetch_project_details(i, fail_on_issue=fail_on_issue)
-                )
-            except Exception as e:
-                if isinstance(e, RateLimitError):
-                    # Ensuring proper breaking on rate limits of the API
-                    forbidden_for_api_limit_counter += 1
-                    if forbidden_for_api_limit_counter > 10:
-                        raise RateLimitError(
-                            f"Github rate limiting hit ({forbidden_for_api_limit_counter} errors with 403 status)"
-                        )
-
-                scrape_failures["GITHUB_REPO:" + i] = e
-                log_warning(f" > Error with repo ({e})")
-                bad_repositories.append(i)
-    except RateLimitError as e:
-        failure_during_scraping = True
-        scrape_failures["SCRAPING"] = e
-        log_warning("Rate limit hit for Github - STOPPING Github scraping")
-
-    def _f_fix(x):
-        out = x.__dict__
-        if isinstance(out["readme_type"], EnumDocumentationFileType):
-            out["readme_type"] = out["readme_type"].value
-        else:
-            out["readme_type"] = str(out["readme_type"])
-
-        return out
-
-    df = pd.DataFrame([_f_fix(i) for i in screening_results])
-    df2export = df.set_index("id").drop(columns=["raw_details"])
-
-    # Cleaning up markdown
-    def _f_readme_cleanup(r):
-        x = r["readme"]
-        if x is None:
-            return "(NO DATA)"
-        elif not isinstance(x, str):
-            return "(INVALID)"
-        x_type = r["readme_type"]
-        if x_type == EnumDocumentationFileType.MARKDOWN.value:
-            out = markdown_io.markdown_to_search_plaintext(
-                x,
-                remove_code=True,
-            )
-        elif x_type == EnumDocumentationFileType.HTML.value:
-            out = html_io.html_to_search_plaintext(
-                x,
-                remove_code=True,
-            )
-        elif x_type == EnumDocumentationFileType.RESTRUCTURED_TEXT.value:
-            try:
-                out = rst_io.rst_to_search_plaintext(
-                    x,
-                    remove_code=True,
-                )
-            except rst_io.RstParsingError as e:
-                scrape_failures[f"RST_PARSING:{r['url']}"] = e
-                # This is to avoid issues if the text is not markdown
-                out = x
-        else:
-            # This is to avoid issues if the text is not markdown
-            out = x
-        return out
-
-    df2export["readme"] = df2export.apply(_f_readme_cleanup, axis=1)
-
-    # Dropping duplicates, if any
-    df2export.drop_duplicates(subset=["url"], inplace=True)
+    failure_during_scraping = len(scrape_failures) > 1
 
     if target_output_file.endswith(".csv"):
         # Dropping READMEs for CSV to look reasonable
         df.drop(columns=["readme"]).to_csv(target_output_file, sep=";")
     elif target_output_file.endswith(".json"):
-        df2export.T.to_json(target_output_file)
+        df.T.to_json(target_output_file)
     else:
         raise ValueError(f"Unsupported file type for export: {target_output_file}")
 
@@ -197,7 +64,7 @@ def scrape_all(
         binary_target_output_file = binary_target_output_file.replace(
             f".{i}", ".feather"
         )
-    df2export.reset_index().to_feather(binary_target_output_file)
+    df.reset_index().to_feather(binary_target_output_file)
 
     print(
         f"""
@@ -217,7 +84,10 @@ def scrape_all(
         "organisations": len(organisations),
     }
 
-    failed = dict(organisations=bad_organisations, repositories=bad_repositories)
+    failed = dict(
+        organisations=scrape_result.failing_organisations,
+        repositories=scrape_result.failing_repositories,
+    )
 
     # TOML formatting
     doc = document()
@@ -285,7 +155,3 @@ def optimise_scraped_data_for_search():
     log_info("Exporting input listing")
     df_opt.to_feather(FILE_OUTPUT_OPTIMISED_LISTING_FEATHER)
     log_info("- Exported")
-
-
-if __name__ == "__main__":
-    scrape_all()
