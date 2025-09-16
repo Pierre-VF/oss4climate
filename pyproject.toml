@@ -1,6 +1,6 @@
 [project]
 name = "oss4climate"
-version = "0.4.0"
+version = "0.4.1"
 readme = "README.md"
 description = "Package to create listings of Open Source for Energy"
 authors = [
@@ -12,16 +12,16 @@ dependencies = [
     "beautifulsoup4>=4.12.3",
     "docutils>=0.21.2",
     "jinja2>=3.1.5",
-    "markdown>=3.7",
-    "pandas>=2.2.3",
+    "markdown>=3.9",
+    "pandas>=2.3.2",
     "pyarrow>=18.1.0",
     "pydantic>=2.10.5",
     "pydantic-settings>=2.7.1",
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
-    "spacy>=3.8.3",
+    "spacy>=3.8.7",
     "sqlmodel>=0.0.22",
-    "tomlkit>=0.13.2",
+    "tomlkit>=0.13.3",
     "tqdm>=4.67.1",
 ]
 packages = [
@@ -41,7 +41,7 @@ scripts = [
     "typer>=0.15.1",
 ]
 test = [
-    "pytest>=8.4.1",
+    "pytest>=8.4.2",
     "httpx>=0.28.1",
     "coverage>=7.10.4",
 ]
