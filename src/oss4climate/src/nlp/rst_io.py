@@ -15,8 +15,8 @@ def __rst_to_html(rst_str: str) -> str:
             # warnings.simplefilter("ignore")
             x = publish_string(
                 rst_str,
-                parser_name="restructuredtext",
-                writer_name="html",
+                parser="restructuredtext",
+                writer="html",
             )
     except Exception as e:
         raise RstParsingError("Failed to parse RST file") from e
