@@ -7,7 +7,7 @@ from oss4climate.src.log import log_warning
 
 def find_all_links_in_html(html_str: str) -> list[str]:
     b = BeautifulSoup(html_str, features="html.parser")
-    rs = b.findAll(name="a")
+    rs = b.find_all(name="a")
     return [x.get("href") for x in rs]
 
 

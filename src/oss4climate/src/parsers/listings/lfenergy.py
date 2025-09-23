@@ -25,7 +25,7 @@ def fetch_all_project_urls_from_lfe_webpage(
     )
     b = BeautifulSoup(r_text, features="html.parser")
 
-    rs = b.findAll(name="a")
+    rs = b.find_all(name="a")
     shortlisted_urls = [
         i for i in [x.get("href") for x in rs] if i.startswith(_PROJECT_PAGE_URL_BASE)
     ]

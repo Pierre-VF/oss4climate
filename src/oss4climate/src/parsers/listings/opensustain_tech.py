@@ -41,7 +41,7 @@ def fetch_categorised_projects_from_opensustain_webpage(
     #   and assumes that the information is rolled out in a consistent sequential manner
     d = dict()
     orphan_links = []
-    xs = b.findAll(name=["h2", "h3", "li"])
+    xs = b.find_all(name=["h2", "h3", "li"])
     current_h2 = None
     current_h3 = None
     for i in xs:
@@ -54,7 +54,7 @@ def fetch_categorised_projects_from_opensustain_webpage(
             if current_h3 not in d[current_h2].keys():
                 d[current_h2][current_h3] = []
         elif i.name == "li":
-            links = [j.get("href") for j in i.findAll(name="a")]
+            links = [j.get("href") for j in i.find_all(name="a")]
             if current_h2 and current_h3:
                 if current_h3 not in d[current_h2].keys():
                     d[current_h2][current_h3] = []
