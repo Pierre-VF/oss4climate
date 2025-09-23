@@ -1,6 +1,6 @@
 [project]
 name = "oss4climate"
-version = "0.4.1"
+version = "0.4.2"
 readme = "README.md"
 description = "Package to create listings of Open Source for Energy"
 authors = [
