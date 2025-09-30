@@ -9,7 +9,7 @@ authors = [
 
 requires-python = ">=3.12"
 dependencies = [
-    "beautifulsoup4>=4.13.5",
+    "beautifulsoup4>=4.14.2",
     "docutils>=0.22.2",
     "jinja2>=3.1.6",
     "markdown>=3.9",
@@ -17,7 +17,7 @@ dependencies = [
     "pyarrow>=18.1.0",
     "pydantic>=2.11.9",
     "pydantic-settings>=2.7.1",
-    "pyyaml>=6.0.2",
+    "pyyaml>=6.0.3",
     "requests>=2.32.3",
     "spacy>=3.8.7",
     "sqlmodel>=0.0.25",
@@ -43,7 +43,7 @@ scripts = [
 test = [
     "pytest>=8.4.2",
     "httpx>=0.28.1",
-    "coverage>=7.10.4",
+    "coverage>=7.10.7",
 ]
 app = [
     "fastapi>=0.117.1",
@@ -52,5 +52,5 @@ app = [
     "uvicorn[standard]>=0.34.0",
 ]
 notebooks = [
-    "scikit-learn>=1.6.1",
+    "scikit-learn>=1.7.2",
 ]
