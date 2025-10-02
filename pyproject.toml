@@ -53,4 +53,5 @@ app = [
 ]
 notebooks = [
     "scikit-learn>=1.7.2",
+    "openpyxl",
 ]
