@@ -4,6 +4,7 @@ Analysis of the OSS.tech landscape
 
 import os
 import os.path
+import sys
 from urllib.parse import urlparse
 from urllib.request import urlretrieve
 
@@ -16,6 +17,7 @@ RESULTS_FOLDER = f"{DATA_FOLDER}/results"
 PROJECT_XLSX = f"{DATA_FOLDER}/projects.xlsx"
 ORGANISATIONS_XLSX = f"{DATA_FOLDER}/organisations.xlsx"
 FUNDING_XLSX = f"{DATA_FOLDER}/funding.xlsx"
+LOG_FILE = f"{RESULTS_FOLDER}/log.txt"
 
 funding_xlsx_url = r"https://api.getgrist.com/o/docs/api/docs/gSscJkc5Rb1Rw45gh1o1Yc/download/xlsx?viewSection=17&tableId=Funding&activeSortSpec=%5B%5D&filters=%5B%5D&linkingFilter=%7B%22filters%22%3A%7B%7D%2C%22operations%22%3A%7B%7D%7D"
 organisations_xlsx_url = r"https://api.getgrist.com/o/docs/api/docs/gSscJkc5Rb1Rw45gh1o1Yc/download/xlsx?viewSection=7&tableId=Organizations&activeSortSpec=%5B-156%5D&filters=%5B%7B%22colRef%22%3A124%2C%22filter%22%3A%22%7B%5C%22excluded%5C%22%3A%5B%5D%7D%22%7D%5D&linkingFilter=%7B%22filters%22%3A%7B%7D%2C%22operations%22%3A%7B%7D%7D"
@@ -25,6 +27,9 @@ projects_xlsx_url = r"https://api.getgrist.com/o/docs/api/docs/gSscJkc5Rb1Rw45gh
 for i in [DATA_FOLDER, RESULTS_FOLDER]:
     if not os.path.exists(i):
         os.makedirs(i, exist_ok=True)
+
+file_out = open(LOG_FILE, "w")
+sys.stdout = file_out
 
 # ------------------------------------------------------------------------------------
 # Step 1 : Download files if missing
@@ -67,6 +72,8 @@ def plot_histogram(
     x_ticks_vertical: bool = True,
     order: bool = True,
     fig_size: tuple[int, int] = (12, 6),
+    yaxis_title: str = "Number of projects",
+    xaxis_title: str | None = None,
 ) -> None:
     fig, ax = plt.subplots(figsize=fig_size)
     if order:
@@ -78,6 +85,9 @@ def plot_histogram(
     ax.bar(x=idx, height=x_sorted)
     if x_ticks_vertical:
         ax.set_xticks(idx, idx, rotation="vertical")
+    ax.set_ylabel(yaxis_title)
+    if xaxis_title:
+        ax.set_xlabel(xaxis_title)
     fig.tight_layout()
     fig.savefig(path_out)
 
@@ -90,8 +100,8 @@ def plot_pie(
     ax.pie(
         x,
         labels=x.index,
-        radius=3,
-        center=(4, 4),
+        # radius=3,
+        # center=(4, 4),
         # wedgeprops={"linewidth": 1, "edgecolor": "white"},
         # frame=True,
     )
@@ -142,6 +152,7 @@ plot_histogram(
     path_out=f"{RESULTS_FOLDER}/ecosystems.png",
     x_ticks_vertical=True,
     order=True,
+    xaxis_title="Ecosystem",
 )
 
 
@@ -150,7 +161,7 @@ projects_by_language = {}
 unique_languages = df_projects_augmented["language"].unique()
 for e in list(unique_languages):
     if e == "nan":
-        continue
+        e = "(Undefined)"
     repos_e = []
     for i, r in df_projects_augmented.iterrows():
         if e == r["language"]:
@@ -167,6 +178,7 @@ plot_histogram(
     path_out=f"{RESULTS_FOLDER}/languages.png",
     x_ticks_vertical=True,
     order=True,
+    xaxis_title="Programming language",
 )
 
 # Which projects are funded?
@@ -238,10 +250,12 @@ plot_histogram(
     path_out=f"{RESULTS_FOLDER}/per_contributors.png",
     x_ticks_vertical=False,
     order=False,
+    xaxis_title="Number of contributors",
     # fig_size=(20, 6),
 )
 
-print(projects_by_contributors)
+# Closing file output
+file_out.close()
 
 
 """
