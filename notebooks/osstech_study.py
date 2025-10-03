@@ -7,6 +7,7 @@ import os.path
 from urllib.parse import urlparse
 from urllib.request import urlretrieve
 
+import matplotlib.pyplot as plt
 import pandas as pd
 
 DATA_FOLDER = ".data"
@@ -58,6 +59,45 @@ print(" ")
 # Step 3: Looking at Richard's questions
 # ------------------------------------------------------------------------------------
 
+
+# Plotting functions
+def plot_histogram(
+    x: pd.Series,
+    path_out: str,
+    x_ticks_vertical: bool = True,
+    order: bool = True,
+) -> None:
+    fig, ax = plt.subplots(figsize=(12, 6))
+    if order:
+        x_sorted = x.sort_values(ascending=False)
+    else:
+        x_sorted = x.copy()
+    x_sorted.index = [str(i) for i in x_sorted.index.to_list()]
+    idx = x_sorted.index.to_list()
+    ax.bar(x=idx, height=x_sorted)
+    if x_ticks_vertical:
+        ax.set_xticks(idx, idx, rotation="vertical")
+    fig.tight_layout()
+    fig.savefig(path_out)
+
+
+def plot_pie(
+    x: pd.Series,
+    path_out: str,
+) -> None:
+    fig, ax = plt.subplots()
+    ax.pie(
+        x,
+        labels=x.index,
+        radius=3,
+        center=(4, 4),
+        # wedgeprops={"linewidth": 1, "edgecolor": "white"},
+        # frame=True,
+    )
+    fig.tight_layout()
+    fig.savefig(path_out)
+
+
 df_projects_augmented = df_projects.copy()
 df_projects_augmented["augmented_ecosystems"] = df_projects_augmented[
     "ecosystems"
@@ -89,8 +129,18 @@ for e in list(unique_ecosystems):
             repos_e.append(dict(r))
     projects_by_ecosystem[e] = repos_e
 print("Repos per ecosystem:")
-[print(f"- {k} : {len(v)} projects") for k, v in projects_by_ecosystem.items()]
+ecosystem_size = {k: len(v) for k, v in projects_by_ecosystem.items()}
+[print(f"- {k} : {v} projects") for k, v in ecosystem_size.items()]
 print(" ")
+
+plot_histogram(
+    pd.Series(list(ecosystem_size.values()), index=list(ecosystem_size.keys())).astype(
+        int
+    ),
+    path_out=f"{RESULTS_FOLDER}/ecosystems.png",
+    x_ticks_vertical=True,
+    order=True,
+)
 
 
 # Which projects use which language?
@@ -105,13 +155,30 @@ for e in list(unique_languages):
             repos_e.append(dict(r))
     projects_by_language[e] = repos_e
 print("Repos per language:")
-[print(f"- {k} : {len(v)} projects") for k, v in projects_by_language.items()]
+language_size = {k: len(v) for k, v in projects_by_language.items()}
+[print(f"- {k} : {v} projects") for k, v in language_size.items()]
 print(" ")
+plot_histogram(
+    pd.Series(list(language_size.values()), index=list(language_size.keys())).astype(
+        int
+    ),
+    path_out=f"{RESULTS_FOLDER}/languages.png",
+    x_ticks_vertical=True,
+    order=True,
+)
 
 # Which projects are funded?
 funded_projects = df_projects_augmented.loc[
     df_projects_augmented["augmented_is_funded"] == True, :
 ].copy()
+
+n_funded = len(funded_projects)
+n_unfunded = len(df_projects_augmented) - n_funded
+
+plot_pie(
+    pd.Series([n_funded, n_unfunded], index=["Funded", "Unfunded"]),
+    path_out=f"{RESULTS_FOLDER}/funding.png",
+)
 
 # Contributors per project
 
