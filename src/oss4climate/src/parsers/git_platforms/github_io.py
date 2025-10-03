@@ -37,6 +37,44 @@ class _GithubTargetType(Enum):
     UNKNOWN = "UNKNOWN"
 
 
+def _f_str_to_datetime_or_none(x: str) -> datetime | None:
+    return datetime.fromisoformat(x) if x else None
+
+
+class _PRDetails:
+    def __init__(
+        self,
+        url: str,
+        user_id: str,
+        title: str,
+        state: str,
+        created_at: str | None = None,
+        closed_at: str | None = None,
+        merged_at: str | None = None,
+        **kwargs,
+    ):
+        self.url: str = url
+        self.title: str = title
+        self.state: str = state
+        self.user_id: str = user_id
+        self.created_at: datetime | None = _f_str_to_datetime_or_none(created_at)
+        self.closed_at: datetime | None = _f_str_to_datetime_or_none(closed_at)
+        self.merged_at: datetime | None = _f_str_to_datetime_or_none(merged_at)
+
+    @property
+    def accepted(self) -> bool:
+        return self.merged_at is not None
+
+    @property
+    def approval_time(self) -> timedelta | None:
+        if self.merged_at is None:
+            return None
+        elif self.created_at is None:
+            return None
+        else:
+            return self.merged_at - self.created_at
+
+
 @lru_cache(maxsize=1)
 def _github_headers() -> dict[str, str]:
     headers = {
@@ -406,6 +444,32 @@ class GithubScraper(_GPScraper):
                 raise e
             file_tree = f"ERROR with file tree ({e})"
         return file_tree
+
+    def fetch_pull_requests(
+        self,
+        repo_path: str,
+        open_only: bool = True,
+    ) -> list[_PRDetails]:
+        repo_name = self._extract_organisation_and_repository_as_url_block(repo_path)
+        if open_only:
+            state = "open"
+        else:
+            state = "all"
+        out = []
+        more_to_fetch = True
+        page = 1
+        per_page = 100
+        while more_to_fetch:
+            r = _web_get(
+                url=f"https://api.github.com/repos/{repo_name}/pulls?state={state}&per_page={per_page}&page={page}",
+                with_headers=True,
+                is_json=True,
+                cache_lifetime=self.cache_lifetime,
+            )
+            out += [_PRDetails(**i, user_id=i["user"].get("login")) for i in r]
+            more_to_fetch = len(r) == 100
+            page += 1
+        return out
 
     def extract_repository_organisation(self, repo_path: str) -> str:
         repo_path = self._extract_organisation_and_repository_as_url_block(repo_path)
