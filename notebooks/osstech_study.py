@@ -66,8 +66,9 @@ def plot_histogram(
     path_out: str,
     x_ticks_vertical: bool = True,
     order: bool = True,
+    fig_size: tuple[int, int] = (12, 6),
 ) -> None:
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=fig_size)
     if order:
         x_sorted = x.sort_values(ascending=False)
     else:
@@ -108,6 +109,7 @@ df_projects_augmented["augmented_is_funded"] = (
 df_projects_augmented["augmented_funded_through"] = df_projects_augmented[
     "funding_links"
 ].apply(lambda x: urlparse(x).netloc if str(x) != "nan" else "")
+df_projects_augmented["count"] = 1
 
 # What are the ecosystems?
 all_ecosystems = []
@@ -181,6 +183,65 @@ plot_pie(
 )
 
 # Contributors per project
+df_projects_by_contributors = (
+    df_projects_augmented.loc[:, ["count", "contributors"]]
+    .groupby("contributors")
+    .sum()
+)
+
+
+def _f_cat(x: int) -> str:
+    if x < 5:
+        return str(int(x))
+    elif x <= 10:
+        return "5-10"
+    elif x <= 20:
+        return "11-20"
+    elif x <= 50:
+        return "21-50"
+    elif x <= 100:
+        return "51-100"
+    elif x <= 200:
+        return "101-200"
+    elif x <= 1000:
+        return "201-1000"
+    else:
+        return ">1000"
+
+
+df_projects_by_contributors["contributors_2"] = df_projects_by_contributors.index
+df_projects_by_contributors["contributors_cat"] = df_projects_by_contributors[
+    "contributors_2"
+].apply(_f_cat)
+s_contributors = (
+    df_projects_by_contributors.loc[:, ["count", "contributors_cat"]]
+    .groupby("contributors_cat")
+    .sum()
+)["count"]
+
+plot_histogram(
+    s_contributors.loc[
+        [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5-10",
+            "11-20",
+            "21-50",
+            "51-100",
+            "101-200",
+            "201-1000",
+            ">1000",
+        ]
+    ],
+    path_out=f"{RESULTS_FOLDER}/per_contributors.png",
+    x_ticks_vertical=False,
+    order=False,
+    # fig_size=(20, 6),
+)
+
+print(projects_by_contributors)
 
 
 """
