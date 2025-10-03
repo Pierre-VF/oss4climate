@@ -11,6 +11,8 @@ from urllib.request import urlretrieve
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+
 DATA_FOLDER = ".data"
 RESULTS_FOLDER = f"{DATA_FOLDER}/results"
 
@@ -253,6 +255,43 @@ plot_histogram(
     xaxis_title="Number of contributors",
     # fig_size=(20, 6),
 )
+
+
+# Analysis of PRs
+url = "https://github.com/protontypes/open-sustainable-technology"
+ghs = GithubScraper()
+prs = ghs.fetch_pull_requests(url, open_only=False)
+
+n_total_prs = len(prs)
+n_accepted_prs = 0
+approval_times = []
+users = pd.Series([i.user_id for i in prs]).unique()
+
+for i in prs:
+    if i.accepted:
+        n_accepted_prs += 1
+        approval_times.append(i.approval_time)
+
+print(f"Percentage of approvals: {100 * n_accepted_prs / n_total_prs}")
+print(f"Number of users having opened PRs: {len(users)}")
+
+s_approval_times = pd.Series(approval_times)
+
+
+def _td_to_days(td, _round: bool = False) -> float:
+    out = td.seconds / (3600 * 24) + td.days
+    if _round:
+        out = round(out)
+    return out
+
+
+print(f"Mean approval time: {_td_to_days(s_approval_times.mean())} days")
+print(f"Median approval time: {_td_to_days(s_approval_times.median())} days")
+print(f"75% approval time: {_td_to_days(s_approval_times.quantile(0.75))} days")
+print(f"Max approval time: {_td_to_days(s_approval_times.max())} days")
+
+
+# End
 
 # Closing file output
 file_out.close()
