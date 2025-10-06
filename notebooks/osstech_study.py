@@ -5,6 +5,7 @@ Analysis of the OSS.tech landscape
 import os
 import os.path
 import sys
+from datetime import timedelta
 from urllib.parse import urlparse
 from urllib.request import urlretrieve
 
@@ -90,15 +91,22 @@ def plot_histogram(
     ax.set_ylabel(yaxis_title)
     if xaxis_title:
         ax.set_xlabel(xaxis_title)
-    fig.tight_layout()
-    fig.savefig(path_out)
+    try:
+        fig.tight_layout()
+    except Exception as e:
+        print(f"Failed figure layout tightening {path_out} ({e})")
+    try:
+        fig.savefig(path_out)
+    except Exception as e:
+        print(f"Failed figure export {path_out} ({e})")
 
 
 def plot_pie(
     x: pd.Series,
     path_out: str,
+    fig_size: tuple[int, int] = (14, 6),
 ) -> None:
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=fig_size)
     ax.pie(
         x,
         labels=x.index,
@@ -123,6 +131,9 @@ df_projects_augmented["augmented_funded_through"] = df_projects_augmented[
 ].apply(lambda x: urlparse(x).netloc if str(x) != "nan" else "")
 df_projects_augmented["count"] = 1
 
+
+n_projects = len(df_projects_augmented)
+
 # What are the ecosystems?
 all_ecosystems = []
 for i in df_projects_augmented["augmented_ecosystems"].to_list():
@@ -144,7 +155,10 @@ for e in list(unique_ecosystems):
     projects_by_ecosystem[e] = repos_e
 print("Repos per ecosystem:")
 ecosystem_size = {k: len(v) for k, v in projects_by_ecosystem.items()}
-[print(f"- {k} : {v} projects") for k, v in ecosystem_size.items()]
+[
+    print(f"- {k} : {v} projects ({100 * v / n_projects:.1f} % of total)")
+    for k, v in ecosystem_size.items()
+]
 print(" ")
 
 plot_histogram(
@@ -162,16 +176,19 @@ plot_histogram(
 projects_by_language = {}
 unique_languages = df_projects_augmented["language"].unique()
 for e in list(unique_languages):
-    if e == "nan":
-        e = "(Undefined)"
     repos_e = []
     for i, r in df_projects_augmented.iterrows():
-        if e == r["language"]:
+        if e == str(r["language"]):
             repos_e.append(dict(r))
+    if str(e) == "nan":
+        e = "(Undefined)"
     projects_by_language[e] = repos_e
 print("Repos per language:")
 language_size = {k: len(v) for k, v in projects_by_language.items()}
-[print(f"- {k} : {v} projects") for k, v in language_size.items()]
+[
+    print(f"- {k} : {v} projects ({100 * v / n_projects:.1f} % of total)")
+    for k, v in language_size.items()
+]
 print(" ")
 plot_histogram(
     pd.Series(list(language_size.values()), index=list(language_size.keys())).astype(
@@ -192,8 +209,30 @@ n_funded = len(funded_projects)
 n_unfunded = len(df_projects_augmented) - n_funded
 
 plot_pie(
-    pd.Series([n_funded, n_unfunded], index=["Funded", "Unfunded"]),
+    pd.Series([n_funded, n_unfunded], index=["Funding enabled", "Unfunded"]),
     path_out=f"{RESULTS_FOLDER}/funding.png",
+)
+
+
+# Pie charts per something
+def _pie_plot_per_something(dfx: pd.DataFrame, col: str, path_out: str):
+    all_x = dfx[col].unique().tolist()
+    projects_per_something = {k: len(dfx[dfx[col] == k]) for k in all_x}
+    plot_pie(
+        pd.Series(
+            list(projects_per_something.values()),
+            index=list(projects_per_something.keys()),
+        ),
+        path_out=path_out,
+    )
+
+
+# Projects per section
+_pie_plot_per_something(
+    df_projects_augmented, col="category", path_out=f"{RESULTS_FOLDER}/per_category.png"
+)
+_pie_plot_per_something(
+    df_projects_augmented, col="platform", path_out=f"{RESULTS_FOLDER}/per_platform.png"
 )
 
 # Contributors per project
@@ -201,7 +240,7 @@ df_projects_by_contributors = (
     df_projects_augmented.loc[:, ["count", "contributors"]]
     .groupby("contributors")
     .sum()
-)
+).reset_index()
 
 
 def _f_cat(x: int) -> str:
@@ -215,12 +254,8 @@ def _f_cat(x: int) -> str:
         return "21-50"
     elif x <= 100:
         return "51-100"
-    elif x <= 200:
-        return "101-200"
-    elif x <= 1000:
-        return "201-1000"
     else:
-        return ">1000"
+        return ">100"
 
 
 df_projects_by_contributors["contributors_2"] = df_projects_by_contributors.index
@@ -244,9 +279,7 @@ plot_histogram(
             "11-20",
             "21-50",
             "51-100",
-            "101-200",
-            "201-1000",
-            ">1000",
+            ">100",
         ]
     ],
     path_out=f"{RESULTS_FOLDER}/per_contributors.png",
@@ -256,39 +289,93 @@ plot_histogram(
     # fig_size=(20, 6),
 )
 
-
-# Analysis of PRs
+# -----------------------------------------------------------------------------------
+# Analysis of PRs and activity of OSST
+# -----------------------------------------------------------------------------------
 url = "https://github.com/protontypes/open-sustainable-technology"
-ghs = GithubScraper()
+ghs = GithubScraper(cache_lifetime=timedelta(days=1))
 prs = ghs.fetch_pull_requests(url, open_only=False)
 
 n_total_prs = len(prs)
 n_accepted_prs = 0
 approval_times = []
-users = pd.Series([i.user_id for i in prs]).unique()
+users = pd.Series([i.user_id for i in prs])
 
 for i in prs:
     if i.accepted:
         n_accepted_prs += 1
         approval_times.append(i.approval_time)
 
-print(f"Percentage of approvals: {100 * n_accepted_prs / n_total_prs}")
-print(f"Number of users having opened PRs: {len(users)}")
+print(f"Percentage of approvals: {(100 * n_accepted_prs / n_total_prs):.1f}")
+print(f"Number of users having opened PRs: {len(users.unique())}")
 
-s_approval_times = pd.Series(approval_times)
+df_approvals = pd.Series(approval_times).to_frame("duration")
+df_approvals["count"] = 1
 
 
-def _td_to_days(td, _round: bool = False) -> float:
+def _td_to_days(td, _round: bool = False) -> float | str:
     out = td.seconds / (3600 * 24) + td.days
     if _round:
-        out = round(out)
+        if out < 1:
+            out = "<1"
+        elif out < 2:
+            out = "1-2"
+        elif out < 3:
+            out = "2-3"
+        elif out < 7:
+            out = "3-7"
+        elif out < 14:
+            out = "7-14"
+        elif out < 28:
+            out = "14-28"
+        elif out <= 60:
+            out = "28-60"
+        elif out > 60:
+            out = ">60"
     return out
 
 
-print(f"Mean approval time: {_td_to_days(s_approval_times.mean())} days")
-print(f"Median approval time: {_td_to_days(s_approval_times.median())} days")
-print(f"75% approval time: {_td_to_days(s_approval_times.quantile(0.75))} days")
-print(f"Max approval time: {_td_to_days(s_approval_times.max())} days")
+t_app = df_approvals["duration"]
+print(f"Mean approval time: {_td_to_days(t_app.mean()):.1f} days")
+print(f"Median approval time: {_td_to_days(t_app.median()):.1f} days")
+print(f"75% approval time: {_td_to_days(t_app.quantile(0.75)):.1f} days")
+print(f"Max approval time: {_td_to_days(t_app.max()):.1f} days")
+
+df_approvals["days"] = df_approvals["duration"].apply(
+    lambda x: _td_to_days(x, _round=True)
+)
+s_approval_times_days = df_approvals[["days", "count"]].groupby("days").sum()["count"]
+
+plot_histogram(
+    s_approval_times_days.loc[
+        ["<1", "1-2", "2-3", "3-7", "7-14", "14-28", "28-60", ">60"]
+    ],
+    path_out=f"{RESULTS_FOLDER}/osst_approval_time.png",
+    xaxis_title="Days to approve PR",
+    yaxis_title="Number of PRs",
+    order=False,
+    fig_size=(1200, 500),
+)
+
+df_prs_per_user = (
+    pd.DataFrame(data={"user_id": [i.user_id for i in prs], "count": 1})
+    .groupby("user_id")
+    .sum()
+)
+
+df_prs_per_user_simpler = df_prs_per_user.reset_index()
+df_prs_per_user_simpler.loc[df_prs_per_user_simpler["count"] < 5, "user_id"] = (
+    "(Others)"
+)
+
+plot_histogram(
+    df_prs_per_user_simpler.groupby("user_id").sum()["count"],
+    path_out=f"{RESULTS_FOLDER}/osst_prs_per_user.png",
+    xaxis_title="User",
+    yaxis_title="Number of PRs",
+    x_ticks_vertical=True,
+    order=True,
+)
 
 
 # End
