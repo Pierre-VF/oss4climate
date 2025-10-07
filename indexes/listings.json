@@ -395,6 +395,11 @@
                 "url": "https://github.com/opengeos/leafmap"
             },
             {
+                "license": "MIT License",
+                "license_url": "https://raw.githubusercontent.com/owid/etl/refs/heads/master/LICENSE",
+                "url": "https://github.com/owid/etl"
+            },
+            {
                 "license": "Creative Commons Zero v1.0 Universal",
                 "license_url": "https://raw.githubusercontent.com/pangeo-data/awesome-open-climate-science/refs/heads/master/LICENSE",
                 "target_count": 10,
