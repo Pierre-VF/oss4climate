@@ -15,12 +15,12 @@ dependencies = [
     "markdown>=3.9",
     "pandas>=2.3.2",
     "pyarrow>=21.0.0",
-    "pydantic>=2.11.10",
+    "pydantic>=2.12.1",
     "pydantic-settings>=2.7.1",
     "pyyaml>=6.0.3",
     "requests>=2.32.3",
     "spacy>=3.8.7",
-    "sqlmodel>=0.0.25",
+    "sqlmodel>=0.0.27",
     "tomlkit>=0.13.3",
     "tqdm>=4.67.1",
 ]
@@ -37,7 +37,7 @@ build-backend = "hatchling.build"
 [dependency-groups]
 scripts = [
     "black>=24.10.0",
-    "ruff>=0.13.3",
+    "ruff>=0.14.0",
     "typer>=0.15.1",
 ]
 test = [
@@ -46,7 +46,7 @@ test = [
     "coverage>=7.10.7",
 ]
 app = [
-    "fastapi>=0.117.1",
+    "fastapi>=0.119.0",
     "gunicorn>=23.0.0",
     "sentry-sdk[fastapi]>=2.19.2",
     "uvicorn[standard]>=0.34.0",
