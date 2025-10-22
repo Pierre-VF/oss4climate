@@ -11,7 +11,6 @@ from urllib.request import urlretrieve
 
 import matplotlib.pyplot as plt
 import pandas as pd
-
 from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
 
 DATA_FOLDER = ".data"
@@ -27,6 +26,10 @@ organisations_xlsx_url = r"https://api.getgrist.com/o/docs/api/docs/gSscJkc5Rb1R
 projects_xlsx_url = r"https://api.getgrist.com/o/docs/api/docs/gSscJkc5Rb1Rw45gh1o1Yc/download/xlsx?viewSection=5&tableId=Projects&activeSortSpec=%5B132%5D&filters=%5B%5D&linkingFilter=%7B%22filters%22%3A%7B%7D%2C%22operations%22%3A%7B%7D%7D"
 
 # Ensuring folders exist
+try:
+    os.rmdir(RESULTS_FOLDER)
+except:
+    pass
 for i in [DATA_FOLDER, RESULTS_FOLDER]:
     if not os.path.exists(i):
         os.makedirs(i, exist_ok=True)
@@ -107,9 +110,16 @@ def plot_pie(
     fig_size: tuple[int, int] = (14, 6),
 ) -> None:
     fig, ax = plt.subplots(figsize=fig_size)
+
+    def _f_label(s: pd.Series) -> list[str]:
+        out = [f"{i} ({v:.0f})" for i, v in s.items()]
+        return out
+
     ax.pie(
         x,
-        labels=x.index,
+        labels=_f_label(x),
+        textprops={"fontsize": 14},
+        autopct="%1.1f%%",
         # radius=3,
         # center=(4, 4),
         # wedgeprops={"linewidth": 1, "edgecolor": "white"},
@@ -368,8 +378,14 @@ df_prs_per_user_simpler.loc[df_prs_per_user_simpler["count"] < 5, "user_id"] = (
     "(Others)"
 )
 
+prs_per_user_ranked = df_prs_per_user_simpler.groupby("user_id").sum()
+n_prs = prs_per_user_ranked["count"].sum()
+prs_per_user_ranked["percent"] = 100 * prs_per_user_ranked["count"] / n_prs
+
+print(f"Total PRs: {n_prs}")
+print(prs_per_user_ranked)
 plot_histogram(
-    df_prs_per_user_simpler.groupby("user_id").sum()["count"],
+    prs_per_user_ranked["count"],
     path_out=f"{RESULTS_FOLDER}/osst_prs_per_user.png",
     xaxis_title="User",
     yaxis_title="Number of PRs",
