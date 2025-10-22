@@ -393,6 +393,31 @@ plot_histogram(
     order=True,
 )
 
+# -----------------------------------------------------------------------------------
+# Analysis of dependencies, from Ecosystems
+# -----------------------------------------------------------------------------------
+
+complete_dependencies = []
+n_deps_i = 10
+i = 1
+while n_deps_i:
+    print(f"Acquiring Ecosyste.ms page {i}")
+    url_ecosystems_i = f"https://ost.ecosyste.ms/api/v1/projects/dependencies?page={i}"
+    ECOSYSTEMS_JSON_i = f"{DATA_FOLDER}/ecosystems-dependencies-p{i}.json"
+    _f_download_if_missing(url_ecosystems_i, ECOSYSTEMS_JSON_i)
+
+    deps_i = pd.read_json(ECOSYSTEMS_JSON_i)
+    i += 1
+    n_deps_i = len(deps_i)
+    if n_deps_i > 0:
+        complete_dependencies.append(deps_i)
+
+df_dependencies = pd.concat(complete_dependencies, axis=1).sort_values(
+    "count", ascending=False
+)
+print("Dependencies to packages in OST: ")
+print(df_dependencies[df_dependencies["in_ost"]])
+
 
 # End
 
