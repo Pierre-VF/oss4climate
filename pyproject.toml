@@ -1,6 +1,6 @@
 [project]
 name = "oss4climate"
-version = "0.4.8"
+version = "0.4.9"
 readme = "README.md"
 description = "Package to create listings of Open Source for Energy"
 authors = [
@@ -12,10 +12,10 @@ dependencies = [
     "beautifulsoup4>=4.14.2",
     "docutils>=0.22.2",
     "jinja2>=3.1.6",
-    "markdown>=3.9",
+    "markdown>=3.10",
     "pandas>=2.3.2",
     "pyarrow>=22.0.0",
-    "pydantic>=2.12.3",
+    "pydantic>=2.12.4",
     "pydantic-settings>=2.7.1",
     "pyyaml>=6.0.3",
     "requests>=2.32.3",
@@ -37,16 +37,16 @@ build-backend = "hatchling.build"
 [dependency-groups]
 scripts = [
     "black>=25.9.0",
-    "ruff>=0.14.2",
+    "ruff>=0.14.4",
     "typer>=0.20.0",
 ]
 test = [
     "pytest>=8.4.2",
     "httpx>=0.28.1",
-    "coverage>=7.11.0",
+    "coverage>=7.11.3",
 ]
 app = [
-    "fastapi>=0.120.1",
+    "fastapi>=0.121.1",
     "gunicorn>=23.0.0",
     "sentry-sdk[fastapi]>=2.19.2",
     "uvicorn[standard]>=0.38.0",

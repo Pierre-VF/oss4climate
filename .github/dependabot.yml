@@ -10,4 +10,4 @@ updates:
    # For the production setup
    directory: "/"
    schedule:
-     interval: weekly
+     interval: monthly
