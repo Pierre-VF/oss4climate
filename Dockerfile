@@ -12,8 +12,6 @@ RUN apt-get update
 RUN apt-get install -y ca-certificates
 RUN update-ca-certificates
 RUN uv sync --all-groups
-RUN uv add pip
-RUN uv run spacy download en_core_web_sm
 # Run app
 LABEL organisation="oss4climate"
 EXPOSE 8080
