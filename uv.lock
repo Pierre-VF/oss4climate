@@ -688,7 +688,7 @@ wheels = [
 
 [[package]]
 name = "oss4climate"
-version = "0.4.9"
+version = "0.4.10"
 source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },
