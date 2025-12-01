@@ -22,6 +22,7 @@ class Settings(pydantic_settings.BaseSettings):
     APP_URL_BASE: str = "https://oss4climate.pierrevf.consulting"
     APP_PROXY_PATH: Optional[str] = None
     APP_URL_FAVICON: str = "https://www.pierrevf.consulting/wp-content/uploads/2023/11/cropped-logo_base_png-32x32.png"
+    APP_LEMATISED_SEARCH: bool = False
 
     model_config = pydantic_settings.SettingsConfigDict(
         env_file_encoding="utf-8",
@@ -44,6 +45,30 @@ class Settings(pydantic_settings.BaseSettings):
             # for backwards compatibility
             return self.APP_SQLITE_DB
         return f"{self.LOCAL_FOLDER}/{self.APP_SQLITE_DB}"
+
+    def get_description_file_and_column(self) -> tuple[str, str]:
+        if self.APP_LEMATISED_SEARCH:
+            return FILE_OUTPUT_OPTIMISED_LISTING_FEATHER, "optimised_description"
+        else:
+            return FILE_OUTPUT_LISTING_FEATHER, "description"
+
+    def get_readme_file_and_column(self) -> tuple[str, str]:
+        if self.APP_LEMATISED_SEARCH:
+            return FILE_OUTPUT_OPTIMISED_LISTING_FEATHER, "optimised_readme"
+        else:
+            return FILE_OUTPUT_LISTING_FEATHER, "readme"
+
+    def get_listing_file_with_readme_and_description_file_columns(
+        self,
+    ) -> tuple[str, str, str]:
+        if self.APP_LEMATISED_SEARCH:
+            return (
+                FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
+                "optimised_readme",
+                "optimised_description",
+            )
+        else:
+            return FILE_OUTPUT_LISTING_FEATHER, "readme", "description"
 
 
 # Loading settings

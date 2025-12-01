@@ -6,9 +6,9 @@ from typing import Optional
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-
-from oss4climate.src.config import FILE_OUTPUT_OPTIMISED_LISTING_FEATHER, SETTINGS
+from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info, log_warning
+
 from oss4climate_app.config import STATIC_FILES_PATH, URL_FAVICON
 from oss4climate_app.src.data_io import (
     SEARCH_ENGINE_DESCRIPTIONS,
@@ -61,8 +61,12 @@ def initialise_error_logging():
 async def lifespan(app: FastAPI):
     # Initialising error logging at app start
     initialise_error_logging()
+
+    listing_file, readme_field, description_field = (
+        SETTINGS.get_listing_file_with_readme_and_description_file_columns()
+    )
     log_info("Starting app")
-    if not os.path.exists(FILE_OUTPUT_OPTIMISED_LISTING_FEATHER):
+    if not os.path.exists(listing_file):
         # Only importing this heavier part if needed
         from oss4climate.src.search import listing_search
 
@@ -71,19 +75,17 @@ async def lifespan(app: FastAPI):
     log_info("- Loading documents")
     log_info(" -- Feather file loaded")
     for r in SEARCH_RESULTS.iter_documents(
-        FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
+        listing_file,
         load_in_object_without_readme=True,  # As documents are used later for display
         display_tqdm=True,
         memory_safe=True,  # essential in environments with little memory
     ):
         # Skip repos with missing info
-        for k in ["optimised_readme", "optimised_description"]:
+        for k in [readme_field, description_field]:
             if r[k] is None:
                 r[k] = ""
-        SEARCH_ENGINE_DESCRIPTIONS.index(
-            url=r["url"], content=r["optimised_description"]
-        )
-        SEARCH_ENGINE_READMES.index(r["url"], content=r["optimised_readme"])
+        SEARCH_ENGINE_DESCRIPTIONS.index(url=r["url"], content=r[description_field])
+        SEARCH_ENGINE_READMES.index(r["url"], content=r[readme_field])
     log_info(" -- All repos loaded")
     ui.repository_index_characteristics_from_documents()
     log_info(" -- All metrics loaded")

@@ -9,6 +9,7 @@ from typing import Any, Iterable
 import pandas as pd
 from tqdm import tqdm
 
+from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_warning
 from oss4climate.src.parsers.licenses import license_category_from_license_name
 
@@ -25,37 +26,45 @@ def _documents_loader(documents: pd.DataFrame | str | None, limit: int | None = 
         assert documents.endswith(".feather"), (
             f"Only accepting .feather files (not {documents})"
         )
+        __, readme_col, description_col = (
+            SETTINGS.get_listing_file_with_readme_and_description_file_columns()
+        )
+
         # This line and the usage of pandas is part of an explicit optimisation scheme (for <512 MB in operations)
         new_docs = pd.read_feather(
             documents,
-            columns=[
-                "id",
-                "name",
-                "organisation",
-                "url",
-                "website",
-                "optimised_description",
-                "license",
-                "latest_update",
-                "language",
-                "last_commit",
-                "open_pull_requests",
-                "master_branch",
-                "optimised_readme",
-                "is_fork",
-                "forked_from",
-                "readme_type",
-                "description",
-            ],
+            columns=list(
+                {
+                    "id",
+                    "name",
+                    "organisation",
+                    "url",
+                    "website",
+                    "license",
+                    "latest_update",
+                    "language",
+                    "last_commit",
+                    "open_pull_requests",
+                    "master_branch",
+                    "is_fork",
+                    "forked_from",
+                    "readme_type",
+                    "description",
+                    readme_col,
+                    description_col,
+                }
+            ),
             # dtype_backend="pyarrow",
         )
-        sparse_cols = [
-            "description",
-            "language",
-            "license",
-            "optimised_readme",
-            "optimised_description",
-        ]
+        sparse_cols = list(
+            {
+                "description",
+                "language",
+                "license",
+                readme_col,
+                description_col,
+            }
+        )
         new_docs.loc[:, sparse_cols] = new_docs[sparse_cols].astype("Sparse[str]")
 
         if limit is not None:
@@ -95,6 +104,10 @@ class SearchResults:
         else:
             iterator_to_run = new_docs.iterrows()
 
+        __, readme_col, description_col = (
+            SETTINGS.get_listing_file_with_readme_and_description_file_columns()
+        )
+
         if memory_safe:
             # Using a protection against wild readmes (with an assumption that only the readmes do run wild)
             for k, r in iterator_to_run:
@@ -107,11 +120,11 @@ class SearchResults:
                     )
                     # TODO : this is a quickfix
                     # Cutting the readme as it's likely to overflow memory
-                    readme_opt = r["optimised_readme"][
+                    readme_opt = r[readme_col][
                         : int(bytes_limit)
                     ]  # heuristic that every char takes a byte
-                    new_docs.loc[k, "optimised_readme"] = readme_opt
-                    r["optimised_readme"] = readme_opt
+                    new_docs.loc[k, readme_col] = readme_opt
+                    r[readme_col] = readme_opt
                     yield r
         else:
             for __, r in iterator_to_run:
@@ -121,7 +134,7 @@ class SearchResults:
         if load_in_object_without_readme:
             cols_to_drop = [
                 i
-                for i in ["readme", "optimised_readme", "optimised_description"]
+                for i in {"readme", readme_col, description_col}
                 if i in new_docs.columns
             ]
             self.__documents = new_docs.drop(
