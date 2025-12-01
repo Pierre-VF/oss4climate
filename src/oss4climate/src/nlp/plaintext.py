@@ -49,8 +49,10 @@ def reduce_to_informative_lemmas(txt: str, nlp_model=None) -> list[str]:
     if nlp_model is None:
         nlp_model = get_spacy_english_model()
 
-    def _f_useful_filter(token):
-        return not (token.is_stop or token.is_punct or token.like_num)
+    def _f_useful_filter(token: str) -> bool:
+        return str(token)[0].isalpha() and not (token.is_stop)
+        # Less drastic alternative (excluding stop words and num )would be:
+        # return not (token.is_stop or token.is_punct or token.like_num)
 
     cleaned_lemmas = list(
         map(lambda token: token.lemma_, filter(_f_useful_filter, nlp_model(txt)))
