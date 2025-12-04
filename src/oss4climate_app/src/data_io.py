@@ -99,6 +99,7 @@ def search_for_results(query: Optional[str] = None) -> pd.DataFrame:
         log_info(f"Searching for {query} / lemmatized to {optimised_query}")
     else:
         optimised_query = query
+        log_info(f"Searching for {query}")
 
     res_desc = SEARCH_ENGINE_DESCRIPTIONS.search(
         optimised_query,
