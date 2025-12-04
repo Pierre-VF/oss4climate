@@ -5,9 +5,9 @@ from functools import lru_cache
 from typing import Optional
 
 import pandas as pd
-
 from oss4climate.src.config import (
     FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
+    SETTINGS,
 )
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
@@ -78,7 +78,10 @@ def n_repositories_indexed():
     return SEARCH_RESULTS.n_documents
 
 
-NLP_MODEL = get_spacy_english_model()
+if SETTINGS.APP_LEMATISED_SEARCH:
+    NLP_MODEL = get_spacy_english_model()
+else:
+    NLP_MODEL = None
 
 
 @lru_cache(maxsize=10)
@@ -89,13 +92,21 @@ def search_for_results(query: Optional[str] = None) -> pd.DataFrame:
         df_x.sort_values("name", inplace=True)
         return df_x
 
-    lemmatized_query = " ".join(
-        reduce_to_informative_lemmas(query, nlp_model=NLP_MODEL)
-    )
-    log_info(f"Searching for {query} / lemmatized to {lemmatized_query}")
+    if SETTINGS.APP_LEMATISED_SEARCH:
+        optimised_query = " ".join(
+            reduce_to_informative_lemmas(query, nlp_model=NLP_MODEL)
+        )
+        log_info(f"Searching for {query} / lemmatized to {optimised_query}")
+    else:
+        optimised_query = query
+        log_info(f"Searching for {query}")
 
-    res_desc = SEARCH_ENGINE_DESCRIPTIONS.search(lemmatized_query)
-    res_readme = SEARCH_ENGINE_READMES.search(lemmatized_query)
+    res_desc = SEARCH_ENGINE_DESCRIPTIONS.search(
+        optimised_query,
+    )
+    res_readme = SEARCH_ENGINE_READMES.search(
+        optimised_query,
+    )
 
     df_combined = (
         res_desc.to_frame("description")
@@ -158,19 +169,22 @@ def refresh_data(force_refresh: bool = False):
 
         log_warning("- Listing not found, downloading again")
         listing_search.download_listing_data_for_app()
+
+    listing_file, readme_field, description_field = (
+        SETTINGS.get_listing_file_with_readme_and_description_file_columns()
+    )
+
     log_info("- Loading documents")
     # Make sure to coordinate the below with the app start procedure
     for r in SEARCH_RESULTS.iter_documents(
-        FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
+        listing_file,
         load_in_object_without_readme=True,
         display_tqdm=True,
         memory_safe=True,
     ):
         # Skip repos with missing info
-        for k in ["optimised_readme", "optimised_description"]:
+        for k in [description_field, readme_field]:
             if r[k] is None:
                 r[k] = ""
-        SEARCH_ENGINE_DESCRIPTIONS.index(
-            url=r["url"], content=r["optimised_description"]
-        )
-        SEARCH_ENGINE_READMES.index(r["url"], content=r["optimised_readme"])
+        SEARCH_ENGINE_DESCRIPTIONS.index(url=r["url"], content=r[description_field])
+        SEARCH_ENGINE_READMES.index(r["url"], content=r[readme_field])

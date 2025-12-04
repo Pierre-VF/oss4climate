@@ -155,6 +155,10 @@
                 "url": "https://github.com/Green-Software-Foundation/awesome-green-software"
             },
             {
+                "license_url": "https://raw.githubusercontent.com/open-risk/awesome-sustainable-finance/refs/heads/main/LICENSE",
+                "url": "https://github.com/open-risk/awesome-sustainable-finance"
+            },
+            {
                 "license": "?",
                 "target_count": 67,
                 "url": "https://github.com/IndEcol/Dashboard"

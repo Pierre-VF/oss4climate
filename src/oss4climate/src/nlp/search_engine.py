@@ -36,7 +36,11 @@ def normalize_string(input_string: str | Any) -> str:
 
 
 class SearchEngine:
-    def __init__(self, k1: float = 1.5, b: float = 0.75):
+    def __init__(
+        self,
+        k1: float = 1.5,
+        b: float = 0.75,
+    ):
         self._index: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
         self._documents_length: dict[str, str] = {}
         self.k1 = k1
@@ -75,7 +79,10 @@ class SearchEngine:
             result[url] = idf_score * numerator / denominator
         return result
 
-    def search(self, query: str) -> pd.Series:
+    def search(
+        self,
+        query: str,
+    ) -> pd.Series:
         keywords = normalize_string(query).split(" ")
         url_scores: dict[str, float] = {}
         for kw in keywords:

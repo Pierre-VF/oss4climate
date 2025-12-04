@@ -4,15 +4,10 @@ import re
 def get_spacy_english_model(minimal: bool = True):
     try:
         import en_core_web_sm
-    except ImportError:
-        import os
-
-        print("Downloading the spacy model")
-        # Pip is required prior to the model install (for dependency reasons as of 13/1/2025)
-        os.system("uv pip install pip")
-        os.system("uv run spacy download en_core_web_sm")
-        print("Done")
-        import en_core_web_sm
+    except ImportError as e:
+        raise ImportError(
+            "The 'en_core_web_sm' spaCy model is required (please make sure you installed wiht the right settings)"
+        ) from e
 
     nlp_model = en_core_web_sm.load()
 
@@ -49,8 +44,10 @@ def reduce_to_informative_lemmas(txt: str, nlp_model=None) -> list[str]:
     if nlp_model is None:
         nlp_model = get_spacy_english_model()
 
-    def _f_useful_filter(token):
-        return not (token.is_stop or token.is_punct or token.like_num)
+    def _f_useful_filter(token: str) -> bool:
+        return str(token)[0].isalpha() and not (token.is_stop)
+        # Less drastic alternative (excluding stop words and num )would be:
+        # return not (token.is_stop or token.is_punct or token.like_num)
 
     cleaned_lemmas = list(
         map(lambda token: token.lemma_, filter(_f_useful_filter, nlp_model(txt)))

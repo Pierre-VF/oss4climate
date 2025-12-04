@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:0.9.8-bookworm-slim
+FROM ghcr.io/astral-sh/uv:0.9.13-bookworm-slim
 WORKDIR /home
 # Copying files over
 # Index folder creation is required for operation when the indexes aren't present
@@ -12,8 +12,6 @@ RUN apt-get update
 RUN apt-get install -y ca-certificates
 RUN update-ca-certificates
 RUN uv sync --all-groups
-RUN uv add pip
-RUN uv run spacy download en_core_web_sm
 # Run app
 LABEL organisation="oss4climate"
 EXPOSE 8080
