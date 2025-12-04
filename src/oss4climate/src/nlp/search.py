@@ -136,6 +136,9 @@ class SearchResults:
                 i
                 for i in {"readme", readme_col, description_col}
                 if i in new_docs.columns
+                and (
+                    i != "description"
+                )  # do not remove descriptions as they're needed for UI
             ]
             self.__documents = new_docs.drop(
                 columns=cols_to_drop,

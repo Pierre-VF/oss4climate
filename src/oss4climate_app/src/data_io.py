@@ -92,8 +92,7 @@ def search_for_results(query: Optional[str] = None) -> pd.DataFrame:
         df_x.sort_values("name", inplace=True)
         return df_x
 
-    lemmatised_search = SETTINGS.APP_LEMATISED_SEARCH
-    if lemmatised_search:
+    if SETTINGS.APP_LEMATISED_SEARCH:
         optimised_query = " ".join(
             reduce_to_informative_lemmas(query, nlp_model=NLP_MODEL)
         )
@@ -102,10 +101,10 @@ def search_for_results(query: Optional[str] = None) -> pd.DataFrame:
         optimised_query = query
 
     res_desc = SEARCH_ENGINE_DESCRIPTIONS.search(
-        optimised_query, lemmatised_search=lemmatised_search
+        optimised_query,
     )
     res_readme = SEARCH_ENGINE_READMES.search(
-        optimised_query, lemmatised_search=lemmatised_search
+        optimised_query,
     )
 
     df_combined = (

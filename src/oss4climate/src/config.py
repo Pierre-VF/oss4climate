@@ -46,18 +46,6 @@ class Settings(pydantic_settings.BaseSettings):
             return self.APP_SQLITE_DB
         return f"{self.LOCAL_FOLDER}/{self.APP_SQLITE_DB}"
 
-    def get_description_file_and_column(self) -> tuple[str, str]:
-        if self.APP_LEMATISED_SEARCH:
-            return FILE_OUTPUT_OPTIMISED_LISTING_FEATHER, "optimised_description"
-        else:
-            return FILE_OUTPUT_LISTING_FEATHER, "description"
-
-    def get_readme_file_and_column(self) -> tuple[str, str]:
-        if self.APP_LEMATISED_SEARCH:
-            return FILE_OUTPUT_OPTIMISED_LISTING_FEATHER, "optimised_readme"
-        else:
-            return FILE_OUTPUT_LISTING_FEATHER, "readme"
-
     def get_listing_file_with_readme_and_description_file_columns(
         self,
     ) -> tuple[str, str, str]:
