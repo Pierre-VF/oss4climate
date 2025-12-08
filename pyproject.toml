@@ -24,6 +24,8 @@ dependencies = [
     "sqlmodel>=0.0.27",
     "tomlkit>=0.13.3",
     "tqdm>=4.67.1",
+    # Security forces below (not actual direct dependencies)
+    "urllib3>=2.6.0",
 ]
 packages = [
     "src/oss4climate",
