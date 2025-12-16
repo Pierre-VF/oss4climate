@@ -155,10 +155,6 @@
                 "url": "https://github.com/Green-Software-Foundation/awesome-green-software"
             },
             {
-                "license_url": "https://raw.githubusercontent.com/open-risk/awesome-sustainable-finance/refs/heads/main/LICENSE",
-                "url": "https://github.com/open-risk/awesome-sustainable-finance"
-            },
-            {
                 "license": "?",
                 "target_count": 67,
                 "url": "https://github.com/IndEcol/Dashboard"
@@ -385,6 +381,12 @@
                 "license_url": "https://raw.githubusercontent.com/open-energy-transition/Awesome-Electric-Grid-Mapping/main/LICENSE",
                 "target_count": 23,
                 "url": "https://github.com/open-energy-transition/Awesome-Electric-Grid-Mapping"
+            },
+            {
+                "license": "Creative Commons Zero v1.0 Universal",
+                "license_url": "https://raw.githubusercontent.com/open-risk/awesome-sustainable-finance/main/LICENSE",
+                "target_count": 78,
+                "url": "https://github.com/open-risk/awesome-sustainable-finance"
             },
             {
                 "license": "MIT License",
