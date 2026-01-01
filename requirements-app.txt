@@ -13,7 +13,7 @@ cymem==2.0.13
 docutils==0.22.3
 en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0.tar.gz
 fastapi==0.123.6
-greenlet==3.2.4
+greenlet==3.3.0
 gunicorn==23.0.0
 h11==0.16.0
 httptools==0.7.1
