@@ -43,7 +43,7 @@ soupsieve==2.8
 spacy==3.8.11
 spacy-legacy==3.0.12
 spacy-loggers==1.0.5
-sqlalchemy==2.0.45
+sqlalchemy==2.0.44
 sqlmodel==0.0.27
 srsly==2.5.2
 starlette==0.50.0
