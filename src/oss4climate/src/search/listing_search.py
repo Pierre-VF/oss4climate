@@ -28,6 +28,7 @@ def _download_file(url: str, target: str) -> None:
 def download_listing_data_for_app():
     os.makedirs(FILE_OUTPUT_DIR, exist_ok=True)
     _download_file(URL_LISTINGS_INDEX, FILE_INPUT_LISTINGS_INDEX)
+    _download_file(URL_LISTING_FEATHER, URL_LISTING_FEATHER)
     _download_file(URL_OPTIMISED_LISTING_FEATHER, FILE_OUTPUT_OPTIMISED_LISTING_FEATHER)
     print("Download complete")
 
