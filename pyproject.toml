@@ -1,6 +1,6 @@
 [project]
 name = "oss4climate"
-version = "0.5.1"
+version = "0.5.2"
 readme = "README.md"
 description = "Package to create listings of Open Source for Energy"
 authors = [
@@ -25,7 +25,7 @@ dependencies = [
     "tomlkit>=0.13.3",
     "tqdm>=4.67.1",
     # Security forces below (not actual direct dependencies)
-    "urllib3>=2.6.0",
+    "urllib3>=2.6.3",
 ]
 packages = [
     "src/oss4climate",
@@ -41,7 +41,7 @@ build-backend = "hatchling.build"
 scripts = [
     "black>=25.11.0",
     "ruff>=0.14.7",
-    "typer>=0.20.0",
+    "typer>=0.21.0",
 ]
 test = [
     "pytest>=9.0.1",
@@ -52,10 +52,10 @@ app = [
     "fastapi>=0.121.1",
     "gunicorn>=23.0.0",
     "sentry-sdk[fastapi]>=2.19.2",
-    "uvicorn[standard]>=0.38.0",
+    "uvicorn[standard]>=0.40.0",
 ]
 notebooks = [
-    "scikit-learn>=1.7.2",
+    "scikit-learn>=1.8.0",
 ]
 
 [tool.uv.sources]
