@@ -45,7 +45,7 @@ spacy-loggers==1.0.5
 sqlalchemy==2.0.46
 sqlmodel==0.0.31
 srsly==2.5.2
-starlette==0.52.1
+starlette==0.50.0
 thinc==8.3.10
 tomlkit==0.14.0
 tqdm==4.67.1
