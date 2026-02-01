@@ -22,7 +22,7 @@ jinja2==3.1.6
 markdown==3.10.1
 markupsafe==3.0.3
 murmurhash==1.0.15
-numpy==2.4.2
+numpy==2.4.1
 packaging==26.0
 pandas==3.0.0
 preshed==3.0.12
