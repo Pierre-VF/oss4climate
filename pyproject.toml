@@ -19,13 +19,12 @@ dependencies = [
     "pydantic-settings>=2.7.1",
     "pyyaml>=6.0.3",
     "requests>=2.32.3",
-    "spacy>=3.8.11",
-    "en-core-web-sm",
     "sqlmodel>=0.0.27",
     "tomlkit>=0.13.3",
     "tqdm>=4.67.1",
     # Security forces below (not actual direct dependencies)
     "urllib3>=2.6.3",
+    "typesense>=2.0.0",
 ]
 packages = [
     "src/oss4climate",
@@ -57,6 +56,3 @@ app = [
 notebooks = [
     "scikit-learn>=1.8.0",
 ]
-
-[tool.uv.sources]
-en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0.tar.gz" }

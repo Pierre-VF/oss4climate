@@ -167,3 +167,4 @@ cython_debug/
 *.csv
 .data
 .Trash*
+search_backend/typesense-data/
