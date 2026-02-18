@@ -22,6 +22,9 @@ dependencies = [
     "sqlmodel>=0.0.27",
     "tomlkit>=0.13.3",
     "tqdm>=4.67.1",
+    # Spacy models
+    "spacy>=3.8.11",
+    "en-core-web-sm",
     # Security forces below (not actual direct dependencies)
     "urllib3>=2.6.3",
     "typesense>=2.0.0",
@@ -56,3 +59,6 @@ app = [
 notebooks = [
     "scikit-learn>=1.8.0",
 ]
+
+[tool.uv.sources]
+en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0.tar.gz" }
