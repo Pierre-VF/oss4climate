@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional
 
 import pydantic_settings
@@ -7,7 +8,7 @@ from dotenv import load_dotenv
 class Settings(pydantic_settings.BaseSettings):
     GITHUB_API_TOKEN: Optional[str] = None
     GITLAB_ACCESS_TOKEN: Optional[str] = None
-    LOCAL_FOLDER: str = ".data"
+    LOCAL_FOLDER: str = str(Path(__file__).parent.parent.parent.parent / ".data")
     SCRAPING_SQLITE_DB: str = "db.sqlite"
     APP_SQLITE_DB: str = "app_db.sqlite"
     # For usage analytics
