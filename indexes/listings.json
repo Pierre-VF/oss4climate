@@ -462,6 +462,7 @@
             {
                 "license": "GNU General Public License v3.0",
                 "license_url": "https://raw.githubusercontent.com/rOpenGov/giscoR/main/LICENSE.md",
+                "target_count": 3,
                 "url": "https://github.com/rOpenGov/giscoR"
             },
             {
