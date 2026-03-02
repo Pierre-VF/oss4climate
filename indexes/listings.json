@@ -462,6 +462,7 @@
             {
                 "license": "GNU General Public License v3.0",
                 "license_url": "https://raw.githubusercontent.com/rOpenGov/giscoR/main/LICENSE.md",
+                "target_count": 3,
                 "url": "https://github.com/rOpenGov/giscoR"
             },
             {
@@ -472,6 +473,12 @@
                 "license": "?",
                 "target_count": 88,
                 "url": "https://github.com/raoulcollenteur/Python-Hydrology-Tools"
+            },
+            {
+                "url": "https://github.com/rebase-energy/awesome-energy-models"
+            },
+            {
+                "url": "https://github.com/rebase-energy/awesome-weather-models"
             },
             {
                 "license": "MIT License",
