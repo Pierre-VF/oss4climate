@@ -146,9 +146,10 @@ class SearchResults:
             self._fix_documents()
 
     def _fix_documents(self):
-        # Ensuring that given columns are in datetime format
+        # Ensuring that given columns are in datetime format (UTC-aware to allow
+        # comparison with timezone-aware datetimes in refine_by_active_in_past_year)
         self.__documents["latest_update"] = pd.to_datetime(
-            self.__documents["latest_update"]
+            self.__documents["latest_update"], utc=True
         )
         # Adding a license_category column (if missing)
         if "license_category" not in self.__documents.keys():
