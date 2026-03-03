@@ -40,34 +40,35 @@
 
 name: "Repo Assist"
 "on":
-  discussion:
-    types:
-    - created
-    - edited
-  discussion_comment:
-    types:
-    - created
-    - edited
-  issue_comment:
-    types:
-    - created
-    - edited
-  issues:
-    types:
-    - opened
-    - edited
-    - reopened
-  pull_request:
-    types:
-    - opened
-    - edited
-    - reopened
-  pull_request_review_comment:
-    types:
-    - created
-    - edited
-  schedule:
-  - cron: "51 20 * * *"
+  # NOTE: all triggers (except the manual ones) were commented out to avoid excess costs
+  #discussion:
+  #  types:
+  #  - created
+  #  - edited
+  #discussion_comment:
+  #  types:
+  #  - created
+  #  - edited
+  #issue_comment:
+  #  types:
+  #  - created
+  #  - edited
+  #issues:
+  #  types:
+  #  - opened
+  #  - edited
+  #  - reopened
+  #pull_request:
+  #  types:
+  #  - opened
+  #  - edited
+  #  - reopened
+  #pull_request_review_comment:
+  #  types:
+  #  - created
+  #  - edited
+  #schedule:
+  #- cron: "51 20 1 * *"
   workflow_dispatch: null
 
 permissions: {}
