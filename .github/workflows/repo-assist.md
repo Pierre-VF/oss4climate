@@ -27,11 +27,17 @@ permissions: read-all
 network:
   allowed:
   - defaults
-  - dotnet
-  - node
+  #- dotnet
+  #- node
   - python
-  - rust
-  - java
+  #- rust
+  #- java
+  # Explicitly allowing networks containing relevant resources
+  allowed:
+    - defaults # Basic infrastructure
+    - python # Python/PyPI ecosystem
+    - "data.pierrevf.consulting"
+    - "gitlab.com"
 
 safe-outputs:
   add-comment:
