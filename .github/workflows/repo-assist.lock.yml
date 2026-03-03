@@ -77,6 +77,14 @@ concurrency:
 
 run-name: "Repo Assist"
 
+# Explicitly allowing networks containing relevant resources
+network:
+  allowed:
+    - defaults # Basic infrastructure
+    - python # Python/PyPI ecosystem
+    - "data.pierrevf.consulting"
+    - "gitlab.com"
+
 jobs:
   activation:
     needs: pre_activation
