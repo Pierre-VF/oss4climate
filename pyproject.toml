@@ -56,6 +56,10 @@ app = [
     "sentry-sdk[fastapi]>=2.19.2",
     "uvicorn[standard]>=0.40.0",
 ]
+mcp = [
+    "mcp[cli]>=1.26.0, <2",
+    "pydantic-ai-slim[mistral,fastmcp,cli]>=1.66.0",
+]
 notebooks = [
     "scikit-learn>=1.8.0",
 ]
