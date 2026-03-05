@@ -87,7 +87,7 @@ else:
 @lru_cache(maxsize=10)
 def search_for_results(query: Optional[str] = None) -> pd.DataFrame:
     if (query is None) or (len(query) < 1):
-        df_x = SEARCH_RESULTS.documents_without_readme
+        df_x = SEARCH_RESULTS.documents_without_readme.copy()
         df_x["score"] = 1
         df_x.sort_values("name", inplace=True)
         return df_x
@@ -132,9 +132,9 @@ def search_for_results(query: Optional[str] = None) -> pd.DataFrame:
         return res
 
     df_combined["score"] = df_combined["description"] * 10 + df_combined["readme"]
-    df_out = SEARCH_RESULTS.documents_without_readme
-    if "score" in df_out.keys():
-        df_out.drop(columns=["score"], inplace=True)
+    df_out = SEARCH_RESULTS.documents_without_readme.copy()
+    if "score" in df_out.columns:
+        df_out = df_out.drop(columns=["score"])
 
     df_out = df_out.merge(
         df_combined[["score"]],
