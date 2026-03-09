@@ -2075,6 +2075,7 @@ repositories = [
     "https://github.com/dataforgoodfr/quotaclimat",
     "https://github.com/dataspects/mediawiki-manager",
     "https://github.com/datazoompuc/datazoom.amazonia",
+    "https://github.com/datons/python-entsoe",
     "https://github.com/davemlz/awesome-spectral-indices",
     "https://github.com/davemlz/eemont",
     "https://github.com/davemlz/espectro",
@@ -4256,5 +4257,4 @@ invalid_urls = [
     "https://gitlab.com",
     "https://gitlab.com/-/user_settings/personal_access_tokens",
     "https://gitlab.com/geoharmonizer_inea/eumap/blob/master/LICENSE",
-    "https://github.com/energy-modelling-ireland/wiki",
 ]
