@@ -190,6 +190,10 @@ class ParsingTargets:
     unknown: list[str] = field(default_factory=list)
     invalid: list[str] = field(default_factory=list)
 
+    def __contains__(self, project_url: str) -> bool:
+        # Return True if item is in the object, False otherwise
+        return project_url in self.as_url_list()
+
     def __add__(self, other: "ParsingTargets") -> "ParsingTargets":
         return ParsingTargets(
             github_organisations=self.github_organisations + other.github_organisations,
