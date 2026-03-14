@@ -7,7 +7,7 @@ authors = [
     { name = "Pierre V-F", email = "hello@pierrevf.com"}
 ]
 
-requires-python = ">=3.12"
+requires-python = ">=3.12, <3.14"
 dependencies = [
     "beautifulsoup4>=4.14.2",
     "docutils>=0.22.3",
@@ -59,7 +59,7 @@ app = [
     "uvicorn[standard]>=0.40.0",
 ]
 mcp = [
-    "mcp[cli]>=1.26.0, <2",
+    "fastmcp>=3.1, <4",
     "pydantic-ai-slim[mistral,fastmcp,cli]>=1.66.0",
 ]
 notebooks = [
