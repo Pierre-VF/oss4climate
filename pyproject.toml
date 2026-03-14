@@ -1,6 +1,6 @@
 [project]
 name = "oss4climate"
-version = "0.5.3"
+version = "0.6.0"
 readme = "README.md"
 description = "Package to create listings of Open Source for Energy"
 authors = [
@@ -60,7 +60,7 @@ app = [
 ]
 mcp = [
     "fastmcp>=3.1, <4",
-    "pydantic-ai-slim[mistral,fastmcp,cli]>=1.66.0",
+    "pydantic-ai-slim[mistral,anthropic,fastmcp,cli]>=1.68.0",
 ]
 notebooks = [
     "scikit-learn>=1.8.0",

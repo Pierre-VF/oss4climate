@@ -1,9 +1,8 @@
 import pandas as pd
 import typesense
 import typesense.exceptions
-from tqdm import tqdm
-
 from oss4climate.src.config import SETTINGS
+from tqdm import tqdm
 
 API_KEY = "12345"
 
@@ -51,9 +50,12 @@ repo_schemas = {
 }
 
 # Delete the collection
-print("First deleting all projects")
-client.collections["projects"].delete()
-print("Delete completed")
+try:
+    print("First deleting all projects")
+    client.collections["projects"].delete()
+    print("Delete completed")
+except typesense.exceptions.ObjectNotFound:
+    print("No projects defined")
 print(" ")
 print("Then recreating collections")
 try:
