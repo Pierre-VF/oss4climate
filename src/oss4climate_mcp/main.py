@@ -67,6 +67,12 @@ def search_for_projects(topic: str, n_max_results: int = 50) -> list[ProjectDeta
     return [ProjectDetails.from_row(i) for _, i in res.iterrows()]
 
 
+@mcp.prompt()
+def search_prompt(topic: str):
+    """Provides a prompt to guide the user in searching for a project"""
+    return f"Tell me about 10 projects that address the topic of {topic}"
+
+
 # Run with streamable HTTP transport
 if __name__ == "__main__":
     mcp.run(transport="streamable-http")
