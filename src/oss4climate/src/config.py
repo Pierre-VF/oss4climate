@@ -24,6 +24,13 @@ class Settings(pydantic_settings.BaseSettings):
     APP_PROXY_PATH: Optional[str] = None
     APP_URL_FAVICON: str = "https://www.pierrevf.consulting/wp-content/uploads/2023/11/cropped-logo_base_png-32x32.png"
 
+    # Typesense settings
+    TYPESENSE_API_KEY: str = "12345"
+    TYPESENSE_HOST: str = "localhost"
+    TYPESENSE_PORT: int = 8108
+    TYPESENSE_PROTOCOL: str = "http"
+    TYPESENSE_CONNECTION_TIMEOUT: int = 2
+
     model_config = pydantic_settings.SettingsConfigDict(
         env_file_encoding="utf-8",
     )
