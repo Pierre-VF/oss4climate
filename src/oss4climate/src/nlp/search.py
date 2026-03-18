@@ -96,8 +96,9 @@ class SearchResults:
         memory_safe: bool = True,
         bytes_limit: int = 2e5,
         display_tqdm: bool = False,
+        n_max: int | None = None,
     ) -> Iterable[dict[str, Any]]:
-        new_docs = _documents_loader(documents=documents, limit=None)
+        new_docs = _documents_loader(documents=documents, limit=n_max)
 
         if display_tqdm:
             iterator_to_run = tqdm(new_docs.iterrows())

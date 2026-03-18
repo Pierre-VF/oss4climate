@@ -38,7 +38,7 @@ class _RepositoryIndexCharacteristics:
 @lru_cache(maxsize=1)
 def repository_index_characteristics_from_documents(
     documents: pd.DataFrame | str | None = None,
-):
+) -> _RepositoryIndexCharacteristics:
     if documents is None:
         n = SEARCH_RESULTS.n_documents
         if n == 0:
@@ -73,10 +73,6 @@ def unique_license_categories() -> list[EnumLicenseCategories]:
 @lru_cache(maxsize=1)
 def n_repositories_indexed():
     return SEARCH_RESULTS.n_documents
-
-
-# TODO : remove all usages
-NLP_MODEL = None
 
 
 @lru_cache(maxsize=10)

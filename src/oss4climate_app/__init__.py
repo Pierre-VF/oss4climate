@@ -6,9 +6,9 @@ from typing import Optional
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
+
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info, log_warning
-
 from oss4climate_app.config import STATIC_FILES_PATH, URL_FAVICON
 from oss4climate_app.src.data_io import (
     SEARCH_ENGINE_DESCRIPTIONS,
@@ -79,6 +79,7 @@ async def lifespan(app: FastAPI):
         load_in_object_without_readme=True,  # As documents are used later for display
         display_tqdm=True,
         memory_safe=True,  # essential in environments with little memory
+        n_max=100,  # TODO: remove this limitation (for dev)
     ):
         # Skip repos with missing info
         for k in [readme_field, description_field]:

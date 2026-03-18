@@ -20,7 +20,7 @@ class Settings(pydantic_settings.BaseSettings):
     # App settings
     DATA_REFRESH_KEY: Optional[str] = None
     SENTRY_DSN_URL: Optional[str] = None
-    APP_URL_BASE: str = "https://oss4climate.pierrevf.consulting"
+    APP_URL_BASE: str = ""
     APP_PROXY_PATH: Optional[str] = None
     APP_URL_FAVICON: str = "https://www.pierrevf.consulting/wp-content/uploads/2023/11/cropped-logo_base_png-32x32.png"
 
