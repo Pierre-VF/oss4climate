@@ -5,8 +5,9 @@ from functools import lru_cache
 from typing import Optional
 
 import pandas as pd
+
 from oss4climate.src.config import (
-    FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
+    FILE_OUTPUT_LISTING_FEATHER,
     SETTINGS,
 )
 from oss4climate.src.helpers import sorted_list_of_unique_elements
@@ -152,7 +153,7 @@ def clear_cache():
 
 
 def refresh_data(force_refresh: bool = False):
-    if force_refresh or not os.path.exists(FILE_OUTPUT_OPTIMISED_LISTING_FEATHER):
+    if force_refresh or not os.path.exists(FILE_OUTPUT_LISTING_FEATHER):
         from oss4climate.src.search import listing_search
 
         log_warning("- Listing not found, downloading again")
