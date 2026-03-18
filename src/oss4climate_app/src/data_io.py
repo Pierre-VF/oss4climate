@@ -12,10 +12,6 @@ from oss4climate.src.config import (
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
 from oss4climate.src.models import EnumLicenseCategories
-from oss4climate.src.nlp.plaintext import (
-    get_spacy_english_model,
-    reduce_to_informative_lemmas,
-)
 from oss4climate.src.nlp.search import SearchResults
 from oss4climate.src.nlp.search_engine import SearchEngine
 
@@ -78,10 +74,8 @@ def n_repositories_indexed():
     return SEARCH_RESULTS.n_documents
 
 
-if SETTINGS.APP_LEMATISED_SEARCH:
-    NLP_MODEL = get_spacy_english_model()
-else:
-    NLP_MODEL = None
+# TODO : remove all usages
+NLP_MODEL = None
 
 
 @lru_cache(maxsize=10)
@@ -92,14 +86,8 @@ def search_for_results(query: Optional[str] = None) -> pd.DataFrame:
         df_x.sort_values("name", inplace=True)
         return df_x
 
-    if SETTINGS.APP_LEMATISED_SEARCH:
-        optimised_query = " ".join(
-            reduce_to_informative_lemmas(query, nlp_model=NLP_MODEL)
-        )
-        log_info(f"Searching for {query} / lemmatized to {optimised_query}")
-    else:
-        optimised_query = query
-        log_info(f"Searching for {query}")
+    optimised_query = query
+    log_info(f"Searching for {query}")
 
     res_desc = SEARCH_ENGINE_DESCRIPTIONS.search(
         optimised_query,

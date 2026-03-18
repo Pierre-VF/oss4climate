@@ -23,7 +23,6 @@ class Settings(pydantic_settings.BaseSettings):
     APP_URL_BASE: str = "https://oss4climate.pierrevf.consulting"
     APP_PROXY_PATH: Optional[str] = None
     APP_URL_FAVICON: str = "https://www.pierrevf.consulting/wp-content/uploads/2023/11/cropped-logo_base_png-32x32.png"
-    APP_LEMATISED_SEARCH: bool = False
 
     model_config = pydantic_settings.SettingsConfigDict(
         env_file_encoding="utf-8",
@@ -50,14 +49,7 @@ class Settings(pydantic_settings.BaseSettings):
     def get_listing_file_with_readme_and_description_file_columns(
         self,
     ) -> tuple[str, str, str]:
-        if self.APP_LEMATISED_SEARCH:
-            return (
-                FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
-                "optimised_readme",
-                "optimised_description",
-            )
-        else:
-            return FILE_OUTPUT_LISTING_FEATHER, "readme", "description"
+        return FILE_OUTPUT_LISTING_FEATHER, "readme", "description"
 
 
 # Loading settings
