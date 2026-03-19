@@ -1,6 +1,7 @@
 import pandas as pd
 import typesense
 import typesense.exceptions
+from pydantic import BaseModel
 from tqdm import tqdm
 from typesense.types.document import (
     SearchParameters,
@@ -8,9 +9,9 @@ from typesense.types.document import (
 
 from oss4climate.src.config import SETTINGS
 
-TYPESENSE_EMBEDDING_MODEL = "ts/all-MiniLM-L12-v2"
+_TYPESENSE_EMBEDDING_MODEL = "ts/all-MiniLM-L12-v2"
 
-TYPESENSE_REPO_SCHEMA = {
+_TYPESENSE_REPO_SCHEMA = {
     "name": "projects",
     "fields": [
         {"name": "idx", "type": "int32"},
@@ -21,7 +22,7 @@ TYPESENSE_REPO_SCHEMA = {
             "type": "float[]",
             "embed": {
                 "from": ["description"],
-                "model_config": {"model_name": TYPESENSE_EMBEDDING_MODEL},
+                "model_config": {"model_name": _TYPESENSE_EMBEDDING_MODEL},
             },
         },
         {"name": "readme", "type": "string"},
@@ -30,7 +31,7 @@ TYPESENSE_REPO_SCHEMA = {
             "type": "float[]",
             "embed": {
                 "from": ["readme"],
-                "model_config": {"model_name": TYPESENSE_EMBEDDING_MODEL},
+                "model_config": {"model_name": _TYPESENSE_EMBEDDING_MODEL},
             },
         },
         {"name": "language", "type": "string"},
@@ -67,7 +68,7 @@ def reset_typesense_schema():
     print(" ")
     print("Then recreating collections")
     try:
-        _TYPESENSE_CLIENT.collections.create(TYPESENSE_REPO_SCHEMA)
+        _TYPESENSE_CLIENT.collections.create(_TYPESENSE_REPO_SCHEMA)
 
     except typesense.exceptions.ObjectAlreadyExists:
         pass
@@ -87,25 +88,45 @@ def index_data_in_typesense(df: pd.DataFrame) -> None:
     ]
 
 
-def search_in_typesense(query: str) -> list[dict[str, str | int]]:
+class _ResultItem(BaseModel):
+    name: str
+    description: str
+    language: str | None = None
+    url: str
+    readme: str
+
+
+class SearchResult(BaseModel):
+    page: int
+    total_results: int
+    results: list[_ResultItem]
+
+
+def search_in_typesense(
+    query: str, results_per_page: int = 50, page: int = 1
+) -> SearchResult:
     r = _TYPESENSE_CLIENT.collections[
         "projects"
     ].documents.search(
         SearchParameters(
             q=query,
-            query_by="embedding_description, name",
+            query_by="description, embedding_readme, name",
             # For hybrid search
             # rerank_hybrid_matches=True,
-            vector_query="embedding_description:([], k: 200)",  # Here, reduce the relevant fields
+            vector_query="embedding_readme:([], k: 200)",  # Here, reduce the relevant fields
             # sort_by="idx:asc",
-            exclude_fields="embedding_description",
-            per_page=20,
-            page=1,
+            exclude_fields=["embedding_description", "embedding_readme"],
+            per_page=results_per_page,
+            page=page,
         )
     )
-    return [i["document"] for i in r["hits"]]
+    return SearchResult(
+        page=r["page"],
+        total_results=r["found"],
+        results=[_ResultItem(**i["document"]) for i in r["hits"]],
+    )
 
 
 if __name__ == "__main__":
-    r = search_in_typesense("green")
+    r = search_in_typesense("wind power")
     print(r)

@@ -37,6 +37,6 @@ df = pd.read_feather(
 )
 df["idx"] = df.index.to_series().astype(int)
 
-index_data_in_typesense(df.head(5))
+index_data_in_typesense(df.head(500))
 
 print("DONE")
