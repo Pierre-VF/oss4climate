@@ -11,8 +11,8 @@ from oss4climate.src.config import (
     URL_LISTING_FEATHER,
     URL_RAW_INDEX,
 )
-from oss4climate.src.nlp.search import SearchResults
 from oss4climate_app.src import data_io
+from oss4climate_scripts.src.search import SearchResults
 
 
 def download_data():

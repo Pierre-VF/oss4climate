@@ -15,14 +15,13 @@ from oss4climate_app.config import URL_CODE_REPOSITORY, URL_DATA_FEATHER
 from oss4climate_app.src.data_io import (
     clear_cache,
     refresh_data,
-    search_for_results,
 )
 from oss4climate_app.src.database import (
     dump_database_request_log_as_csv,
     dump_database_search_log_as_csv,
 )
-from oss4climate_app.src.log_activity import log_search
 from oss4climate_app.src.routers import listing_credits
+from oss4climate_app.src.search import typesense_io
 
 
 class ForbiddenError(RuntimeError):
@@ -45,30 +44,13 @@ async def search(
     request: Request,
     background_tasks: BackgroundTasks,
     query: Optional[str] = None,
-):
+) -> typesense_io.SearchResult:
     if query:
         query = query.strip().lower()
-    df_out = search_for_results(query)
-    n_total_found = len(df_out)
-    # Log results
-    background_tasks.add_task(
-        log_search,
-        search_term=f"API:{query}",
-        number_of_results=n_total_found,
-        view_offset=None,
-    )
-    if "score" in df_out.keys():
-        json_txt = (
-            df_out.reset_index(inplace=False)
-            .drop(columns=["score"])
-            .T.to_json(date_format="iso", indent=None)
-        )
-    else:
-        json_txt = df_out.reset_index(inplace=False).T.to_json(
-            date_format="iso", indent=None
-        )
-
-    return PlainTextResponse(json_txt, media_type="text/json")
+    if query is None:
+        query = " "  # TODO : find a better solution
+    res = typesense_io.search_in_typesense(query)
+    return res
 
 
 @app.get("/code")

@@ -10,11 +10,6 @@ from fastapi.staticfiles import StaticFiles
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info, log_warning
 from oss4climate_app.config import STATIC_FILES_PATH, URL_FAVICON
-from oss4climate_app.src.data_io import (
-    SEARCH_ENGINE_DESCRIPTIONS,
-    SEARCH_ENGINE_READMES,
-    SEARCH_RESULTS,
-)
 from oss4climate_app.src.log_activity import log_landing
 from oss4climate_app.src.routers import api, ui
 from oss4climate_app.src.templates import render_template
@@ -66,29 +61,8 @@ async def lifespan(app: FastAPI):
         SETTINGS.get_listing_file_with_readme_and_description_file_columns()
     )
     log_info("Starting app")
-    if not os.path.exists(listing_file):
-        # Only importing this heavier part if needed
-        from oss4climate_app.src.data_io import download_listing_data_for_app
-
-        log_warning("- Listing not found, downloading again")
-        download_listing_data_for_app()
-    log_info("- Loading documents")
-    log_info(" -- Feather file loaded")
-    for r in SEARCH_RESULTS.iter_documents(
-        listing_file,
-        load_in_object_without_readme=True,  # As documents are used later for display
-        display_tqdm=True,
-        memory_safe=True,  # essential in environments with little memory
-        n_max=100,  # TODO: remove this limitation (for dev)
-    ):
-        # Skip repos with missing info
-        for k in [readme_field, description_field]:
-            if r[k] is None:
-                r[k] = ""
-        SEARCH_ENGINE_DESCRIPTIONS.index(url=r["url"], content=r[description_field])
-        SEARCH_ENGINE_READMES.index(r["url"], content=r[readme_field])
-    log_info(" -- All repos loaded")
-    ui.repository_index_characteristics_from_documents()
+    if True:
+        ui.repository_index_characteristics_from_documents()
     log_info(" -- All metrics loaded")
     yield
     log_info("Exiting app")

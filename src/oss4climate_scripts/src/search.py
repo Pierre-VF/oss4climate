@@ -1,7 +1,3 @@
-"""
-Module to perform basic search
-"""
-
 import sys
 from datetime import UTC, datetime, timedelta
 from typing import Any, Iterable
@@ -10,6 +6,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from oss4climate.src.config import SETTINGS
+from oss4climate.src.database.projects import project_dataframe_loader
 from oss4climate.src.log import log_warning
 from oss4climate.src.parsers.licenses import license_category_from_license_name
 
@@ -19,62 +16,6 @@ def _lower_str(x: str, *args, **kwargs):
         return x.lower()  # remove_stopwords_and_punctuation(x)
     else:
         return ""
-
-
-def _documents_loader(documents: pd.DataFrame | str | None, limit: int | None = None):
-    if isinstance(documents, str):
-        assert documents.endswith(".feather"), (
-            f"Only accepting .feather files (not {documents})"
-        )
-        __, readme_col, description_col = (
-            SETTINGS.get_listing_file_with_readme_and_description_file_columns()
-        )
-
-        # This line and the usage of pandas is part of an explicit optimisation scheme (for <512 MB in operations)
-        new_docs = pd.read_feather(
-            documents,
-            columns=list(
-                {
-                    "id",
-                    "name",
-                    "organisation",
-                    "url",
-                    "website",
-                    "license",
-                    "latest_update",
-                    "language",
-                    "last_commit",
-                    "open_pull_requests",
-                    "master_branch",
-                    "is_fork",
-                    "forked_from",
-                    "readme_type",
-                    "description",
-                    readme_col,
-                    description_col,
-                }
-            ),
-            # dtype_backend="pyarrow",
-        )
-        sparse_cols = list(
-            {
-                "description",
-                "language",
-                "license",
-                readme_col,
-                description_col,
-            }
-        )
-        new_docs.loc[:, sparse_cols] = new_docs[sparse_cols].astype("Sparse[str]")
-
-        if limit is not None:
-            new_docs = new_docs.head(int(limit))
-    else:
-        if limit is not None:
-            new_docs = documents.head(int(limit))
-        else:
-            new_docs = documents.copy()
-    return new_docs
 
 
 class SearchResults:
@@ -98,7 +39,7 @@ class SearchResults:
         display_tqdm: bool = False,
         n_max: int | None = None,
     ) -> Iterable[dict[str, Any]]:
-        new_docs = _documents_loader(documents=documents, limit=n_max)
+        new_docs = project_dataframe_loader(documents=documents, limit=n_max)
 
         if display_tqdm:
             iterator_to_run = tqdm(new_docs.iterrows())
@@ -159,7 +100,7 @@ class SearchResults:
             )
 
     def load_documents(self, documents: pd.DataFrame | str, limit: int | None = None):
-        new_docs = _documents_loader(documents=documents, limit=limit)
+        new_docs = project_dataframe_loader(documents=documents, limit=limit)
         if self.__documents:
             self.__documents += new_docs
         else:

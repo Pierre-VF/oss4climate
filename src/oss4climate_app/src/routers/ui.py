@@ -21,11 +21,11 @@ from oss4climate_app.config import (
 )
 from oss4climate_app.src.data_io import (
     repository_index_characteristics_from_documents,
-    search_for_results,
     unique_license_categories,
 )
 from oss4climate_app.src.log_activity import log_search
 from oss4climate_app.src.routers import listing_credits
+from oss4climate_app.src.search import typesense_io
 from oss4climate_app.src.templates import render_template
 
 app = APIRouter(include_in_schema=False)
@@ -59,7 +59,8 @@ def _render_ui_template(
     return render_template(request, template_file=template_file, content=resp)
 
 
-def ui_base_search_page(request: Request):
+@app.get("/search", response_class=HTMLResponse, include_in_schema=False)
+async def search(request: Request):
     characteristics = repository_index_characteristics_from_documents()
     return _render_ui_template(
         request=request,
@@ -72,11 +73,6 @@ def ui_base_search_page(request: Request):
             "free_text": "",
         },
     )
-
-
-@app.get("/search", response_class=HTMLResponse, include_in_schema=False)
-async def search(request: Request):
-    return ui_base_search_page(request=request)
 
 
 @app.get("/results", response_class=HTMLResponse, include_in_schema=False)
@@ -94,7 +90,19 @@ async def search_results(
 ):
     if query:
         query = query.strip().lower()
-    df_out = search_for_results(query)
+    if n_results is None:
+        n_results = 50
+    if offset is None:
+        page = 1
+    else:
+        page = offset
+    r = typesense_io.search_in_typesense(query, results_per_page=n_results, page=page)
+
+    # TODO: make this neater
+    df_out = pd.DataFrame([i.__dict__ for i in r.results])
+    df_out["is_fork"] = False
+    df_out["last_commit"] = date.today()
+    df_out["license_category"] = "?"
 
     # Adding a primitive refinment mechanism by language (not implemented in the most effective manner)
     if language and (language != "*"):

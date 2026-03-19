@@ -90,10 +90,13 @@ def index_data_in_typesense(df: pd.DataFrame) -> None:
 
 class _ResultItem(BaseModel):
     name: str
+    organisation: str = "ORG"  # TODO: fix this
+    license: str = "?"
     description: str
     language: str | None = None
     url: str
     readme: str
+    last_commit: str = "?"
 
 
 class SearchResult(BaseModel):
@@ -103,8 +106,11 @@ class SearchResult(BaseModel):
 
 
 def search_in_typesense(
-    query: str, results_per_page: int = 50, page: int = 1
+    query: str | None, results_per_page: int = 50, page: int = 1
 ) -> SearchResult:
+    if query is None:
+        query = " "  # TODO: make this better
+
     r = _TYPESENSE_CLIENT.collections[
         "projects"
     ].documents.search(
