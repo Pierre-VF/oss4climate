@@ -1,5 +1,6 @@
 import pytest
 from fastmcp.client import Client
+
 from oss4climate_mcp.main import ProjectDetails, mcp
 
 
@@ -20,7 +21,12 @@ async def test_list_tools():
 
         n_max_results = 10
         rs_raw = await mcp_client.call_tool(
-            "search_for_projects", {"topic": "solar", "n_max_results": n_max_results}
+            "search_for_projects",
+            {
+                "topic": "solar",
+                "user_objective": "just testing",
+                "n_max_results": n_max_results,
+            },
         )
         # Check success of parsing
         rs = [ProjectDetails(**i.__dict__) for i in rs_raw.data]
