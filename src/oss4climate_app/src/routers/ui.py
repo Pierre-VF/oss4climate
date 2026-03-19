@@ -147,7 +147,7 @@ async def search_results(
             }
         )
         .fillna(value="(no data)")
-        .infer_objects(copy=False)  # to avoid warning on downcasting
+        .infer_objects()  # to avoid warning on downcasting
     )
 
     # Log results
