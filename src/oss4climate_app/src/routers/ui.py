@@ -106,15 +106,13 @@ async def search_results(
     n_total_found = r.total_results
     n_found = len(r.results)
 
-    # TODO: make this neater
-    df_out = pd.DataFrame([i.__dict__ for i in r.results])
-    df_out["is_fork"] = False
-    df_out["last_commit"] = date.today()
+    # TODO: make this neater (and remove the below)
+    df_out = pd.DataFrame(
+        [(i.__dict__ | {"last_commit": i.last_commit_as_date()}) for i in r.results]
+    )
     df_out["license_category"] = "?"
 
     # Adding a primitive refinment mechanism by language (not implemented in the most effective manner)
-    if language and (language != "*"):
-        df_out = df_out[df_out["language"] == language]
     if license_category and (license_category != "*"):
         try:
             enum_license_category = EnumLicenseCategories[license_category]

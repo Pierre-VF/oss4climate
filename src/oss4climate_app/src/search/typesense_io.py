@@ -22,12 +22,11 @@ class ResultItem(BaseModel):
     language: str | None = None
     url: str
     readme: str
-    _last_commit: int
+    last_commit_timestamp: int
     is_fork: bool = False
 
-    @property
-    def last_commit(self) -> date:
-        return datetime.fromtimestamp(self._last_commit).date()
+    def last_commit_as_date(self) -> date:
+        return datetime.fromtimestamp(self.last_commit_timestamp).date()
 
     # Remaining options: id;website;license_url;latest_update;all_languages;open_pull_requests;master_branch;is_fork;forked_from;readme_type
 
@@ -59,7 +58,10 @@ _TYPESENSE_REPO_SCHEMA = {
         {"name": "license", "type": "string"},
         {"name": "language", "type": "string"},
         {"name": "url", "type": "string"},
-        {"name": "_last_commit", "type": "int64"},  # date is not supported by TypeSense
+        {
+            "name": "last_commit_timestamp",
+            "type": "int64",
+        },  # date is not supported by TypeSense
         {"name": "is_fork", "type": "bool"},
         # TODO : add hints from the README files (just need to compress key information well enough there)
     ],
@@ -111,8 +113,8 @@ def _date_to_timestamp(x: date | None) -> int:
 
 
 def index_data_in_typesense(df: pd.DataFrame) -> None:
-    if "_last_commit" not in df.columns:
-        df["_last_commit"] = df["last_commit"].apply(_date_to_timestamp)
+    if "last_commit_timestamp" not in df.columns:
+        df["last_commit_timestamp"] = df["last_commit"].apply(_date_to_timestamp)
 
     [
         _TYPESENSE_CLIENT.collections["projects"].documents.import_(
@@ -176,5 +178,5 @@ def search_in_typesense(
 
 
 if __name__ == "__main__":
-    r = search_in_typesense("wind power")
+    r = search_in_typesense("wind power", languages="C++")
     print(r)

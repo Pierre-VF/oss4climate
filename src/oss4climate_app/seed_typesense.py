@@ -35,6 +35,6 @@ reset_typesense_schema()
 df = project_dataframe_loader(FILE_OUTPUT_LISTING_FEATHER)
 df["idx"] = df.index.to_series().astype(int)
 
-index_data_in_typesense(df.head(200))
+index_data_in_typesense(df.head(100))
 
 print("DONE")
