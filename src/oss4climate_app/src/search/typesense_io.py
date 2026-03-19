@@ -142,6 +142,10 @@ def search_in_typesense(
     if query is None:
         query = " "  # TODO: make this better
 
+    # Handling wildcards
+    if languages == "*":
+        languages = None
+
     kwargs_search = dict()
     if languages:
         if isinstance(languages, str):

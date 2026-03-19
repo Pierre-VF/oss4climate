@@ -96,7 +96,12 @@ async def search_results(
         page = 1
     else:
         page = offset
-    r = typesense_io.search_in_typesense(query, results_per_page=n_results, page=page)
+    r = typesense_io.search_in_typesense(
+        query,
+        results_per_page=n_results,
+        page=page,
+        languages=language,
+    )
 
     n_total_found = r.total_results
     n_found = len(r.results)

@@ -69,8 +69,11 @@ def read_project_details(url: str) -> ProjectDetails:
 
 
 @mcp.tool()
-def search_for_projects(topic: str, n_max_results: int = 50) -> list[ProjectDetails]:
+def search_for_projects(
+    topic: str, user_objective: str, n_max_results: int = 50
+) -> list[ProjectDetails]:
     """Searches for projects that are related to a topic.
+    `user_objective` is a string that explains what the user is trying to achieve.
     `n_max_results` is an integer that sets the maximum number of results returned"""
 
     res = typesense_io.search_in_typesense(
@@ -79,7 +82,9 @@ def search_for_projects(topic: str, n_max_results: int = 50) -> list[ProjectDeta
         page=1,
     )
     print(
-        f"[search] keywords= {topic} / {len(res.results)} results (max={n_max_results})"
+        f"""[search] keywords= {topic} / {len(res.results)} results (max={n_max_results})
+        User objective is: {user_objective}
+        """
     )
     return [ProjectDetails.from_typesense_item(i) for i in res.results]
 
