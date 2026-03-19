@@ -3,12 +3,17 @@ from dataclasses import dataclass
 from datetime import date
 from functools import lru_cache
 from typing import Optional
+from urllib.request import urlretrieve
 
 import pandas as pd
 
 from oss4climate.src.config import (
+    FILE_INPUT_LISTINGS_INDEX,
+    FILE_OUTPUT_DIR,
     FILE_OUTPUT_LISTING_FEATHER,
     SETTINGS,
+    URL_LISTING_FEATHER,
+    URL_LISTINGS_INDEX,
 )
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
@@ -19,6 +24,19 @@ from oss4climate.src.nlp.search_engine import SearchEngine
 SEARCH_ENGINE_DESCRIPTIONS = SearchEngine()
 SEARCH_ENGINE_READMES = SearchEngine()
 SEARCH_RESULTS = SearchResults()
+
+
+def download_file(url: str, target: str) -> None:
+    print(f"Fetching {url}")
+    urlretrieve(url, target)
+    print(f"-> Downloaded to {target}")
+
+
+def download_listing_data_for_app():
+    os.makedirs(FILE_OUTPUT_DIR, exist_ok=True)
+    download_file(URL_LISTINGS_INDEX, FILE_INPUT_LISTINGS_INDEX)
+    download_file(URL_LISTING_FEATHER, FILE_OUTPUT_LISTING_FEATHER)
+    print("Download complete")
 
 
 def _f_none_to_unknown(x: str | date | None) -> str:
@@ -150,10 +168,8 @@ def clear_cache():
 
 def refresh_data(force_refresh: bool = False):
     if force_refresh or not os.path.exists(FILE_OUTPUT_LISTING_FEATHER):
-        from oss4climate.src.search import listing_search
-
         log_warning("- Listing not found, downloading again")
-        listing_search.download_listing_data_for_app()
+        download_listing_data_for_app()
 
     listing_file, readme_field, description_field = (
         SETTINGS.get_listing_file_with_readme_and_description_file_columns()

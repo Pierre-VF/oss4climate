@@ -1,33 +1,18 @@
 import os
-from urllib.request import urlretrieve
 
 import pandas as pd
 
 from oss4climate.src.config import (
-    FILE_INPUT_LISTINGS_INDEX,
     FILE_OUTPUT_DIR,
     FILE_OUTPUT_LISTING_CSV,
     FILE_OUTPUT_LISTING_FEATHER,
     FILE_OUTPUT_SUMMARY_TOML,
     URL_LISTING_CSV,
     URL_LISTING_FEATHER,
-    URL_LISTINGS_INDEX,
     URL_RAW_INDEX,
 )
 from oss4climate.src.nlp.search import SearchResults
-
-
-def _download_file(url: str, target: str) -> None:
-    print(f"Fetching {url}")
-    urlretrieve(url, target)
-    print(f"-> Downloaded to {target}")
-
-
-def download_listing_data_for_app():
-    os.makedirs(FILE_OUTPUT_DIR, exist_ok=True)
-    _download_file(URL_LISTINGS_INDEX, FILE_INPUT_LISTINGS_INDEX)
-    _download_file(URL_LISTING_FEATHER, FILE_OUTPUT_LISTING_FEATHER)
-    print("Download complete")
+from oss4climate_app.src import data_io
 
 
 def download_data():
@@ -37,7 +22,7 @@ def download_data():
         (URL_LISTING_CSV, FILE_OUTPUT_LISTING_CSV),
         (URL_LISTING_FEATHER, FILE_OUTPUT_LISTING_FEATHER),
     ]:
-        _download_file(url_i, file_i)
+        data_io.download_file(url_i, file_i)
 
     print("Download complete")
 

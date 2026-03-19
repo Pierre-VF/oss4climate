@@ -5,13 +5,13 @@ CLI module
 from datetime import timedelta
 
 import typer
-from oss4climate.src.search import listing_search
 
 from oss4climate_scripts import scripts
 from oss4climate_scripts.scripts import (
     data_publication,
     repository_scraping,
 )
+from oss4climate_scripts.src import utils
 
 app = typer.Typer()
 
@@ -64,13 +64,13 @@ def generate_listing():
 @app.command()
 def search():
     """Searches in the listing"""
-    listing_search.search_in_listing()
+    utils.search_in_listing()
 
 
 @app.command()
 def download_data():
     """Downloads the latest listing"""
-    listing_search.download_data()
+    utils.download_data()
 
 
 if __name__ == "__main__":
