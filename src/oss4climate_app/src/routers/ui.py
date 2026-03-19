@@ -98,6 +98,9 @@ async def search_results(
         page = offset
     r = typesense_io.search_in_typesense(query, results_per_page=n_results, page=page)
 
+    n_total_found = r.total_results
+    n_found = len(r.results)
+
     # TODO: make this neater
     df_out = pd.DataFrame([i.__dict__ for i in r.results])
     df_out["is_fork"] = False
@@ -129,9 +132,6 @@ async def search_results(
         )
     for i in ["license", "last_commit"]:
         df_out.loc[:, i] = df_out[i].apply(_f_none_to_unknown)
-
-    n_total_found = len(df_out)
-    n_found = n_total_found
 
     # Filling the gaps for clean display
     cols_to_clean = ["description", "language", "license"]

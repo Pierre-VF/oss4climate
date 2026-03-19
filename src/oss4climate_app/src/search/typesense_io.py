@@ -1,3 +1,5 @@
+from datetime import date, datetime
+
 import pandas as pd
 import typesense
 import typesense.exceptions
@@ -10,6 +12,25 @@ from typesense.types.document import (
 from oss4climate.src.config import SETTINGS
 
 _TYPESENSE_EMBEDDING_MODEL = "ts/all-MiniLM-L12-v2"
+
+
+class ResultItem(BaseModel):
+    name: str
+    organisation: str
+    license: str = "?"
+    description: str
+    language: str | None = None
+    url: str
+    readme: str
+    _last_commit: int
+    is_fork: bool = False
+
+    @property
+    def last_commit(self) -> date:
+        return datetime.fromtimestamp(self._last_commit).date()
+
+    # Remaining options: id;website;license_url;latest_update;all_languages;open_pull_requests;master_branch;is_fork;forked_from;readme_type
+
 
 _TYPESENSE_REPO_SCHEMA = {
     "name": "projects",
@@ -34,12 +55,21 @@ _TYPESENSE_REPO_SCHEMA = {
                 "model_config": {"model_name": _TYPESENSE_EMBEDDING_MODEL},
             },
         },
+        {"name": "organisation", "type": "string"},
+        {"name": "license", "type": "string"},
         {"name": "language", "type": "string"},
         {"name": "url", "type": "string"},
+        {"name": "_last_commit", "type": "int64"},  # date is not supported by TypeSense
+        {"name": "is_fork", "type": "bool"},
         # TODO : add hints from the README files (just need to compress key information well enough there)
     ],
     "default_sorting_field": "idx",
 }
+_TYPESENSE_REPO_SCHEMA_FIELDS = [
+    i["name"]
+    for i in _TYPESENSE_REPO_SCHEMA["fields"]
+    if not i["name"].startswith("embedding_")
+]
 
 
 _TYPESENSE_CLIENT = typesense.Client(
@@ -74,42 +104,49 @@ def reset_typesense_schema():
         pass
 
 
+def _date_to_timestamp(x: date | None) -> int:
+    if x is None:
+        return 0  # TODO: find a better placeholder
+    return int(datetime(x.year, x.month, x.day).timestamp())
+
+
 def index_data_in_typesense(df: pd.DataFrame) -> None:
+    if "_last_commit" not in df.columns:
+        df["_last_commit"] = df["last_commit"].apply(_date_to_timestamp)
+
     [
         _TYPESENSE_CLIENT.collections["projects"].documents.import_(
             [
-                {
-                    k: r[k]
-                    for k in ["idx", "name", "description", "language", "url", "readme"]
-                }
+                {k: r[k] for k in _TYPESENSE_REPO_SCHEMA_FIELDS}
+                | {
+                    "readme": r["readme"][:3000]
+                }  # Cutting the readme for RAM preservation
             ]
         )
         for __, r in tqdm(df.iterrows())
     ]
 
 
-class _ResultItem(BaseModel):
-    name: str
-    organisation: str = "ORG"  # TODO: fix this
-    license: str = "?"
-    description: str
-    language: str | None = None
-    url: str
-    readme: str
-    last_commit: str = "?"
-
-
 class SearchResult(BaseModel):
     page: int
     total_results: int
-    results: list[_ResultItem]
+    results: list[ResultItem]
 
 
 def search_in_typesense(
-    query: str | None, results_per_page: int = 50, page: int = 1
+    query: str | None,
+    results_per_page: int = 50,
+    page: int = 1,
+    languages: list[str] | str | None = None,
 ) -> SearchResult:
     if query is None:
         query = " "  # TODO: make this better
+
+    kwargs_search = dict()
+    if languages:
+        if isinstance(languages, str):
+            languages = [languages]
+        kwargs_search["filter_by"] = f"language: [{','.join(languages)}]"
 
     r = _TYPESENSE_CLIENT.collections[
         "projects"
@@ -124,12 +161,13 @@ def search_in_typesense(
             exclude_fields=["embedding_description", "embedding_readme"],
             per_page=results_per_page,
             page=page,
+            **kwargs_search,
         )
     )
     return SearchResult(
         page=r["page"],
         total_results=r["found"],
-        results=[_ResultItem(**i["document"]) for i in r["hits"]],
+        results=[ResultItem(**i["document"]) for i in r["hits"]],
     )
 
 

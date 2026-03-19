@@ -5,13 +5,14 @@ Example of an MCP server using https://github.com/modelcontextprotocol/python-sd
 import pandas as pd
 from fastmcp import FastMCP
 from fastmcp.exceptions import NotFoundError
-from oss4climate.src.config import SETTINGS
 from pydantic import BaseModel
 
+from oss4climate.src.config import FILE_OUTPUT_LISTING_FEATHER
+from oss4climate.src.database.projects import project_dataframe_loader
+from oss4climate_app.src.search import typesense_io
+
 # Full indexing of the files
-df: pd.DataFrame = pd.read_feather(
-    SETTINGS.get_listing_file_with_readme_and_description_file_columns()[0]
-)
+df: pd.DataFrame = project_dataframe_loader(FILE_OUTPUT_LISTING_FEATHER)
 df["idx"] = df.index.to_series().astype(int)
 
 # Create an MCP server
@@ -27,6 +28,19 @@ class ProjectDetails(BaseModel):
     language: str
     url: str
     readme_preview: str | None = None
+    license: str | None = None
+
+    @staticmethod
+    def from_typesense_item(r: typesense_io.ResultItem) -> "ProjectDetails":
+        return ProjectDetails(
+            idx=str(r.name),
+            name=r.name,
+            description=str(r.description),
+            language=str(r.language),
+            url=r.url,
+            readme_preview=str(r.readme)[:2000],
+            license=r.license,
+        )
 
     @staticmethod
     def from_row(r: dict | pd.Series) -> "ProjectDetails":
@@ -58,13 +72,16 @@ def read_project_details(url: str) -> ProjectDetails:
 def search_for_projects(topic: str, n_max_results: int = 50) -> list[ProjectDetails]:
     """Searches for projects that are related to a topic.
     `n_max_results` is an integer that sets the maximum number of results returned"""
-    keywords = topic.split(" ")
-    res = df[df["readme"].apply(lambda x: any([(i in x) for i in keywords]))].head(
-        n_max_results
+
+    res = typesense_io.search_in_typesense(
+        query=topic,
+        results_per_page=n_max_results,
+        page=1,
     )
-    print(f"[search] keywords= {keywords} / {len(res)} results (max={n_max_results})")
-    print(res[["url", "name"]])
-    return [ProjectDetails.from_row(i) for _, i in res.iterrows()]
+    print(
+        f"[search] keywords= {topic} / {len(res.results)} results (max={n_max_results})"
+    )
+    return [ProjectDetails.from_typesense_item(i) for i in res.results]
 
 
 @mcp.prompt()
