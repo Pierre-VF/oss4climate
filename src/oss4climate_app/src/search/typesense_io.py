@@ -3,13 +3,12 @@ from datetime import date, datetime
 import pandas as pd
 import typesense
 import typesense.exceptions
+from oss4climate.src.config import SETTINGS
 from pydantic import BaseModel
 from tqdm import tqdm
 from typesense.types.document import (
     SearchParameters,
 )
-
-from oss4climate.src.config import SETTINGS
 
 _TYPESENSE_EMBEDDING_MODEL = "ts/all-MiniLM-L12-v2"
 
@@ -76,13 +75,7 @@ _TYPESENSE_REPO_SCHEMA_FIELDS = [
 
 _TYPESENSE_CLIENT = typesense.Client(
     {
-        "nodes": [
-            {
-                "host": SETTINGS.TYPESENSE_HOST,
-                "port": SETTINGS.TYPESENSE_PORT,
-                "protocol": SETTINGS.TYPESENSE_PROTOCOL,
-            }
-        ],
+        "nodes": [SETTINGS.typesense_config],
         "api_key": SETTINGS.TYPESENSE_API_KEY,
         "connection_timeout_seconds": SETTINGS.TYPESENSE_CONNECTION_TIMEOUT,
     }

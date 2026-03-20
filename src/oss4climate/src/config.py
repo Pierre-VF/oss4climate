@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Optional
+from urllib.parse import urlsplit
 
 import pydantic_settings
 from dotenv import load_dotenv
@@ -25,15 +26,22 @@ class Settings(pydantic_settings.BaseSettings):
     APP_URL_FAVICON: str = "https://www.pierrevf.consulting/wp-content/uploads/2023/11/cropped-logo_base_png-32x32.png"
 
     # Typesense settings
-    TYPESENSE_API_KEY: str = "12345"
-    TYPESENSE_HOST: str = "localhost"
-    TYPESENSE_PORT: int = 8108
-    TYPESENSE_PROTOCOL: str = "http"
+    TYPESENSE_API_KEY: str = ""
+    TYPESENSE_HOST: str = "http://localhost:8108"
     TYPESENSE_CONNECTION_TIMEOUT: int = 2
 
     model_config = pydantic_settings.SettingsConfigDict(
         env_file_encoding="utf-8",
     )
+
+    @property
+    def typesense_config(self) -> dict[str, int | str]:
+        url = urlsplit(self.TYPESENSE_HOST)
+        return {
+            "host": url.hostname,
+            "port": url.port,
+            "protocol": url.scheme,
+        }
 
     @property
     def full_url_base(self) -> str:
