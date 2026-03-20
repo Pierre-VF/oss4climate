@@ -147,15 +147,19 @@ def search_in_typesense(
             languages = [languages]
         kwargs_search["filter_by"] = f"language: [{','.join(languages)}]"
 
-    r = _TYPESENSE_CLIENT.collections[
-        "projects"
-    ].documents.search(
+    # Enable hybrid search only if used in settings
+    if SETTINGS.ENABLE_HYBRID_SEARCH:
+        query_by = "description, embedding_readme, name"
+    else:
+        query_by = "description, readme, name"
+
+    r = _TYPESENSE_CLIENT.collections["projects"].documents.search(
         SearchParameters(
             q=query,
-            query_by="description, embedding_readme, name",
+            query_by=query_by,
             # For hybrid search
             # rerank_hybrid_matches=True,
-            vector_query="embedding_readme:([], k: 200)",  # Here, reduce the relevant fields
+            # vector_query="embedding_readme:([], k: 200)",  # Here, reduce the relevant fields
             # sort_by="idx:asc",
             exclude_fields=["embedding_description", "embedding_readme"],
             per_page=results_per_page,
@@ -171,5 +175,5 @@ def search_in_typesense(
 
 
 if __name__ == "__main__":
-    r = search_in_typesense("wind power", languages="C++")
+    r = search_in_typesense("wind power")  # , languages="C++")
     print(r)

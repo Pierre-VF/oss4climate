@@ -30,6 +30,9 @@ class Settings(pydantic_settings.BaseSettings):
     TYPESENSE_HOST: str = "http://localhost:8108"
     TYPESENSE_CONNECTION_TIMEOUT: int = 2
 
+    # Search parameters
+    ENABLE_HYBRID_SEARCH: bool = False
+
     model_config = pydantic_settings.SettingsConfigDict(
         env_file_encoding="utf-8",
     )
