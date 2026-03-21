@@ -68,7 +68,7 @@ jobs:
 
       # Run and test
       - name: Installing packages
-        run: make install
+        run: uv sync --group=app --group=test
 
       # From https://typesense.org/docs/guide/github-actions.html
       - name: Start Typesense

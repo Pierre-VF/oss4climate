@@ -4,7 +4,7 @@ import pytest
 
 
 # Test data path
-@pytest.fixture
+@pytest.fixture(scope="session")
 def path_data_for_tests() -> Path:
     return Path(__file__).parent / "data_for_tests"
 

@@ -11,13 +11,13 @@ from oss4climate_app.src.search.typesense_io import (
 
 
 # Test data path
-@pytest.fixture
+@pytest.fixture(scope="session")
 def csv_data_for_seeding(path_data_for_tests) -> Path:
     return path_data_for_tests / "listing.csv"
 
 
-@pytest.fixture
-def typesense_client(csv_data_for_seeding):
+@pytest.fixture(scope="session")
+def _initialised_client(csv_data_for_seeding):
     client = typesense.Client(
         {
             "nodes": [SETTINGS.typesense_config],
@@ -31,3 +31,8 @@ def typesense_client(csv_data_for_seeding):
     df["latest_update"] = pd.to_datetime(df["latest_update"])
     index_data_in_typesense(client, df)
     return client
+
+
+@pytest.fixture
+def typesense_client(_initialised_client):
+    return _initialised_client
