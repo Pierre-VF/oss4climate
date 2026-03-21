@@ -14,17 +14,15 @@ dependencies = [
     "jinja2>=3.1.6",
     "markdown>=3.10",
     "pandas>=2.3.2",
-    "pyarrow>=22.0.0",
     "pydantic>=2.12.4",
     "pydantic-settings>=2.7.1",
-    "pyyaml>=6.0.3",
     "requests>=2.32.3",
     "sqlmodel>=0.0.27",
     "tomlkit>=0.13.3",
     "tqdm>=4.67.1",
+    "typesense>=2.0.0",
     # Security forces below (not actual direct dependencies)
     "urllib3>=2.6.3",
-    "typesense>=2.0.0",
 ]
 packages = [
     "src/oss4climate",
@@ -58,7 +56,4 @@ app = [
 ]
 mcp = [
     "pydantic-ai-slim[mistral,anthropic,fastmcp,cli]>=1.68.0",
-]
-notebooks = [
-    "scikit-learn>=1.8.0",
 ]

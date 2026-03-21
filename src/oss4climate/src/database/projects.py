@@ -42,7 +42,6 @@ def project_dataframe_loader(
                     description_col,
                 }
             ),
-            # dtype_backend="pyarrow",
         )
         sparse_cols = list(
             {
