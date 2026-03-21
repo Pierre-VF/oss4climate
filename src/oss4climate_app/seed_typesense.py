@@ -26,7 +26,7 @@ from oss4climate_app.src.search.typesense_io import (
 
 # Full indexing of the files
 df = project_dataframe_loader(FILE_OUTPUT_LISTING_FEATHER)
-raise RuntimeError("STOP here")
+
 
 ts_client = generate_client()
 reset_typesense_schema(ts_client)
