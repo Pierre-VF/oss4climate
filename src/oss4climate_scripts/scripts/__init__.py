@@ -8,7 +8,6 @@ from datetime import timedelta
 from oss4climate.src.config import (
     FILE_INPUT_INDEX,
     FILE_INPUT_LISTINGS_INDEX,
-    FILE_OUTPUT_SUMMARY_TOML,
 )
 from oss4climate.src.log import log_info
 from oss4climate.src.parsers import (
@@ -27,6 +26,8 @@ from oss4climate.src.parsers.listings.opensustain_tech import (
     fetch_all_project_urls_from_opensustain_webpage,
     fetch_listing_of_listings_from_opensustain_webpage,
 )
+
+from oss4climate_scripts.src.config import FILE_OUTPUT_SUMMARY_TOML
 
 
 def format_individual_file(file_path: str) -> None:

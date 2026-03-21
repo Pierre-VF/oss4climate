@@ -4,8 +4,6 @@ Module to perform basic search
 
 import pandas as pd
 
-from oss4climate.src.config import SETTINGS
-
 
 def project_dataframe_loader(
     documents: pd.DataFrame | str | None, limit: int | None = None
@@ -14,9 +12,7 @@ def project_dataframe_loader(
         assert documents.endswith(".feather"), (
             f"Only accepting .feather files (not {documents})"
         )
-        __, readme_col, description_col = (
-            SETTINGS.get_listing_file_with_readme_and_description_file_columns()
-        )
+        readme_col, description_col = "readme", "description"
 
         # This line and the usage of pandas is part of an explicit optimisation scheme (for <512 MB in operations)
         new_docs = pd.read_feather(

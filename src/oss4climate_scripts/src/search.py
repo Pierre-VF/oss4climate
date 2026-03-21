@@ -3,12 +3,10 @@ from datetime import UTC, datetime, timedelta
 from typing import Any, Iterable
 
 import pandas as pd
-from tqdm import tqdm
-
-from oss4climate.src.config import SETTINGS
 from oss4climate.src.database.projects import project_dataframe_loader
 from oss4climate.src.log import log_warning
 from oss4climate.src.parsers.licenses import license_category_from_license_name
+from tqdm import tqdm
 
 
 def _lower_str(x: str, *args, **kwargs):
@@ -46,9 +44,7 @@ class SearchResults:
         else:
             iterator_to_run = new_docs.iterrows()
 
-        __, readme_col, description_col = (
-            SETTINGS.get_listing_file_with_readme_and_description_file_columns()
-        )
+        readme_col, description_col = "readme", "description"
 
         if memory_safe:
             # Using a protection against wild readmes (with an assumption that only the readmes do run wild)

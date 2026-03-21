@@ -62,9 +62,6 @@ async def lifespan(app: FastAPI):
     # Ensure that context data is available
     download_listing_data_for_app(force_refresh=False, load_feather_listing=False)
 
-    listing_file, readme_field, description_field = (
-        SETTINGS.get_listing_file_with_readme_and_description_file_columns()
-    )
     log_info("Starting app")
     if True:
         ui.repository_index_characteristics_from_documents()

@@ -1,17 +1,14 @@
 import os
 
 import pandas as pd
-
-from oss4climate.src.config import (
+from oss4climate_app.config import URL_LISTING_FEATHER
+from oss4climate_app.src import data_io
+from oss4climate_scripts.src.config import (
     FILE_OUTPUT_DIR,
-    FILE_OUTPUT_LISTING_CSV,
     FILE_OUTPUT_LISTING_FEATHER,
     FILE_OUTPUT_SUMMARY_TOML,
-    URL_LISTING_CSV,
-    URL_LISTING_FEATHER,
     URL_RAW_INDEX,
 )
-from oss4climate_app.src import data_io
 from oss4climate_scripts.src.search import SearchResults
 
 
@@ -19,7 +16,6 @@ def download_data():
     os.makedirs(FILE_OUTPUT_DIR, exist_ok=True)
     for url_i, file_i in [
         (URL_RAW_INDEX, FILE_OUTPUT_SUMMARY_TOML),
-        (URL_LISTING_CSV, FILE_OUTPUT_LISTING_CSV),
         (URL_LISTING_FEATHER, FILE_OUTPUT_LISTING_FEATHER),
     ]:
         data_io.download_file(url_i, file_i)

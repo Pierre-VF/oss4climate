@@ -1,8 +1,6 @@
 from oss4climate.src.config import (
     FILE_INPUT_INDEX,
     FILE_OUTPUT_DIR,
-    FILE_OUTPUT_LISTING_CSV,
-    FILE_OUTPUT_SUMMARY_TOML,
 )
 from oss4climate.src.crawler import scrape_all_targets
 from oss4climate.src.helpers import sorted_list_of_unique_elements
@@ -13,10 +11,11 @@ from oss4climate.src.parsers import (
 from tomlkit import document, dump
 
 from oss4climate_scripts import scripts
+from oss4climate_scripts.src.config import FILE_OUTPUT_SUMMARY_TOML
 
 
 def scrape_all(
-    target_output_file: str = FILE_OUTPUT_LISTING_CSV,
+    target_output_file: str = FILE_OUTPUT_LISTING_FEATHER,
     fail_on_issue=False,
 ) -> None:
     """
@@ -26,7 +25,7 @@ def scrape_all(
     (source: https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28)
 
 
-    :param target_output_file: name of file to output results to, defaults to FILE_OUTPUT_LISTING_CSV
+    :param target_output_file: name of file to output results to, defaults to FILE_OUTPUT_LISTING_FEATHER
     :raises ValueError: if output file type is not supported (CSV, JSON)
     :return: /
     """
@@ -48,6 +47,8 @@ def scrape_all(
         df.drop(columns=["readme"]).to_csv(target_output_file, sep=";")
     elif target_output_file.endswith(".json"):
         df.T.to_json(target_output_file)
+    elif target_output_file.endswith(".feather"):
+        pass  # Export happens below
     else:
         raise ValueError(f"Unsupported file type for export: {target_output_file}")
 

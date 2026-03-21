@@ -4,9 +4,6 @@ from functools import lru_cache
 
 from oss4climate.src.config import (
     SETTINGS,
-    URL_LISTING_CSV,
-    URL_LISTING_FEATHER,
-    URL_LISTINGS_INDEX,
     Settings,
 )
 
@@ -21,8 +18,12 @@ APP_VERSION = str(uuid.uuid4())
 URL_CODE_REPOSITORY = "https://github.com/Pierre-VF/oss4climate"
 URL_FEEDBACK_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSeei-0V5CobVNX-qOX3lI11FuvTBv1JV77fcUZOideeDtcEhA/viewform?usp=sf_link"
 
-URL_DATA_LISTINGS_JSON = URL_LISTINGS_INDEX
-URL_DATA_CSV = URL_LISTING_CSV
+
+# For data hosted outside of Github
+URL_BASE = "https://data.pierrevf.consulting/oss4climate"
+URL_RAW_INDEX = f"{URL_BASE}/summary.toml"
+URL_LISTING_FEATHER = f"{URL_BASE}/listing_data.feather"
+
 URL_DATA_FEATHER = URL_LISTING_FEATHER
 URL_FAVICON = SETTINGS.APP_URL_FAVICON
 

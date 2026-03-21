@@ -1,6 +1,7 @@
 import typesense
 import typesense.exceptions
-from oss4climate.src.config import FILE_OUTPUT_LISTING_FEATHER, SETTINGS
+from oss4climate.src.config import SETTINGS
+from oss4climate_scripts.src.config import FILE_OUTPUT_LISTING_FEATHER
 
 client = typesense.Client(
     {

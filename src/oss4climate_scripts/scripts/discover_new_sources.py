@@ -4,11 +4,8 @@ This module contains methods to discover new sources of code
 
 import os
 
-from tqdm import tqdm
-
 from oss4climate.src.config import (
     FILE_INPUT_INDEX,
-    FILE_OUTPUT_LISTING_FEATHER,
 )
 from oss4climate.src.database.projects import project_dataframe_loader
 from oss4climate.src.log import (
@@ -22,6 +19,11 @@ from oss4climate.src.parsers import (
     url_qualifies,
 )
 from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+from tqdm import tqdm
+
+from oss4climate_scripts.src.config import (
+    FILE_OUTPUT_LISTING_FEATHER,
+)
 
 
 def discover_repositories_in_existing_organisations(output_file: str) -> None:
