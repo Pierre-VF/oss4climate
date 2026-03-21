@@ -5,7 +5,7 @@ from oss4climate.src.config import (
     SETTINGS,
 )
 from oss4climate.src.log import log_info
-from oss4climate_app.config import (
+from oss4climate_app.src.config import (
     FILE_INPUT_LISTINGS_INDEX,
     FILE_OUTPUT_LISTING_FEATHER,
 )

@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info
 
-from oss4climate_app.config import URL_CODE_REPOSITORY, URL_LISTING_FEATHER
+from oss4climate_app.src.config import URL_CODE_REPOSITORY, URL_LISTING_FEATHER
 from oss4climate_app.src.data_io import (
     clear_cache,
     refresh_data,

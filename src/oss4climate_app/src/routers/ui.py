@@ -9,7 +9,7 @@ import pandas as pd
 from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi.responses import HTMLResponse
 
-from oss4climate_app.config import (
+from oss4climate_app.src.config import (
     FORCE_HTTPS,
     SETTINGS,
     URL_CODE_REPOSITORY,

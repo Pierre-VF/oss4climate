@@ -8,7 +8,7 @@ from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_warning
 from oss4climate.src.models import EnumLicenseCategories
 
-from oss4climate_app.config import (
+from oss4climate_app.src.config import (
     FILE_INPUT_LISTINGS_INDEX,
     FILE_OUTPUT_DIR,
     FILE_OUTPUT_LISTING_FEATHER,

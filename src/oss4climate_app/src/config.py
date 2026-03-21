@@ -7,7 +7,7 @@ from oss4climate.src.config import (
     Settings,
 )
 
-_script_dir = pathlib.Path(__file__).resolve().parent
+_script_dir = pathlib.Path(__file__).resolve().parent.parent
 TEMPLATES_PATH = _script_dir / "templates"
 STATIC_FILES_PATH = _script_dir / "static"
 

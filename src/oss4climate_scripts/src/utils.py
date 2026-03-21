@@ -1,13 +1,13 @@
 import os
 
 import pandas as pd
-from oss4climate_app.config import (
+from oss4climate_app.src import data_io
+from oss4climate_app.src.config import (
     FILE_OUTPUT_DIR,
     FILE_OUTPUT_LISTING_FEATHER,
     URL_LISTING_FEATHER,
     URL_RAW_INDEX,
 )
-from oss4climate_app.src import data_io
 from oss4climate_scripts.src.config import FILE_OUTPUT_SUMMARY_TOML
 from oss4climate_scripts.src.search import SearchResults
 

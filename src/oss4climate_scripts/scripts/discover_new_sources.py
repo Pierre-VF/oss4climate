@@ -16,7 +16,7 @@ from oss4climate.src.parsers import (
     url_qualifies,
 )
 from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
-from oss4climate_app.config import (
+from oss4climate_app.src.config import (
     FILE_OUTPUT_LISTING_FEATHER,
 )
 from tqdm import tqdm

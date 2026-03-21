@@ -2,7 +2,7 @@ import typesense
 import typesense.exceptions
 from oss4climate.src.config import SETTINGS
 
-from oss4climate_app.config import FILE_OUTPUT_LISTING_FEATHER
+from oss4climate_app.src.config import FILE_OUTPUT_LISTING_FEATHER
 
 client = typesense.Client(
     {

@@ -9,8 +9,8 @@ from fastapi.staticfiles import StaticFiles
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info, log_warning
 
-from oss4climate_app.config import STATIC_FILES_PATH, URL_FAVICON
 from oss4climate_app.src import mcp_server
+from oss4climate_app.src.config import STATIC_FILES_PATH, URL_FAVICON
 from oss4climate_app.src.data_io import download_listing_data_for_app
 from oss4climate_app.src.log_activity import log_landing
 from oss4climate_app.src.routers import api, ui
