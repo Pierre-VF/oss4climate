@@ -1,29 +1,21 @@
-import pandas as pd
-from tomlkit import document, dump
-
-from oss4climate.src.config import (
-    FILE_INPUT_INDEX,
-    FILE_OUTPUT_DIR,
-    FILE_OUTPUT_LISTING_CSV,
-    FILE_OUTPUT_LISTING_FEATHER,
-    FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
-    FILE_OUTPUT_SUMMARY_TOML,
-)
 from oss4climate.src.crawler import scrape_all_targets
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
-from oss4climate.src.nlp.plaintext import (
-    get_spacy_english_model,
-    reduce_to_informative_lemmas,
-)
 from oss4climate.src.parsers import (
     ParsingTargets,
 )
+from tomlkit import document, dump
+
 from oss4climate_scripts import scripts
+from oss4climate_scripts.src.config import (
+    FILE_INPUT_INDEX,
+    FILE_OUTPUT_DIR,
+    FILE_OUTPUT_SUMMARY_TOML,
+)
 
 
 def scrape_all(
-    target_output_file: str = FILE_OUTPUT_LISTING_CSV,
+    target_output_file: str = FILE_OUTPUT_LISTING_FEATHER,
     fail_on_issue=False,
 ) -> None:
     """
@@ -33,7 +25,7 @@ def scrape_all(
     (source: https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28)
 
 
-    :param target_output_file: name of file to output results to, defaults to FILE_OUTPUT_LISTING_CSV
+    :param target_output_file: name of file to output results to, defaults to FILE_OUTPUT_LISTING_FEATHER
     :raises ValueError: if output file type is not supported (CSV, JSON)
     :return: /
     """
@@ -55,6 +47,8 @@ def scrape_all(
         df.drop(columns=["readme"]).to_csv(target_output_file, sep=";")
     elif target_output_file.endswith(".json"):
         df.T.to_json(target_output_file)
+    elif target_output_file.endswith(".feather"):
+        pass  # Export happens below
     else:
         raise ValueError(f"Unsupported file type for export: {target_output_file}")
 
@@ -124,34 +118,3 @@ def scrape_all(
         log_warning("Failure(s) happened during the scraping!")
 
     log_info("Done")
-
-
-def optimise_scraped_data_for_search():
-    log_info("Loading spaCy english model")
-    nlp_model = get_spacy_english_model()
-    log_info("- Loaded")
-
-    log_info("Loading input listing")
-    df = pd.read_feather(FILE_OUTPUT_LISTING_FEATHER)
-    log_info("- Loaded")
-
-    df_opt = df.copy()
-
-    def _f_opt(x: str | None) -> str | None:
-        if x is None:
-            return None
-        try:
-            out = " ".join(reduce_to_informative_lemmas(x, nlp_model=nlp_model))
-        except Exception as e:
-            log_warning(f"Lemmatisation error: {e}")
-            out = "(OPTIMISATION ERROR)"
-        return out
-
-    log_info("Optimising descriptions")
-    df_opt["optimised_description"] = df_opt["description"].apply(_f_opt)
-    log_info("Optimising readmes")
-    df_opt["optimised_readme"] = df_opt["readme"].apply(_f_opt)
-
-    log_info("Exporting input listing")
-    df_opt.to_feather(FILE_OUTPUT_OPTIMISED_LISTING_FEATHER)
-    log_info("- Exported")

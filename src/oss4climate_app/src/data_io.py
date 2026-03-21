@@ -2,26 +2,44 @@ import os
 from dataclasses import dataclass
 from datetime import date
 from functools import lru_cache
-from typing import Optional
+from urllib.request import urlretrieve
 
-import pandas as pd
-from oss4climate.src.config import (
-    FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
-    SETTINGS,
-)
 from oss4climate.src.helpers import sorted_list_of_unique_elements
-from oss4climate.src.log import log_info, log_warning
+from oss4climate.src.log import log_warning
 from oss4climate.src.models import EnumLicenseCategories
-from oss4climate.src.nlp.plaintext import (
-    get_spacy_english_model,
-    reduce_to_informative_lemmas,
-)
-from oss4climate.src.nlp.search import SearchResults
-from oss4climate.src.nlp.search_engine import SearchEngine
 
-SEARCH_ENGINE_DESCRIPTIONS = SearchEngine()
-SEARCH_ENGINE_READMES = SearchEngine()
-SEARCH_RESULTS = SearchResults()
+from oss4climate_app.src.config import (
+    FILE_INPUT_LISTINGS_INDEX,
+    FILE_OUTPUT_DIR,
+    FILE_OUTPUT_LISTING_FEATHER,
+    URL_LISTING_FEATHER,
+    URL_LISTINGS_INDEX,
+)
+from oss4climate_app.src.search import typesense_io
+
+
+def download_file(url: str, target: str, force_refresh: bool = True) -> None:
+    if os.path.exists(target) and (not force_refresh):
+        return
+    print(f"Fetching {url}")
+    urlretrieve(url, target)
+    print(f"-> Downloaded to {target}")
+
+
+def download_listing_data_for_app(
+    force_refresh: bool = True, load_feather_listing: bool = True
+):
+    os.makedirs(FILE_OUTPUT_DIR, exist_ok=True)
+    download_file(
+        URL_LISTINGS_INDEX, FILE_INPUT_LISTINGS_INDEX, force_refresh=force_refresh
+    )
+    if load_feather_listing:
+        download_file(
+            URL_LISTING_FEATHER,
+            FILE_OUTPUT_LISTING_FEATHER,
+            force_refresh=force_refresh,
+        )
+    print("Download complete")
 
 
 def _f_none_to_unknown(x: str | date | None) -> str:
@@ -39,32 +57,21 @@ class _RepositoryIndexCharacteristics:
 
 
 @lru_cache(maxsize=1)
-def repository_index_characteristics_from_documents(
-    documents: pd.DataFrame | str | None = None,
+def repository_index_characteristics_from_documents() -> (
+    _RepositoryIndexCharacteristics
 ):
-    if documents is None:
-        n = SEARCH_RESULTS.n_documents
-        if n == 0:
-            raise RuntimeError(
-                "Documents must be loaded when no input for 'documents' is provided"
-            )
-        licenses = SEARCH_RESULTS.documents_without_readme["license"].unique().tolist()
-        languages = (
-            SEARCH_RESULTS.documents_without_readme["language"].unique().tolist()
-        )
-    else:
-        licenses = []
-        languages = []
-        n = 0
-        for r in SEARCH_RESULTS.iter_documents(documents):
-            n += 1
-            licenses.append(_f_none_to_unknown(r["license"]))
-            languages.append(_f_none_to_unknown(r["language"]))
-
+    # TOODO: generate this better (doesn't get patched in tests) - in a way that works with cache
+    ts_client = typesense_io.generate_client()
+    licenses = typesense_io.list_values(
+        ts_client, typesense_io.CountableFieldsEnum.license
+    )
+    languages = typesense_io.list_values(
+        ts_client, typesense_io.CountableFieldsEnum.language
+    )
     return _RepositoryIndexCharacteristics(
         unique_licenses=sorted_list_of_unique_elements(licenses),
         unique_languages=sorted_list_of_unique_elements(languages),
-        n_repositories_indexed=n,
+        n_repositories_indexed=n_repositories_indexed(),
     )
 
 
@@ -74,117 +81,22 @@ def unique_license_categories() -> list[EnumLicenseCategories]:
 
 
 @lru_cache(maxsize=1)
-def n_repositories_indexed():
-    return SEARCH_RESULTS.n_documents
-
-
-if SETTINGS.APP_LEMATISED_SEARCH:
-    NLP_MODEL = get_spacy_english_model()
-else:
-    NLP_MODEL = None
-
-
-@lru_cache(maxsize=10)
-def search_for_results(query: Optional[str] = None) -> pd.DataFrame:
-    if (query is None) or (len(query) < 1):
-        df_x = SEARCH_RESULTS.documents_without_readme.copy()
-        df_x["score"] = 1
-        df_x.sort_values("name", inplace=True)
-        return df_x
-
-    if SETTINGS.APP_LEMATISED_SEARCH:
-        optimised_query = " ".join(
-            reduce_to_informative_lemmas(query, nlp_model=NLP_MODEL)
-        )
-        log_info(f"Searching for {query} / lemmatized to {optimised_query}")
-    else:
-        optimised_query = query
-        log_info(f"Searching for {query}")
-
-    res_desc = SEARCH_ENGINE_DESCRIPTIONS.search(
-        optimised_query,
-    )
-    res_readme = SEARCH_ENGINE_READMES.search(
-        optimised_query,
-    )
-
-    df_combined = (
-        res_desc.to_frame("description")
-        .merge(
-            res_readme.to_frame("readme"),
-            how="outer",
-            left_index=True,
-            right_index=True,
-        )
-        .fillna(0)
-        .infer_objects(copy=False)  # to avoid warning on downcasting
-    )
-
-    # Also checking for keywords in name
-    def _f_score_in_name(x):
-        kw = query.lower().split(" ")
-        res = 0
-        x_lower = str(x).lower()
-        for i in kw:
-            if len(i) > 3:  # To reduce noise (quick and dirty)
-                if i in x_lower:
-                    res += 1
-        return res
-
-    df_combined["score"] = df_combined["description"] * 10 + df_combined["readme"]
-    df_out = SEARCH_RESULTS.documents_without_readme.copy()
-    if "score" in df_out.columns:
-        df_out = df_out.drop(columns=["score"])
-
-    df_out = df_out.merge(
-        df_combined[["score"]],
-        how="outer",
-        left_on="url",
-        right_index=True,
-    )
-
-    df_out["score"] = (
-        df_out["score"].astype(float).fillna(0)
-        + df_out["name"].apply(_f_score_in_name) * 10
-        + df_out["organisation"].apply(_f_score_in_name) * 10
-    )
-
-    # Focus only on relevant outputs and carry out filtering and duplicate removal
-    df_out.query("score>0", inplace=True)
-    df_out.sort_values(by="score", ascending=False, inplace=True)
-    df_out.drop_duplicates(subset=["url"], inplace=True)
-    return df_out
+def n_repositories_indexed() -> int:
+    # TODO : avoid on the fly client creation
+    x = typesense_io.count_values(
+        typesense_io.generate_client(),
+        field=typesense_io.CountableFieldsEnum.license,
+    ).sum()
+    return int(x)
 
 
 def clear_cache():
     repository_index_characteristics_from_documents.cache_clear()
-    search_for_results.cache_clear()
     n_repositories_indexed.cache_clear()
     unique_license_categories.cache_clear()
 
 
 def refresh_data(force_refresh: bool = False):
-    if force_refresh or not os.path.exists(FILE_OUTPUT_OPTIMISED_LISTING_FEATHER):
-        from oss4climate.src.search import listing_search
-
+    if force_refresh or not os.path.exists(FILE_OUTPUT_LISTING_FEATHER):
         log_warning("- Listing not found, downloading again")
-        listing_search.download_listing_data_for_app()
-
-    listing_file, readme_field, description_field = (
-        SETTINGS.get_listing_file_with_readme_and_description_file_columns()
-    )
-
-    log_info("- Loading documents")
-    # Make sure to coordinate the below with the app start procedure
-    for r in SEARCH_RESULTS.iter_documents(
-        listing_file,
-        load_in_object_without_readme=True,
-        display_tqdm=True,
-        memory_safe=True,
-    ):
-        # Skip repos with missing info
-        for k in [description_field, readme_field]:
-            if r[k] is None:
-                r[k] = ""
-        SEARCH_ENGINE_DESCRIPTIONS.index(url=r["url"], content=r[description_field])
-        SEARCH_ENGINE_READMES.index(r["url"], content=r[readme_field])
+        download_listing_data_for_app()

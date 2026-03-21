@@ -1,32 +1,59 @@
+from pathlib import Path
 from typing import Optional
+from urllib.parse import urlsplit
 
 import pydantic_settings
 from dotenv import load_dotenv
 
 
 class Settings(pydantic_settings.BaseSettings):
+    # For scraping
     GITHUB_API_TOKEN: Optional[str] = None
     GITLAB_ACCESS_TOKEN: Optional[str] = None
-    LOCAL_FOLDER: str = ".data"
+    LOCAL_FOLDER: str = str(Path(__file__).parent.parent.parent.parent / ".data")
     SCRAPING_SQLITE_DB: str = "db.sqlite"
-    APP_SQLITE_DB: str = "app_db.sqlite"
     # For usage analytics
     UMAMI_SITE_ID: str = ""
-    # Identifiants of FTP for export
+    APP_SQLITE_DB: str = "app_db.sqlite"
+    # Identifiants of FTP for export (scripts only)
     EXPORT_FTP_URL: Optional[str] = None
     EXPORT_FTP_USER: Optional[str] = None
     EXPORT_FTP_PASSWORD: Optional[str] = None
     # App settings
     DATA_REFRESH_KEY: Optional[str] = None
     SENTRY_DSN_URL: Optional[str] = None
-    APP_URL_BASE: str = "https://oss4climate.pierrevf.consulting"
+    APP_URL_BASE: str = ""
     APP_PROXY_PATH: Optional[str] = None
-    APP_URL_FAVICON: str = "https://www.pierrevf.consulting/wp-content/uploads/2023/11/cropped-logo_base_png-32x32.png"
-    APP_LEMATISED_SEARCH: bool = False
+    APP_URL_FAVICON: str | None = None
+
+    # Typesense settings
+    TYPESENSE_API_KEY: str = ""
+    TYPESENSE_HOST: str = ""
+    TYPESENSE_CONNECTION_TIMEOUT: int = 2
+
+    # Search parameters
+    ENABLE_HYBRID_SEARCH: bool = False
 
     model_config = pydantic_settings.SettingsConfigDict(
         env_file_encoding="utf-8",
     )
+
+    @property
+    def typesense_config(self) -> dict[str, int | str]:
+        url = urlsplit(self.TYPESENSE_HOST)
+        if url.hostname in [None, ""]:
+            raise EnvironmentError("Hostname must be provided in TYPESENSE_HOST")
+        if url.scheme in [None, ""]:
+            raise EnvironmentError(
+                "Scheme (http/https) must be provided in TYPESENSE_HOST"
+            )
+        if url.port in [None, ""]:
+            raise EnvironmentError("Port must be provided in TYPESENSE_HOST")
+        return {
+            "host": url.hostname,
+            "port": url.port,
+            "protocol": url.scheme,
+        }
 
     @property
     def full_url_base(self) -> str:
@@ -46,39 +73,8 @@ class Settings(pydantic_settings.BaseSettings):
             return self.APP_SQLITE_DB
         return f"{self.LOCAL_FOLDER}/{self.APP_SQLITE_DB}"
 
-    def get_listing_file_with_readme_and_description_file_columns(
-        self,
-    ) -> tuple[str, str, str]:
-        if self.APP_LEMATISED_SEARCH:
-            return (
-                FILE_OUTPUT_OPTIMISED_LISTING_FEATHER,
-                "optimised_readme",
-                "optimised_description",
-            )
-        else:
-            return FILE_OUTPUT_LISTING_FEATHER, "readme", "description"
-
 
 # Loading settings
 load_dotenv(override=True)
 
 SETTINGS = Settings()
-
-
-# Link to all documents
-FILE_INPUT_INDEX = "indexes/repositories.toml"
-FILE_INPUT_LISTINGS_INDEX = "indexes/listings.json"
-FILE_OUTPUT_DIR = SETTINGS.LOCAL_FOLDER
-FILE_OUTPUT_LISTING_CSV = f"{FILE_OUTPUT_DIR}/listing_data.csv"
-FILE_OUTPUT_LISTING_FEATHER = f"{FILE_OUTPUT_DIR}/listing_data.feather"
-FILE_OUTPUT_OPTIMISED_LISTING_FEATHER = (
-    f"{FILE_OUTPUT_DIR}/optimised_listing_data.feather"
-)
-FILE_OUTPUT_SUMMARY_TOML = f"{FILE_OUTPUT_DIR}/summary.toml"
-
-URL_BASE = "https://data.pierrevf.consulting/oss4climate"
-URL_RAW_INDEX = f"{URL_BASE}/summary.toml"
-URL_LISTINGS_INDEX = f"{URL_BASE}/listings.json"
-URL_LISTING_CSV = f"{URL_BASE}/listing_data.csv"
-URL_LISTING_FEATHER = f"{URL_BASE}/listing_data.feather"
-URL_OPTIMISED_LISTING_FEATHER = f"{URL_BASE}/optimised_listing_data.feather"

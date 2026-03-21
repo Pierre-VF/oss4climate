@@ -1,4 +1,12 @@
+from pathlib import Path
+
 import pytest
+
+
+# Test data path
+@pytest.fixture(scope="session")
+def path_data_for_tests() -> Path:
+    return Path(__file__).parent / "data_for_tests"
 
 
 # Github fixtures
@@ -8,7 +16,7 @@ def github_repo_url() -> str:
 
 
 def github_repo_url_with_organisation() -> str:
-    "https://github.com/DTUWindEnergy/WindEnergyToolbox"
+    return "https://github.com/DTUWindEnergy/WindEnergyToolbox"
 
 
 @pytest.fixture

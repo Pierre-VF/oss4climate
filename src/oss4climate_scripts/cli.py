@@ -6,12 +6,12 @@ from datetime import timedelta
 
 import typer
 
-from oss4climate.src.search import listing_search
 from oss4climate_scripts import scripts
 from oss4climate_scripts.scripts import (
     data_publication,
     repository_scraping,
 )
+from oss4climate_scripts.src import utils
 
 app = typer.Typer()
 
@@ -59,24 +59,18 @@ def publish():
 def generate_listing():
     """Generates the updated listing"""
     repository_scraping.scrape_all()
-    repository_scraping.optimise_scraped_data_for_search()
 
 
 @app.command()
 def search():
     """Searches in the listing"""
-    listing_search.search_in_listing()
+    utils.search_in_listing()
 
 
 @app.command()
 def download_data():
     """Downloads the latest listing"""
-    listing_search.download_data()
-
-
-@app.command()
-def optimise():
-    repository_scraping.optimise_scraped_data_for_search()
+    utils.download_data()
 
 
 if __name__ == "__main__":

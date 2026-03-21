@@ -4,17 +4,14 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import FastAPI, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from oss4climate.src.config import SETTINGS
-from oss4climate.src.log import log_info, log_warning
+from oss4climate.src.log import log_info
 
-from oss4climate_app.config import STATIC_FILES_PATH, URL_FAVICON
-from oss4climate_app.src.data_io import (
-    SEARCH_ENGINE_DESCRIPTIONS,
-    SEARCH_ENGINE_READMES,
-    SEARCH_RESULTS,
-)
+from oss4climate_app.src import mcp_server
+from oss4climate_app.src.config import STATIC_FILES_PATH
+from oss4climate_app.src.data_io import download_listing_data_for_app
 from oss4climate_app.src.log_activity import log_landing
 from oss4climate_app.src.routers import api, ui
 from oss4climate_app.src.templates import render_template
@@ -62,32 +59,12 @@ async def lifespan(app: FastAPI):
     # Initialising error logging at app start
     initialise_error_logging()
 
-    listing_file, readme_field, description_field = (
-        SETTINGS.get_listing_file_with_readme_and_description_file_columns()
-    )
-    log_info("Starting app")
-    if not os.path.exists(listing_file):
-        # Only importing this heavier part if needed
-        from oss4climate.src.search import listing_search
+    # Ensure that context data is available
+    download_listing_data_for_app(force_refresh=False, load_feather_listing=False)
 
-        log_warning("- Listing not found, downloading again")
-        listing_search.download_listing_data_for_app()
-    log_info("- Loading documents")
-    log_info(" -- Feather file loaded")
-    for r in SEARCH_RESULTS.iter_documents(
-        listing_file,
-        load_in_object_without_readme=True,  # As documents are used later for display
-        display_tqdm=True,
-        memory_safe=True,  # essential in environments with little memory
-    ):
-        # Skip repos with missing info
-        for k in [readme_field, description_field]:
-            if r[k] is None:
-                r[k] = ""
-        SEARCH_ENGINE_DESCRIPTIONS.index(url=r["url"], content=r[description_field])
-        SEARCH_ENGINE_READMES.index(r["url"], content=r[readme_field])
-    log_info(" -- All repos loaded")
-    ui.repository_index_characteristics_from_documents()
+    log_info("Starting app")
+    if True:
+        ui.repository_index_characteristics_from_documents()
     log_info(" -- All metrics loaded")
     yield
     log_info("Exiting app")
@@ -131,8 +108,11 @@ def _head_base(request: Request):
 
 @app.get("/favicon.ico")
 def _favicon():
-    # This is just a dummy favicon for now (waiting for a better logo)
-    return RedirectResponse(URL_FAVICON)
+    url = SETTINGS.APP_URL_FAVICON
+    if url:
+        return RedirectResponse(url)
+    else:
+        return JSONResponse(content={"favicon": "not defined"}, status_code=404)
 
 
 # ----------------------------------------------------------------------------------
@@ -171,3 +151,6 @@ def _robots_txt(request: Request):
 app.mount("/api", api.app)
 app.mount("/ui", ui.app)
 app.mount("/static", StaticFiles(directory=str(STATIC_FILES_PATH)), name="static")
+
+# Adding MCP
+app.mount("/mcp", app=mcp_server.mcp.http_app(transport="sse"))

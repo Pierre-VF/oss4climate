@@ -1,10 +1,11 @@
 from functools import lru_cache
 
-from oss4climate.src.config import FILE_INPUT_LISTINGS_INDEX
 from oss4climate.src.parsers.licenses import (
     licence_url_from_license_name,
 )
 from oss4climate.src.parsers.listings import ResourceListing
+
+from oss4climate_app.src.config import FILE_INPUT_LISTINGS_INDEX
 
 
 @lru_cache(maxsize=2)

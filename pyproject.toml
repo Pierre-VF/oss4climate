@@ -1,29 +1,27 @@
 [project]
 name = "oss4climate"
-version = "0.5.3"
+version = "0.6.0"
 readme = "README.md"
 description = "Package to create listings of Open Source for Energy"
 authors = [
-    { name = "Pierre V-F", email = "hello@pierrevf.consulting"}
+    { name = "Pierre V-F", email = "hello@pierrevf.com"}
 ]
 
-requires-python = ">=3.12"
+requires-python = ">=3.12, <3.14"
 dependencies = [
     "beautifulsoup4>=4.14.2",
     "docutils>=0.22.3",
     "jinja2>=3.1.6",
     "markdown>=3.10",
-    "pandas>=2.3.2",
-    "pyarrow>=22.0.0",
+    "pandas>=3.0,<4",
+    "pyarrow>=23.0.1",
     "pydantic>=2.12.4",
     "pydantic-settings>=2.7.1",
-    "pyyaml>=6.0.3",
     "requests>=2.32.3",
-    "spacy>=3.8.11",
-    "en-core-web-sm",
     "sqlmodel>=0.0.27",
     "tomlkit>=0.13.3",
     "tqdm>=4.67.1",
+    "typesense>=2.0.0",
     # Security forces below (not actual direct dependencies)
     "urllib3>=2.6.3",
 ]
@@ -31,6 +29,7 @@ packages = [
     "src/oss4climate",
     "src/oss4climate_scripts",
     "src/oss4climate_app",
+    "src/oss4climate_mcp",
 ]
 
 [build-system]
@@ -39,7 +38,7 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 scripts = [
-    "black>=25.11.0",
+    "black>=26.3.1",
     "ruff>=0.14.7",
     "typer>=0.21.0",
 ]
@@ -47,16 +46,15 @@ test = [
     "pytest>=9.0.1",
     "httpx>=0.28.1",
     "coverage>=7.11.3",
+    "pytest-asyncio>=1.3.0",
 ]
 app = [
-    "fastapi>=0.121.1",
+    "fastapi>=0.135.1",
     "gunicorn>=23.0.0",
     "sentry-sdk[fastapi]>=2.19.2",
-    "uvicorn[standard]>=0.40.0",
+    "uvicorn[standard]>=0.42.0",
+    "fastmcp>=3.1, <4",
 ]
-notebooks = [
-    "scikit-learn>=1.8.0",
+mcp = [
+    "pydantic-ai-slim[mistral,anthropic,fastmcp,cli]>=1.68.0",
 ]
-
-[tool.uv.sources]
-en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0.tar.gz" }

@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:0.9.13-bookworm-slim
+FROM ghcr.io/astral-sh/uv:0.10.10-debian-slim
 WORKDIR /home
 # Copying files over
 # Index folder creation is required for operation when the indexes aren't present
@@ -11,7 +11,8 @@ WORKDIR /home/app
 RUN apt-get update
 RUN apt-get install -y ca-certificates
 RUN update-ca-certificates
-RUN uv sync --all-groups
+# Limit to relevant groups
+RUN uv sync --group test --group app
 # Run app
 LABEL organisation="oss4climate"
 EXPOSE 8080

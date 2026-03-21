@@ -1,7 +1,7 @@
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
-from oss4climate_app.config import (
+from oss4climate_app.src.config import (
     APP_VERSION,
     TEMPLATES_PATH,
 )

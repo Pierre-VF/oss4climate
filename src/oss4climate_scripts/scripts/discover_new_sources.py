@@ -4,17 +4,11 @@ This module contains methods to discover new sources of code
 
 import os
 
-from tqdm import tqdm
-
-from oss4climate.src.config import (
-    FILE_INPUT_INDEX,
-    FILE_OUTPUT_LISTING_FEATHER,
-)
+from oss4climate.src.database.projects import project_dataframe_loader
 from oss4climate.src.log import (
     log_info,
 )
 from oss4climate.src.models import EnumDocumentationFileType
-from oss4climate.src.nlp.search import SearchResults
 from oss4climate.src.parsers import (
     ParsingTargets,
     fetch_all_project_urls_from_markdown_str,
@@ -22,6 +16,14 @@ from oss4climate.src.parsers import (
     url_qualifies,
 )
 from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+from oss4climate_app.src.config import (
+    FILE_OUTPUT_LISTING_FEATHER,
+)
+from tqdm import tqdm
+
+from oss4climate_scripts.src.config import (
+    FILE_INPUT_INDEX,
+)
 
 
 def discover_repositories_in_existing_organisations(output_file: str) -> None:
@@ -50,7 +52,7 @@ def discover_repositories_in_existing_readmes(output_file: str) -> None:
             "The dataset is not available locally - make sure to download it prior to running this"
         )
 
-    dfs = SearchResults(FILE_OUTPUT_LISTING_FEATHER).documents
+    dfs = project_dataframe_loader(FILE_OUTPUT_LISTING_FEATHER)
 
     full_targets = ParsingTargets.from_toml(FILE_INPUT_INDEX)
     for i, r in tqdm(dfs.iterrows()):

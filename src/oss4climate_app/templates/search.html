@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="center">
-    <h1>Open-source code search for climate applications</h1>
+    <h1>Open-source code search for {{ APPLICATION_FIELD }} applications</h1>
 </div>
 <div class="search_form_box center">
     <form id="code_search_form" method="post">
@@ -48,10 +48,15 @@
 </div>
 
 
+<div class="mcp_tip center">
+    <b>This search tool is also available as an MCP tool for your favourite LLM: <a href="{{ URL_BASE }}/mcp/sse">{{ URL_BASE }}/mcp/sse</a></b>
+</div>
 
 <div class="search_stats center">
-    <b>{{ n_repositories_indexed }}</b> open-source repositories in the climate space
+    <b>{{ n_repositories_indexed }}</b> open-source repositories in the {{ APPLICATION_FIELD }} space
 </div>
+
+
 
 <script>
     document.getElementById("code_search_form").addEventListener("submit", function (event) {

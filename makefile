@@ -62,8 +62,6 @@ test_with_coverage:
 cli_help:
 	uv run typer $(CLI_NAME) run --help
 
-cli_optimise:
-	uv run typer $(CLI_NAME) run optimise
 
 
 # ----------------------------------------------------------------------------

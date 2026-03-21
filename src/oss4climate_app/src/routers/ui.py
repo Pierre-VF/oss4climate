@@ -6,36 +6,25 @@ from datetime import date, timedelta
 from typing import Optional
 
 import pandas as pd
-from fastapi import APIRouter, BackgroundTasks, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi.responses import HTMLResponse
 
-from oss4climate.src.models import (
-    EnumLicenseCategories,
-)
-from oss4climate_app.config import (
+from oss4climate_app.src.config import (
     FORCE_HTTPS,
     SETTINGS,
     URL_CODE_REPOSITORY,
     URL_FEEDBACK_FORM,
-    umami_site_id,
 )
 from oss4climate_app.src.data_io import (
     repository_index_characteristics_from_documents,
-    search_for_results,
     unique_license_categories,
 )
 from oss4climate_app.src.log_activity import log_search
 from oss4climate_app.src.routers import listing_credits
+from oss4climate_app.src.search import typesense_io
 from oss4climate_app.src.templates import render_template
 
 app = APIRouter(include_in_schema=False)
-
-
-def _f_none_to_unknown(x: str | date | None) -> str:
-    if x is None:
-        return "(unknown)"
-    else:
-        return str(x)
 
 
 def _render_ui_template(
@@ -47,10 +36,11 @@ def _render_ui_template(
     else:
         canonical_url = f"{url.scheme}://{url.netloc}{url.path}"
     resp = {
-        "UMAMI_SITE_ID": umami_site_id(),
+        "UMAMI_SITE_ID": SETTINGS.UMAMI_SITE_ID,
         "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
         "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
         "URL_BASE": SETTINGS.full_url_base,
+        "APPLICATION_FIELD": "climate",
         "credits_text": f"With contributions from manually curated listings: {listing_credits()}",
         "canonical_url": canonical_url,
     }
@@ -59,7 +49,8 @@ def _render_ui_template(
     return render_template(request, template_file=template_file, content=resp)
 
 
-def ui_base_search_page(request: Request):
+@app.get("/search", response_class=HTMLResponse, include_in_schema=False)
+async def search(request: Request):
     characteristics = repository_index_characteristics_from_documents()
     return _render_ui_template(
         request=request,
@@ -74,11 +65,6 @@ def ui_base_search_page(request: Request):
     )
 
 
-@app.get("/search", response_class=HTMLResponse, include_in_schema=False)
-async def search(request: Request):
-    return ui_base_search_page(request=request)
-
-
 @app.get("/results", response_class=HTMLResponse, include_in_schema=False)
 async def search_results(
     request: Request,
@@ -91,39 +77,45 @@ async def search_results(
     # For backwards compatibility of links
     n_results: Optional[int] = None,
     offset: Optional[int] = None,
+    ts_client=Depends(typesense_io.generate_client),
 ):
     if query:
         query = query.strip().lower()
-    df_out = search_for_results(query)
+    else:
+        # Return all results
+        query = "*"
 
-    # Adding a primitive refinment mechanism by language (not implemented in the most effective manner)
-    if language and (language != "*"):
-        df_out = df_out[df_out["language"] == language]
-    if license_category and (license_category != "*"):
-        try:
-            enum_license_category = EnumLicenseCategories[license_category]
-        except KeyError:
-            raise ValueError("Invalid license category")
+    if n_results is None:
+        n_results = 50
+    if offset is None:
+        page = 1
+    else:
+        page = offset
+    r = typesense_io.search_with_query(
+        ts_client,
+        query,
+        results_per_page=n_results,
+        page=page,
+        languages=language,
+        license_category=license_category,
+    )
 
-        df_out = df_out[df_out["license_category"] == enum_license_category]
+    n_total_found = r.total_results
+    n_found = len(r.results)
+
+    # TODO: make this neater (and remove the below)
+    df_out = pd.DataFrame(
+        [(i.__dict__ | {"last_commit": i.last_commit_as_date()}) for i in r.results]
+    )
+    for i in ["description", "language", "license", "license_category"]:
+        if i not in df_out:
+            df_out[i] = "?"
 
     if exclude_forks:
         df_out = df_out[df_out["is_fork"] == False]
     if exclude_inactive:
         t_limit = date.today() - timedelta(days=365)
         df_out = df_out[df_out["last_commit"] >= t_limit]
-
-    # Refining output
-    if "score" in df_out.keys():
-        df_out.drop(
-            columns=["score"],  # Dropping scores, as it's not informative to the user
-            inplace=True,
-        )
-    for i in ["license", "last_commit"]:
-        df_out.loc[:, i] = df_out[i].apply(_f_none_to_unknown)
-
-    n_total_found = len(df_out)
-    n_found = n_total_found
 
     # Filling the gaps for clean display
     cols_to_clean = ["description", "language", "license"]
@@ -136,7 +128,7 @@ async def search_results(
             }
         )
         .fillna(value="(no data)")
-        .infer_objects(copy=False)  # to avoid warning on downcasting
+        .infer_objects()  # to avoid warning on downcasting
     )
 
     # Log results

@@ -17,6 +17,19 @@ jobs:
       pull-requests: write
       contents: write
 
+
+    strategy:
+      matrix:
+        # versions are wrapped in quotes to preserve the exact versions
+        # especially numbers that has "0" on right-most side (e.g. 26.0)
+        typesense-version: ['30.1']
+        typesense-port: ['8108:8108']
+
+    services:
+      typesense:
+        image: typesense/typesense:${{ matrix.typesense-version }}
+
+
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -28,7 +41,7 @@ jobs:
       - name: "Create UV installation"
         uses: astral-sh/setup-uv@v5
         with:
-          version: "0.9.13"
+          version: "0.10.10"
 
       # Check and fix the code
       - name: Defining Git identity
@@ -36,10 +49,10 @@ jobs:
           git config user.name github_actions
           git config user.email github_actions@pierrevf.consulting
 
-      - name: Generate requirements files for app
-        run: |
-          uv sync --group=app
-          uv pip freeze --exclude-editable > requirements-app.txt
+      #- name: Generate requirements files for app
+      #  run: |
+      #    uv sync --group=app
+      #    uv pip freeze --exclude-editable > requirements-app.txt
 
       - name: Run code cleanup
         run: |
@@ -55,7 +68,46 @@ jobs:
 
       # Run and test
       - name: Installing packages
-        run: make install
+        run: uv sync --group=app --group=test
+
+      # From https://typesense.org/docs/guide/github-actions.html
+      - name: Start Typesense
+        run: |
+          docker run -d \
+          -p ${{ matrix.typesense-port }} \
+          --name typesense \
+          -v /tmp/typesense-data:/data \
+          -v /tmp/typesense-analytics-data:/analytics-data \
+          typesense/typesense:${{ matrix.typesense-version}} \
+          --api-key=DUMMY_TYPESENSE_API_KEY \
+          --data-dir=/data \
+          --enable-search-analytics=true \
+          --analytics-dir=/analytics-data  \
+          --analytics-flush-interval=60 \
+          --analytics-minute-rate-limit=100 \
+          --enable-cors
+
+      - name: Wait for Typesense to be healthy
+        shell: bash
+        run: |
+          start_time=$(date +%s)
+          timeout=30
+          counter=0
+          echo "Waiting for Typesense to be healthy..."
+          until curl -s http://localhost:8108/health | grep -q '"ok":true'; do
+            if [ $counter -eq $timeout ]; then
+              echo "Timed out waiting for Typesense to be healthy"
+              exit 1
+            fi
+            sleep 1
+            counter=$((counter + 1))
+          done
+          end_time=$(date +%s)
+          elapsed=$((end_time - start_time))
+          echo "Typesense healthcheck elapsed: ${elapsed}s"
 
       - name: Run code test
         run: make test
+        env:
+          TYPESENSE_API_KEY: DUMMY_TYPESENSE_API_KEY
+          TYPESENSE_HOST: http://localhost:8108
