@@ -110,4 +110,4 @@ jobs:
         run: make test
         env:
           TYPESENSE_API_KEY: DUMMY_TYPESENSE_API_KEY
-          TYPESENSE_HOST: http://typesense:8108
+          TYPESENSE_HOST: http://localhost:8108

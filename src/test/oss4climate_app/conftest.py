@@ -3,9 +3,11 @@ from pathlib import Path
 import pandas as pd
 import pytest
 import typesense
-import typesense.exceptions
 from oss4climate.src.config import SETTINGS
-from oss4climate_app.src.search.typesense_io import index_data_in_typesense
+from oss4climate_app.src.search.typesense_io import (
+    index_data_in_typesense,
+    reset_typesense_schema,
+)
 
 
 # Test data path
@@ -23,6 +25,7 @@ def typesense_client(csv_data_for_seeding):
             "connection_timeout_seconds": SETTINGS.TYPESENSE_CONNECTION_TIMEOUT,
         }
     )
+    reset_typesense_schema(client)
     df = pd.read_csv(csv_data_for_seeding)
     df["last_commit"] = pd.to_datetime(df["last_commit"])
     df["latest_update"] = pd.to_datetime(df["latest_update"])
