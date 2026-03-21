@@ -1,0 +1,88 @@
+{% extends "v2/_base.html" %}
+
+{% block heading %}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Open-source code search for climate applications</h1>
+
+        <p class="mcp-link">
+            This search tool is also available as an MCP tool for your favourite LLM: <a href="{{ URL_BASE }}/mcp/sse">{{ URL_BASE }}/mcp/sse</a>
+        </p>
+
+        <div class="stats">
+            <strong>{{ n_repositories_indexed }}</strong> open-source repositories in the {{ APPLICATION_FIELD }} space
+        </div>
+
+        <form id="code_search_form" target="results" method="post">
+            <div class="search-container" id="search-section">
+                    <input type="text" id="query" placeholder="Search repositories...">
+                    <button type="submit" class="search_button" data-umami-event="search-click">Search</button>
+            </div>
+
+            <div class="search_refining_form">
+                <label>Refine your search</label><br/>
+                <label for="license_category">License:</label>
+                <select name="license_category" id="license_category">
+                    <option value="*">(Any)</option>
+                    {% for i in unique_license_categories %}
+                    <option value="{{ i.name }}">{{ i.value }}</option>
+                    {% endfor %}
+                </select>
+                <br/>
+
+                <label for="language">Language:</label>
+                <select name="language" id="language">
+                    <option value="*">(Any)</option>
+                    {% for i in languages %}
+                    <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <br/>
+
+                <label>Exclude:</label>
+                <br/>
+                <input type="checkbox" id="exclude_forks" name="exclude_forks" />
+                <label for="exclude_forks">forks</label>
+                <br/>
+                <input type="checkbox" id="exclude_inactive" name="exclude_inactive" />
+                <label for="exclude_inactive" title="Exclude project without commits in the last year">inactive projects</label>
+            </div>
+        </form>
+
+
+        <div class="sources">
+            <h2>Data Sources</h2>
+            <ul class="source-list">
+
+                {% for i, r in credits_df.iterrows() %}
+                <li class="source-item">
+                    <div>
+                        <div class="source-name"><a href="{{r.url}}">{{r.url}}</a></div>
+                        <div class="source-license">Licensed under <a href="{{ r.license_url }}">{{r.license}}</a></div>
+                    </div>
+                    <div class="source-count">{{r.target_count}} projects</div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("code_search_form").addEventListener("submit", function (event) {
+            event.preventDefault();
+            var queryValue = document.getElementById("query").value;
+            var licenseValue = document.getElementById("license_category").value;
+            var languageValue = document.getElementById("language").value;
+            var excludeForks = document.getElementById("exclude_forks").checked;
+            var excludeInactive = document.getElementById("exclude_inactive").checked;
+            window.location.href = "results?"
+                + "query=" + encodeURIComponent(queryValue)
+                + "&license_category=" + encodeURIComponent(licenseValue)
+                + "&language=" + encodeURIComponent(languageValue)
+                + "&exclude_forks=" + encodeURIComponent(excludeForks)
+                + "&exclude_inactive=" + encodeURIComponent(excludeInactive);
+        });
+    </script>
+{% endblock %}

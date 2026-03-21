@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search results for "solar pv"</title>
+    <link href="{{ URL_BASE }}/static/css/styles-v2.css?version={{ APP_VERSION }}" rel="stylesheet">
+    <title>
+        {% block title %}
+            OSS4Climate - Open-source search for climate applications
+        {% endblock %}
+    </title>
+    {% if UMAMI_SITE_ID != "" %}
+        <script defer src="https://cloud.umami.is/script.js" data-website-id="{{ UMAMI_SITE_ID }}"></script>
+    {% endif %}
+
+    <link rel="canonical" href="{{ canonical_url }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-hint" onclick="toggleNav()">☰</div>
+        <div class="nav-links" id="navLinks">
+            <a href="/ui/search">Search</a>
+            <a href="/ui/about">About</a>
+            <a href="/ui/privacy">Privacy</a>
+            <a href="{{ URL_FEEDBACK_FORM }}">Feedback</a>
+            <a href="{{ URL_CODE_REPOSITORY }}">Source code</a>
+            <a href="../api/docs">API</a>
+        </div>
+    </nav>
+
+    {% block content %}
+    {% endblock %}
+
+
+    <script>
+        function toggleNav() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+        }
+    </script>
+</body>
+</html>

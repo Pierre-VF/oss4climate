@@ -21,7 +21,6 @@ def test_app(app_test_client):
 
     assert tc.get("/api/search?query=iot").status_code == 200
     assert tc.get("/api/data/credits").status_code == 200
-    assert tc.get("/api/data/credits_html").status_code == 200
 
     # SEO endpoints test
     for i in ["robots.txt", "sitemap.xml"]:
