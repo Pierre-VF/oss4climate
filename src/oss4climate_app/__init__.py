@@ -11,6 +11,7 @@ from oss4climate.src.log import log_info, log_warning
 
 from oss4climate_app.config import STATIC_FILES_PATH, URL_FAVICON
 from oss4climate_app.src import mcp_server
+from oss4climate_app.src.data_io import download_listing_data_for_app
 from oss4climate_app.src.log_activity import log_landing
 from oss4climate_app.src.routers import api, ui
 from oss4climate_app.src.templates import render_template
@@ -57,6 +58,9 @@ def initialise_error_logging():
 async def lifespan(app: FastAPI):
     # Initialising error logging at app start
     initialise_error_logging()
+
+    # Ensure that context data is available
+    download_listing_data_for_app(force_refresh=False, load_feather_listing=False)
 
     listing_file, readme_field, description_field = (
         SETTINGS.get_listing_file_with_readme_and_description_file_columns()

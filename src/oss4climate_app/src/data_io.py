@@ -18,16 +18,27 @@ from oss4climate.src.models import EnumLicenseCategories
 from oss4climate_app.src.search import typesense_io
 
 
-def download_file(url: str, target: str) -> None:
+def download_file(url: str, target: str, force_refresh: bool = True) -> None:
+    if os.path.exists(target) and (not force_refresh):
+        return
     print(f"Fetching {url}")
     urlretrieve(url, target)
     print(f"-> Downloaded to {target}")
 
 
-def download_listing_data_for_app():
+def download_listing_data_for_app(
+    force_refresh: bool = True, load_feather_listing: bool = True
+):
     os.makedirs(FILE_OUTPUT_DIR, exist_ok=True)
-    download_file(URL_LISTINGS_INDEX, FILE_INPUT_LISTINGS_INDEX)
-    download_file(URL_LISTING_FEATHER, FILE_OUTPUT_LISTING_FEATHER)
+    download_file(
+        URL_LISTINGS_INDEX, FILE_INPUT_LISTINGS_INDEX, force_refresh=force_refresh
+    )
+    if load_feather_listing:
+        download_file(
+            URL_LISTING_FEATHER,
+            FILE_OUTPUT_LISTING_FEATHER,
+            force_refresh=force_refresh,
+        )
     print("Download complete")
 
 
