@@ -8,9 +8,6 @@ from typing import Optional
 import pandas as pd
 from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi.responses import HTMLResponse
-from oss4climate.src.models import (
-    EnumLicenseCategories,
-)
 
 from oss4climate_app.config import (
     FORCE_HTTPS,
@@ -112,31 +109,15 @@ async def search_results(
     df_out = pd.DataFrame(
         [(i.__dict__ | {"last_commit": i.last_commit_as_date()}) for i in r.results]
     )
-    df_out["license_category"] = "?"
-
-    # Adding a primitive refinment mechanism by language (not implemented in the most effective manner)
-    if license_category and (license_category != "*"):
-        try:
-            enum_license_category = EnumLicenseCategories[license_category]
-        except KeyError:
-            raise ValueError("Invalid license category")
-
-        df_out = df_out[df_out["license_category"] == enum_license_category]
+    for i in ["description", "language", "license", "license_category"]:
+        if i not in df_out:
+            df_out[i] = "?"
 
     if exclude_forks:
         df_out = df_out[df_out["is_fork"] == False]
     if exclude_inactive:
         t_limit = date.today() - timedelta(days=365)
         df_out = df_out[df_out["last_commit"] >= t_limit]
-
-    # Refining output
-    if "score" in df_out.keys():
-        df_out.drop(
-            columns=["score"],  # Dropping scores, as it's not informative to the user
-            inplace=True,
-        )
-    for i in ["license", "last_commit"]:
-        df_out.loc[:, i] = df_out[i].apply(_f_none_to_unknown)
 
     # Filling the gaps for clean display
     cols_to_clean = ["description", "language", "license"]
