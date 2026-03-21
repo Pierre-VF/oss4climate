@@ -7,7 +7,7 @@ Note: For now, only redirects
 from typing import Optional
 
 from fastapi import BackgroundTasks, Depends, FastAPI, Request
-from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
+from fastapi.responses import PlainTextResponse, RedirectResponse
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info
 
@@ -66,24 +66,6 @@ async def data_credits():
     """
     credits_text = listing_credits_df()
     return credits_text.T.to_dict()
-
-
-@app.get("/data/credits_html")
-async def data_credits_html():
-    """
-    Credits text for the data (HTML formatted)
-    """
-    credits_text = f"""<!DOCTYPE html>
-    <html lang="en">
-        <head>
-            <meta charset="utf-8">
-            <title>Credits</title>
-        </head>
-        <body>
-            <p>{listing_credits(html=True)}</p>
-        </body>
-    </html>"""
-    return HTMLResponse(credits_text)
 
 
 @app.get("/data/feather")
