@@ -15,6 +15,7 @@ class EnumDocumentationFileType(Enum):
     HTML = "html"
     UNKNOWN = "?"
 
+    @staticmethod
     def from_filename(f: str) -> "EnumDocumentationFileType":
         f_lower = f.lower()
         if f_lower.endswith(".md"):
