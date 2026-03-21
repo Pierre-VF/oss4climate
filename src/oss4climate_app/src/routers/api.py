@@ -20,7 +20,7 @@ from oss4climate_app.src.database import (
     dump_database_request_log_as_csv,
     dump_database_search_log_as_csv,
 )
-from oss4climate_app.src.routers import listing_credits
+from oss4climate_app.src.routers import listing_credits_df
 from oss4climate_app.src.search import typesense_io
 
 
@@ -64,8 +64,8 @@ async def data_credits():
     """
     Credits text for the data
     """
-    credits_text = listing_credits(html=False)
-    return PlainTextResponse(credits_text)
+    credits_text = listing_credits_df()
+    return credits_text.T.to_dict()
 
 
 @app.get("/data/credits_html")

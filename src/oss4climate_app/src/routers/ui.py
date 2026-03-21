@@ -20,7 +20,7 @@ from oss4climate_app.src.data_io import (
     unique_license_categories,
 )
 from oss4climate_app.src.log_activity import log_search
-from oss4climate_app.src.routers import listing_credits
+from oss4climate_app.src.routers import listing_credits_df
 from oss4climate_app.src.search import typesense_io
 from oss4climate_app.src.templates import render_template
 
@@ -28,7 +28,9 @@ app = APIRouter(include_in_schema=False)
 
 
 def _render_ui_template(
-    request: Request, template_file: str, content: dict | None = None
+    request: Request,
+    template_file: str,
+    content: dict | None = None,
 ):
     url = request.url.components
     if FORCE_HTTPS:
@@ -41,7 +43,7 @@ def _render_ui_template(
         "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
         "URL_BASE": SETTINGS.full_url_base,
         "APPLICATION_FIELD": "climate",
-        "credits_text": f"With contributions from manually curated listings: {listing_credits()}",
+        "credits_df": listing_credits_df(),
         "canonical_url": canonical_url,
     }
     if content is not None:
@@ -54,7 +56,7 @@ async def search(request: Request):
     characteristics = repository_index_characteristics_from_documents()
     return _render_ui_template(
         request=request,
-        template_file="search.html",
+        template_file="v2/search.html",
         content={
             "n_repositories_indexed": characteristics.n_repositories_indexed,
             "languages": characteristics.unique_languages,
@@ -141,7 +143,7 @@ async def search_results(
 
     return _render_ui_template(
         request=request,
-        template_file="results.html",
+        template_file="v2/results.html",
         content={
             "request": request,
             "n_found": n_found,
@@ -156,7 +158,7 @@ async def search_results(
 def read_about(request: Request):
     return _render_ui_template(
         request=request,
-        template_file="about.html",
+        template_file="v2/about.html",
     )
 
 
@@ -164,7 +166,7 @@ def read_about(request: Request):
 def read_privacy(request: Request):
     return _render_ui_template(
         request=request,
-        template_file="privacy.html",
+        template_file="v2/privacy.html",
     )
 
 
