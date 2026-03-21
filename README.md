@@ -1,6 +1,6 @@
 # Listing of open-source for climate and energy applications
 
-TLDR; if you're just looking for the search engine, you will find it here: https://oss4climate.pierrevf.consulting/ .
+TLDR; if you're just looking for the search engine, you will find it here: https://oss4climate.apps.pierrevf.com/ .
 
 **WARNING: the project is in active development and still an initial stage, therefore the structure may change without prior notice. If you depend on the code as a dependency to your application, please ensure to pin the specific commits in all your usages.**
 
@@ -21,13 +21,13 @@ However, in the current stage it is indeed not providing all of these features y
 
 ## Do you just want to carry out a search for open-source matching your needs?
 
-To carry out a search without installing anything, you can just use the **web-app** here: https://oss4climate.pierrevf.consulting/
+To carry out a search without installing anything, you can just use the **web-app** here: https://oss4climate.apps.pierrevf.com/
 
 ## What is the license of the code and the data?
 
 The license differs between the source code and the listings data. Please make sure to check the [license file](LICENSE) for all details.
 
-The underlying listing data comes from a variety of repositories, some of which have a creative common licence. **That means that while you are free to reuse and adapt the software, there are restrictions on the usage of the listings data below.** Having noted this, the listing data can be downloaded as [TOML](https://data.pierrevf.consulting/oss4climate/summary.toml), [CSV](https://data.pierrevf.consulting/oss4climate/listing_data.csv) or [Feather (for Python pandas)](https://data.pierrevf.consulting/oss4climate/listing_data.feather).
+The underlying listing data comes from a variety of repositories, some of which have a creative common licence. **That means that while you are free to reuse and adapt the software, there are restrictions on the usage of the listings data below.**
 
 
 ## Where is the data coming from?
@@ -129,4 +129,4 @@ Note: the indexing is heavy and involves a series of web (and API) calls. A cach
 
 Please open an issue on the repository [here](https://github.com/Pierre-VF/oss4climate/issues).
 
-If you have a use-case that you would like to develop based upon this, or need new features, please get in touch with [PierreVF Consulting](https://www.pierrevf.consulting/) for support.
+If you have a use-case that you would like to develop based upon this, or need new features, please get in touch with [PierreVF Consulting](https://www.pierrevf.com/) for support.
