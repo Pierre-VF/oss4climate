@@ -23,12 +23,12 @@ from oss4climate_app.src.search.typesense_io import (
     reset_typesense_schema,
 )
 
-ts_client = generate_client()
-reset_typesense_schema(ts_client)
-
-
 # Full indexing of the files
 df = project_dataframe_loader(FILE_OUTPUT_LISTING_FEATHER)
+raise RuntimeError("STOP here")
+
+ts_client = generate_client()
+reset_typesense_schema(ts_client)
 df["idx"] = df.index.to_series().astype(int)
 
 index_data_in_typesense(ts_client, df)
