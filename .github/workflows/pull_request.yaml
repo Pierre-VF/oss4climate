@@ -29,11 +29,11 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-        command: [
-          "--data-dir=/data",
-          "--api-key=DUMMY_TYPESENSE_API_KEY",
-          "--enable-cors"
-        ]
+        command: >-
+          --data-dir=/data
+          --api-key=DUMMY_TYPESENSE_API_KEY
+          --enable-cors
+
 
     steps:
       - name: "Checkout code"
