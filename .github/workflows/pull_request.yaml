@@ -109,5 +109,5 @@ jobs:
       - name: Run code test
         run: make test
         env:
-          DUMMY_TYPESENSE_API_KEY: DUMMY_TYPESENSE_API_KEY
+          TYPESENSE_API_KEY: DUMMY_TYPESENSE_API_KEY
           TYPESENSE_HOST: http://typesense:8108
