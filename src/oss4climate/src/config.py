@@ -27,7 +27,7 @@ class Settings(pydantic_settings.BaseSettings):
 
     # Typesense settings
     TYPESENSE_API_KEY: str = ""
-    TYPESENSE_HOST: str = "http://localhost:8108"
+    TYPESENSE_HOST: str = ""
     TYPESENSE_CONNECTION_TIMEOUT: int = 2
 
     # Search parameters
@@ -40,6 +40,14 @@ class Settings(pydantic_settings.BaseSettings):
     @property
     def typesense_config(self) -> dict[str, int | str]:
         url = urlsplit(self.TYPESENSE_HOST)
+        if url.hostname in [None, ""]:
+            raise EnvironmentError("Hostname must be provided in TYPESENSE_HOST")
+        if url.scheme in [None, ""]:
+            raise EnvironmentError(
+                "Scheme (http/https) must be provided in TYPESENSE_HOST"
+            )
+        if url.port in [None, ""]:
+            raise EnvironmentError("Port must be provided in TYPESENSE_HOST")
         return {
             "host": url.hostname,
             "port": url.port,
