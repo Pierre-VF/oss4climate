@@ -28,13 +28,6 @@ from oss4climate_app.src.templates import render_template
 app = APIRouter(include_in_schema=False)
 
 
-def _f_none_to_unknown(x: str | date | None) -> str:
-    if x is None:
-        return "(unknown)"
-    else:
-        return str(x)
-
-
 def _render_ui_template(
     request: Request, template_file: str, content: dict | None = None
 ):
@@ -48,6 +41,7 @@ def _render_ui_template(
         "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
         "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
         "URL_BASE": SETTINGS.full_url_base,
+        "APPLICATION_FIELD": "climate",
         "credits_text": f"With contributions from manually curated listings: {listing_credits()}",
         "canonical_url": canonical_url,
     }
