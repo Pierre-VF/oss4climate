@@ -83,10 +83,6 @@ def generate_client() -> typesense.Client:
     )
 
 
-def client_dependency():
-    yield generate_client()
-
-
 def reset_typesense_schema(ts_client: typesense.Client):
     # Delete the collection
     try:
@@ -177,10 +173,9 @@ def search_with_query(
         kwargs_search["filter_by"] = f"language: [{','.join(languages)}]"
 
     # Enable hybrid search only if used in settings
+    query_by = "name, organisation, description, readme"
     if SETTINGS.ENABLE_HYBRID_SEARCH:
-        query_by = "description, embedding_readme, name"
-    else:
-        query_by = "description, readme, name"
+        query_by = f"{query_by}, embedding_readme"
 
     r = ts_client.collections["projects"].documents.search(
         SearchParameters(
