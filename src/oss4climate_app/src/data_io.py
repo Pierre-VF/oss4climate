@@ -60,9 +60,14 @@ class _RepositoryIndexCharacteristics:
 def repository_index_characteristics_from_documents() -> (
     _RepositoryIndexCharacteristics
 ):
-    # TODO: fill this
-    licenses = []
-    languages = []
+    # TOODO: generate this better (doesn't get patched in tests) - in a way that works with cache
+    ts_client = typesense_io.generate_client()
+    licenses = typesense_io.list_values(
+        ts_client, typesense_io.CountableFieldsEnum.license
+    )
+    languages = typesense_io.list_values(
+        ts_client, typesense_io.CountableFieldsEnum.language
+    )
     return _RepositoryIndexCharacteristics(
         unique_licenses=sorted_list_of_unique_elements(licenses),
         unique_languages=sorted_list_of_unique_elements(languages),

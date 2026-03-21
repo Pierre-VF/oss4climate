@@ -202,27 +202,32 @@ def search_with_query(
 class CountableFieldsEnum(Enum):
     license = "license"
     language = "language"
+    organisation = "organisation"
 
 
-def list_values(ts_client: typesense.Client, field: CountableFieldsEnum) -> list[str]:
+def count_values(ts_client: typesense.Client, field: CountableFieldsEnum) -> pd.Series:
     x_field = field.value
     # Facet on "type_id" with a wildcard query
     search_params = {
         "q": "*",  # Match all documents
         "facet_by": x_field,  # Facet on the field you want
-        "max_facet_values": 100,  # Increase if you expect many unique values
+        "max_facet_values": 250,  # Increase if you expect many unique values
     }
-
     results = ts_client.collections["projects"].documents.search(search_params)
+    d = {
+        facet["value"]: facet["count"] for facet in results["facet_counts"][0]["counts"]
+    }
+    return pd.Series(d)
 
-    # Extract the facet values
-    return [facet["value"] for facet in results["facet_counts"][x_field]]
+
+def list_values(ts_client: typesense.Client, field: CountableFieldsEnum) -> list[str]:
+    return count_values(ts_client, field).index.to_list()
 
 
 if __name__ == "__main__":
     ts_client = generate_client()
     c1 = list_values(ts_client, CountableFieldsEnum.license)
-    c1 = list_values(ts_client, CountableFieldsEnum.language)
+    c2 = list_values(ts_client, CountableFieldsEnum.language)
 
     r = search_with_query(ts_client, "wind power")  # , languages="C++")
     print(r)
