@@ -49,10 +49,10 @@ jobs:
           git config user.name github_actions
           git config user.email github_actions@pierrevf.consulting
 
-      - name: Generate requirements files for app
-        run: |
-          uv sync --group=app
-          uv pip freeze --exclude-editable > requirements-app.txt
+      #- name: Generate requirements files for app
+      #  run: |
+      #    uv sync --group=app
+      #    uv pip freeze --exclude-editable > requirements-app.txt
 
       - name: Run code cleanup
         run: |
