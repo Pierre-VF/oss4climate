@@ -22,7 +22,7 @@ jobs:
       matrix:
         # versions are wrapped in quotes to preserve the exact versions
         # especially numbers that has "0" on right-most side (e.g. 26.0)
-        typesense-version: ['31.0']
+        typesense-version: ['30.1']
         typesense-port: ['8108:8108']
 
     services:
