@@ -155,23 +155,24 @@ def search_for_url(ts_client: typesense.Client, url: str) -> SearchResult:
 
 def search_with_query(
     ts_client: typesense.Client,
-    query: str | None,
+    query: str = "*",
     results_per_page: int = 50,
     page: int = 1,
     languages: list[str] | str | None = None,
+    license_category: str | None = None,
 ) -> SearchResult:
     if query is None:
         query = " "  # TODO: make this better
 
-    # Handling wildcards
-    if languages == "*":
-        languages = None
-
     kwargs_search = dict()
-    if languages:
+    if languages not in [None, "*"]:
         if isinstance(languages, str):
             languages = [languages]
         kwargs_search["filter_by"] = f"language: [{','.join(languages)}]"
+    if license_category not in [None, "*"]:
+        # TODO: this needs to be better aligned with actual usages
+        licenses = license_category.split(",")
+        kwargs_search["filter_by"] = f"license: [{','.join(licenses)}]"
 
     # Enable hybrid search only if used in settings
     query_by = "name, organisation, description, readme"

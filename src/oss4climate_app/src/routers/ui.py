@@ -82,6 +82,10 @@ async def search_results(
 ):
     if query:
         query = query.strip().lower()
+    else:
+        # Return all results
+        query = "*"
+
     if n_results is None:
         n_results = 50
     if offset is None:
@@ -94,6 +98,7 @@ async def search_results(
         results_per_page=n_results,
         page=page,
         languages=language,
+        license_category=license_category,
     )
 
     n_total_found = r.total_results

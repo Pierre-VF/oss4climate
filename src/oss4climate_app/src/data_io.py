@@ -81,12 +81,13 @@ def unique_license_categories() -> list[EnumLicenseCategories]:
 
 
 @lru_cache(maxsize=1)
-def n_repositories_indexed():
+def n_repositories_indexed() -> int:
     # TODO : avoid on the fly client creation
-    x = typesense_io.search_with_query(
-        typesense_io.generate_client(), " ", results_per_page=2
-    )
-    return x.total_results
+    x = typesense_io.count_values(
+        typesense_io.generate_client(),
+        field=typesense_io.CountableFieldsEnum.license,
+    ).sum()
+    return int(x)
 
 
 def clear_cache():
