@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from enum import Enum
 
 import pandas as pd
 import typesense
@@ -53,15 +54,15 @@ _TYPESENSE_REPO_SCHEMA = {
                 "model_config": {"model_name": _TYPESENSE_EMBEDDING_MODEL},
             },
         },
-        {"name": "organisation", "type": "string"},
-        {"name": "license", "type": "string"},
-        {"name": "language", "type": "string"},
+        {"name": "organisation", "type": "string", "facet": True},
+        {"name": "license", "type": "string", "facet": True},
+        {"name": "language", "type": "string", "facet": True},
         {"name": "url", "type": "string"},
         {
             "name": "last_commit_timestamp",
             "type": "int64",
         },  # date is not supported by TypeSense
-        {"name": "is_fork", "type": "bool"},
+        {"name": "is_fork", "type": "bool", "facet": True},
         # TODO : add hints from the README files (just need to compress key information well enough there)
     ],
     "default_sorting_field": "idx",
@@ -198,7 +199,30 @@ def search_with_query(
     )
 
 
+class CountableFieldsEnum(Enum):
+    license = "license"
+    language = "language"
+
+
+def list_values(ts_client: typesense.Client, field: CountableFieldsEnum) -> list[str]:
+    x_field = field.value
+    # Facet on "type_id" with a wildcard query
+    search_params = {
+        "q": "*",  # Match all documents
+        "facet_by": x_field,  # Facet on the field you want
+        "max_facet_values": 100,  # Increase if you expect many unique values
+    }
+
+    results = ts_client.collections["projects"].documents.search(search_params)
+
+    # Extract the facet values
+    return [facet["value"] for facet in results["facet_counts"][x_field]]
+
+
 if __name__ == "__main__":
     ts_client = generate_client()
+    c1 = list_values(ts_client, CountableFieldsEnum.license)
+    c1 = list_values(ts_client, CountableFieldsEnum.language)
+
     r = search_with_query(ts_client, "wind power")  # , languages="C++")
     print(r)
