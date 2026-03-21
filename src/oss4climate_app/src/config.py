@@ -1,10 +1,8 @@
 import pathlib
 import uuid
-from functools import lru_cache
 
 from oss4climate.src.config import (
     SETTINGS,
-    Settings,
 )
 
 _script_dir = pathlib.Path(__file__).resolve().parent.parent
@@ -36,11 +34,5 @@ URL_BASE = "https://data.pierrevf.consulting/oss4climate"
 URL_RAW_INDEX = f"{URL_BASE}/summary.toml"
 URL_LISTING_FEATHER = f"{URL_BASE}/listing_data.feather"
 
-URL_FAVICON = SETTINGS.APP_URL_FAVICON
 
 FORCE_HTTPS = True
-
-
-@lru_cache(maxsize=1)
-def umami_site_id() -> str:
-    return Settings().UMAMI_SITE_ID

@@ -7,14 +7,15 @@ from dotenv import load_dotenv
 
 
 class Settings(pydantic_settings.BaseSettings):
+    # For scraping
     GITHUB_API_TOKEN: Optional[str] = None
     GITLAB_ACCESS_TOKEN: Optional[str] = None
     LOCAL_FOLDER: str = str(Path(__file__).parent.parent.parent.parent / ".data")
     SCRAPING_SQLITE_DB: str = "db.sqlite"
-    APP_SQLITE_DB: str = "app_db.sqlite"
     # For usage analytics
     UMAMI_SITE_ID: str = ""
-    # Identifiants of FTP for export
+    APP_SQLITE_DB: str = "app_db.sqlite"
+    # Identifiants of FTP for export (scripts only)
     EXPORT_FTP_URL: Optional[str] = None
     EXPORT_FTP_USER: Optional[str] = None
     EXPORT_FTP_PASSWORD: Optional[str] = None
@@ -23,7 +24,7 @@ class Settings(pydantic_settings.BaseSettings):
     SENTRY_DSN_URL: Optional[str] = None
     APP_URL_BASE: str = ""
     APP_PROXY_PATH: Optional[str] = None
-    APP_URL_FAVICON: str = "https://www.pierrevf.consulting/wp-content/uploads/2023/11/cropped-logo_base_png-32x32.png"
+    APP_URL_FAVICON: str | None = None
 
     # Typesense settings
     TYPESENSE_API_KEY: str = ""

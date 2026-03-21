@@ -4,13 +4,13 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import FastAPI, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from oss4climate.src.config import SETTINGS
-from oss4climate.src.log import log_info, log_warning
+from oss4climate.src.log import log_info
 
 from oss4climate_app.src import mcp_server
-from oss4climate_app.src.config import STATIC_FILES_PATH, URL_FAVICON
+from oss4climate_app.src.config import STATIC_FILES_PATH
 from oss4climate_app.src.data_io import download_listing_data_for_app
 from oss4climate_app.src.log_activity import log_landing
 from oss4climate_app.src.routers import api, ui
@@ -108,8 +108,11 @@ def _head_base(request: Request):
 
 @app.get("/favicon.ico")
 def _favicon():
-    # This is just a dummy favicon for now (waiting for a better logo)
-    return RedirectResponse(URL_FAVICON)
+    url = SETTINGS.APP_URL_FAVICON
+    if url:
+        return RedirectResponse(url)
+    else:
+        return JSONResponse(content={"favicon": "not defined"}, status_code=404)
 
 
 # ----------------------------------------------------------------------------------

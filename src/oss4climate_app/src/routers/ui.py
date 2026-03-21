@@ -14,7 +14,6 @@ from oss4climate_app.src.config import (
     SETTINGS,
     URL_CODE_REPOSITORY,
     URL_FEEDBACK_FORM,
-    umami_site_id,
 )
 from oss4climate_app.src.data_io import (
     repository_index_characteristics_from_documents,
@@ -37,7 +36,7 @@ def _render_ui_template(
     else:
         canonical_url = f"{url.scheme}://{url.netloc}{url.path}"
     resp = {
-        "UMAMI_SITE_ID": umami_site_id(),
+        "UMAMI_SITE_ID": SETTINGS.UMAMI_SITE_ID,
         "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
         "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
         "URL_BASE": SETTINGS.full_url_base,
