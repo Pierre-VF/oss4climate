@@ -19,15 +19,21 @@ jobs:
 
 
     services:
-      postgres:
+      typesense:
         image: typesense/typesense:30.1
         # Service containers to run with `container-job`
         ports:
           - 8108:8108
         options: >-
-          - "--data-dir=/data"
-          - "--api-key=DUMMY_TYPESENSE_API_KEY"
-          - "--enable-cors"
+          --health-cmd "curl -f http://localhost:8108/health || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        command: [
+          "--data-dir=/data",
+          "--api-key=DUMMY_TYPESENSE_API_KEY",
+          "--enable-cors"
+        ]
 
     steps:
       - name: "Checkout code"
