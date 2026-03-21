@@ -22,7 +22,7 @@ async def test_list_tools():
         rs_raw = await mcp_client.call_tool(
             "search_for_projects",
             {
-                "topic": "solar",
+                "topic": "oss4climate",
                 "user_objective": "just testing",
                 "n_max_results": n_max_results,
             },
