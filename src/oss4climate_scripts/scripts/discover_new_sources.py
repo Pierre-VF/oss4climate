@@ -4,9 +4,6 @@ This module contains methods to discover new sources of code
 
 import os
 
-from oss4climate.src.config import (
-    FILE_INPUT_INDEX,
-)
 from oss4climate.src.database.projects import project_dataframe_loader
 from oss4climate.src.log import (
     log_info,
@@ -19,10 +16,13 @@ from oss4climate.src.parsers import (
     url_qualifies,
 )
 from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+from oss4climate_app.config import (
+    FILE_OUTPUT_LISTING_FEATHER,
+)
 from tqdm import tqdm
 
 from oss4climate_scripts.src.config import (
-    FILE_OUTPUT_LISTING_FEATHER,
+    FILE_INPUT_INDEX,
 )
 
 

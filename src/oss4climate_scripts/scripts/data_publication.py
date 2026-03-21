@@ -2,13 +2,15 @@ import os
 from ftplib import FTP
 
 from oss4climate.src.config import (
-    FILE_INPUT_LISTINGS_INDEX,
     SETTINGS,
 )
 from oss4climate.src.log import log_info
+from oss4climate_app.config import (
+    FILE_INPUT_LISTINGS_INDEX,
+    FILE_OUTPUT_LISTING_FEATHER,
+)
 
 from oss4climate_scripts.src.config import (
-    FILE_OUTPUT_LISTING_FEATHER,
     FILE_OUTPUT_SUMMARY_TOML,
 )
 

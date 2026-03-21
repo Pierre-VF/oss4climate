@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info
 
-from oss4climate_app.config import URL_CODE_REPOSITORY, URL_DATA_FEATHER
+from oss4climate_app.config import URL_CODE_REPOSITORY, URL_LISTING_FEATHER
 from oss4climate_app.src.data_io import (
     clear_cache,
     refresh_data,
@@ -91,7 +91,7 @@ async def data_feather():
     """
     Redirects to the dataset in .feather format (please bear in mind the credit considerations for the source projects, see "credits" endpoint)
     """
-    return RedirectResponse(URL_DATA_FEATHER, status_code=307)
+    return RedirectResponse(URL_LISTING_FEATHER, status_code=307)
 
 
 def _permission_admin(key: Optional[str] = None):

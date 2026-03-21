@@ -1,7 +1,3 @@
-from oss4climate.src.config import (
-    FILE_INPUT_INDEX,
-    FILE_OUTPUT_DIR,
-)
 from oss4climate.src.crawler import scrape_all_targets
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
@@ -11,7 +7,11 @@ from oss4climate.src.parsers import (
 from tomlkit import document, dump
 
 from oss4climate_scripts import scripts
-from oss4climate_scripts.src.config import FILE_OUTPUT_SUMMARY_TOML
+from oss4climate_scripts.src.config import (
+    FILE_INPUT_INDEX,
+    FILE_OUTPUT_DIR,
+    FILE_OUTPUT_SUMMARY_TOML,
+)
 
 
 def scrape_all(

@@ -1,4 +1,3 @@
-from oss4climate.src.config import FILE_INPUT_INDEX
 from oss4climate.src.crawler import ParsingTargets, scrape_all_targets
 from oss4climate.src.log import log_info
 from oss4climate.src.parsers.listings.opensustain_tech import (
@@ -6,7 +5,9 @@ from oss4climate.src.parsers.listings.opensustain_tech import (
     fetch_categorised_projects_from_opensustain_webpage,
 )
 from oss4climate.src.parsers.website import crawl_website
+
 from oss4climate_scripts.scripts import format_individual_file
+from oss4climate_scripts.src.config import FILE_INPUT_INDEX
 
 if __name__ == "__main__":
     ## -------------------------------------------------------------------------

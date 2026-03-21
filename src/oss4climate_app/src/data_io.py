@@ -4,16 +4,17 @@ from datetime import date
 from functools import lru_cache
 from urllib.request import urlretrieve
 
-from oss4climate.src.config import (
-    FILE_INPUT_LISTINGS_INDEX,
-    FILE_OUTPUT_DIR,
-    URL_LISTINGS_INDEX,
-)
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_warning
 from oss4climate.src.models import EnumLicenseCategories
 
-from oss4climate_app.config import URL_LISTING_FEATHER
+from oss4climate_app.config import (
+    FILE_INPUT_LISTINGS_INDEX,
+    FILE_OUTPUT_DIR,
+    FILE_OUTPUT_LISTING_FEATHER,
+    URL_LISTING_FEATHER,
+    URL_LISTINGS_INDEX,
+)
 from oss4climate_app.src.search import typesense_io
 
 
@@ -28,8 +29,6 @@ def download_file(url: str, target: str, force_refresh: bool = True) -> None:
 def download_listing_data_for_app(
     force_refresh: bool = True, load_feather_listing: bool = True
 ):
-    from oss4climate_scripts.src.config import FILE_OUTPUT_LISTING_FEATHER
-
     os.makedirs(FILE_OUTPUT_DIR, exist_ok=True)
     download_file(
         URL_LISTINGS_INDEX, FILE_INPUT_LISTINGS_INDEX, force_refresh=force_refresh
@@ -92,8 +91,6 @@ def clear_cache():
 
 
 def refresh_data(force_refresh: bool = False):
-    from oss4climate_scripts.src.config import FILE_OUTPUT_LISTING_FEATHER
-
     if force_refresh or not os.path.exists(FILE_OUTPUT_LISTING_FEATHER):
         log_warning("- Listing not found, downloading again")
         download_listing_data_for_app()

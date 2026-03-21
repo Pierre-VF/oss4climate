@@ -77,15 +77,3 @@ class Settings(pydantic_settings.BaseSettings):
 load_dotenv(override=True)
 
 SETTINGS = Settings()
-
-
-# Link to all documents
-FILE_INPUT_INDEX = "indexes/repositories.toml"
-FILE_INPUT_LISTINGS_INDEX = "indexes/listings.json"
-FILE_OUTPUT_DIR = SETTINGS.LOCAL_FOLDER
-
-# For data available on Github
-__URL_GITHUB_BASE = (
-    "https://raw.githubusercontent.com/Pierre-VF/oss4climate/refs/heads/main/indexes"
-)
-URL_LISTINGS_INDEX = f"{__URL_GITHUB_BASE}/listings.json"
