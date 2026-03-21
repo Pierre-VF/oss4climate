@@ -73,27 +73,32 @@ _TYPESENSE_REPO_SCHEMA_FIELDS = [
 ]
 
 
-_TYPESENSE_CLIENT = typesense.Client(
-    {
-        "nodes": [SETTINGS.typesense_config],
-        "api_key": SETTINGS.TYPESENSE_API_KEY,
-        "connection_timeout_seconds": SETTINGS.TYPESENSE_CONNECTION_TIMEOUT,
-    }
-)
+def generate_client() -> typesense.Client:
+    return typesense.Client(
+        {
+            "nodes": [SETTINGS.typesense_config],
+            "api_key": SETTINGS.TYPESENSE_API_KEY,
+            "connection_timeout_seconds": SETTINGS.TYPESENSE_CONNECTION_TIMEOUT,
+        }
+    )
 
 
-def reset_typesense_schema():
+def client_dependency():
+    yield generate_client()
+
+
+def reset_typesense_schema(ts_client: typesense.Client):
     # Delete the collection
     try:
         print("First deleting all projects")
-        _TYPESENSE_CLIENT.collections["projects"].delete()
+        ts_client.collections["projects"].delete()
         print("Delete completed")
     except typesense.exceptions.ObjectNotFound:
         print("No projects defined")
     print(" ")
     print("Then recreating collections")
     try:
-        _TYPESENSE_CLIENT.collections.create(_TYPESENSE_REPO_SCHEMA)
+        ts_client.collections.create(_TYPESENSE_REPO_SCHEMA)
 
     except typesense.exceptions.ObjectAlreadyExists:
         pass
@@ -105,12 +110,12 @@ def _date_to_timestamp(x: date | None) -> int:
     return int(datetime(x.year, x.month, x.day).timestamp())
 
 
-def index_data_in_typesense(df: pd.DataFrame) -> None:
+def index_data_in_typesense(ts_client: typesense.Client, df: pd.DataFrame) -> None:
     if "last_commit_timestamp" not in df.columns:
         df["last_commit_timestamp"] = df["last_commit"].apply(_date_to_timestamp)
 
     [
-        _TYPESENSE_CLIENT.collections["projects"].documents.import_(
+        ts_client.collections["projects"].documents.import_(
             [
                 {k: r[k] for k in _TYPESENSE_REPO_SCHEMA_FIELDS}
                 | {
@@ -128,7 +133,31 @@ class SearchResult(BaseModel):
     results: list[ResultItem]
 
 
-def search_in_typesense(
+def search_for_url(ts_client: typesense.Client, url: str) -> SearchResult:
+    results_per_page = 5  # Just to highlight that several results are found
+    page = 1
+    r = ts_client.collections["projects"].documents.search(
+        SearchParameters(
+            q=url,
+            query_by="url",
+            # For hybrid search
+            # rerank_hybrid_matches=True,
+            # vector_query="embedding_readme:([], k: 200)",  # Here, reduce the relevant fields
+            # sort_by="idx:asc",
+            exclude_fields=["embedding_description", "embedding_readme"],
+            per_page=results_per_page,
+            page=page,
+        )
+    )
+    return SearchResult(
+        page=r["page"],
+        total_results=r["found"],
+        results=[ResultItem(**i["document"]) for i in r["hits"]],
+    )
+
+
+def search_with_query(
+    ts_client: typesense.Client,
     query: str | None,
     results_per_page: int = 50,
     page: int = 1,
@@ -153,7 +182,7 @@ def search_in_typesense(
     else:
         query_by = "description, readme, name"
 
-    r = _TYPESENSE_CLIENT.collections["projects"].documents.search(
+    r = ts_client.collections["projects"].documents.search(
         SearchParameters(
             q=query,
             query_by=query_by,
@@ -175,5 +204,6 @@ def search_in_typesense(
 
 
 if __name__ == "__main__":
-    r = search_in_typesense("wind power")  # , languages="C++")
+    ts_client = generate_client()
+    r = search_with_query(ts_client, "wind power")  # , languages="C++")
     print(r)

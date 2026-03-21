@@ -1,7 +1,6 @@
 import pytest
 from fastmcp.client import Client
-
-from oss4climate_mcp.main import ProjectDetails, mcp
+from oss4climate_app.src.mcp_server import ProjectDetails, mcp
 
 
 @pytest.mark.asyncio

@@ -3,8 +3,6 @@ from pydantic_ai import Agent
 from pydantic_ai.toolsets.fastmcp import FastMCPToolset
 from pydantic_settings import BaseSettings
 
-from oss4climate_mcp.main import mcp
-
 
 class Settings(BaseSettings):
     # Define the following variables in a ".env" file
@@ -59,7 +57,8 @@ else:
     raise EnvironmentError(f"Model not supported ({model_name})")
 
 # Spin the MCP in the background
-mcp_tool = FastMCPToolset(mcp)
+# mcp_tool = FastMCPToolset(mcp)
+mcp_tool = FastMCPToolset("http://localhost:8080/mcp/sse")
 agent = Agent(
     model,
     toolsets=[mcp_tool],

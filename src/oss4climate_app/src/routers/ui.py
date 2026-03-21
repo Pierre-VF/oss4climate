@@ -6,12 +6,12 @@ from datetime import date, timedelta
 from typing import Optional
 
 import pandas as pd
-from fastapi import APIRouter, BackgroundTasks, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi.responses import HTMLResponse
-
 from oss4climate.src.models import (
     EnumLicenseCategories,
 )
+
 from oss4climate_app.config import (
     FORCE_HTTPS,
     SETTINGS,
@@ -87,6 +87,7 @@ async def search_results(
     # For backwards compatibility of links
     n_results: Optional[int] = None,
     offset: Optional[int] = None,
+    ts_client=Depends(typesense_io.generate_client),
 ):
     if query:
         query = query.strip().lower()
@@ -96,7 +97,8 @@ async def search_results(
         page = 1
     else:
         page = offset
-    r = typesense_io.search_in_typesense(
+    r = typesense_io.search_with_query(
+        ts_client,
         query,
         results_per_page=n_results,
         page=page,

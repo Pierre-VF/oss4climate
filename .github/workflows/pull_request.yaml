@@ -17,6 +17,18 @@ jobs:
       pull-requests: write
       contents: write
 
+
+    services:
+      postgres:
+        image: typesense/typesense:30.1
+        # Service containers to run with `container-job`
+        ports:
+          - 8108:8108
+        options: >-
+          - "--data-dir=/data"
+          - "--api-key=DUMMY_TYPESENSE_API_KEY"
+          - "--enable-cors"
+
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -59,3 +71,6 @@ jobs:
 
       - name: Run code test
         run: make test
+        env:
+          DUMMY_TYPESENSE_API_KEY: DUMMY_TYPESENSE_API_KEY
+          TYPESENSE_HOST: http://typesense:8108

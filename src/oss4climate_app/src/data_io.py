@@ -14,6 +14,7 @@ from oss4climate.src.config import (
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_warning
 from oss4climate.src.models import EnumLicenseCategories
+
 from oss4climate_app.src.search import typesense_io
 
 
@@ -65,7 +66,10 @@ def unique_license_categories() -> list[EnumLicenseCategories]:
 
 @lru_cache(maxsize=1)
 def n_repositories_indexed():
-    x = typesense_io.search_in_typesense(" ", results_per_page=2)
+    # TODO : avoid on the fly client creation
+    x = typesense_io.search_with_query(
+        typesense_io.generate_client(), " ", results_per_page=2
+    )
     return x.total_results
 
 

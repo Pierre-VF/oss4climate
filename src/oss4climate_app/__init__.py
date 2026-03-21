@@ -6,10 +6,11 @@ from typing import Optional
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info, log_warning
+
 from oss4climate_app.config import STATIC_FILES_PATH, URL_FAVICON
+from oss4climate_app.src import mcp_server
 from oss4climate_app.src.log_activity import log_landing
 from oss4climate_app.src.routers import api, ui
 from oss4climate_app.src.templates import render_template
@@ -146,3 +147,6 @@ def _robots_txt(request: Request):
 app.mount("/api", api.app)
 app.mount("/ui", ui.app)
 app.mount("/static", StaticFiles(directory=str(STATIC_FILES_PATH)), name="static")
+
+# Adding MCP
+app.mount("/mcp", app=mcp_server.mcp.http_app(transport="sse"))

@@ -1158,12 +1158,12 @@ dependencies = [
 [package.dev-dependencies]
 app = [
     { name = "fastapi" },
+    { name = "fastmcp" },
     { name = "gunicorn" },
     { name = "sentry-sdk", extra = ["fastapi"] },
     { name = "uvicorn", extra = ["standard"] },
 ]
 mcp = [
-    { name = "fastmcp" },
     { name = "pydantic-ai-slim", extra = ["anthropic", "cli", "fastmcp", "mistral"] },
 ]
 notebooks = [
@@ -1203,14 +1203,12 @@ requires-dist = [
 [package.metadata.requires-dev]
 app = [
     { name = "fastapi", specifier = ">=0.135.1" },
+    { name = "fastmcp", specifier = ">=3.1,<4" },
     { name = "gunicorn", specifier = ">=23.0.0" },
     { name = "sentry-sdk", extras = ["fastapi"], specifier = ">=2.19.2" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.42.0" },
 ]
-mcp = [
-    { name = "fastmcp", specifier = ">=3.1,<4" },
-    { name = "pydantic-ai-slim", extras = ["mistral", "anthropic", "fastmcp", "cli"], specifier = ">=1.68.0" },
-]
+mcp = [{ name = "pydantic-ai-slim", extras = ["mistral", "anthropic", "fastmcp", "cli"], specifier = ">=1.68.0" }]
 notebooks = [{ name = "scikit-learn", specifier = ">=1.8.0" }]
 scripts = [
     { name = "black", specifier = ">=26.3.1" },

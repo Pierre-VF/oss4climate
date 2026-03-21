@@ -4,21 +4,17 @@ Example of an MCP server using https://github.com/modelcontextprotocol/python-sd
 
 import pandas as pd
 from fastmcp import FastMCP
+from fastmcp.dependencies import Depends
 from fastmcp.exceptions import NotFoundError
 from pydantic import BaseModel
 
-from oss4climate.src.config import FILE_OUTPUT_LISTING_FEATHER
-from oss4climate.src.database.projects import project_dataframe_loader
 from oss4climate_app.src.search import typesense_io
-
-# Full indexing of the files
-df: pd.DataFrame = project_dataframe_loader(FILE_OUTPUT_LISTING_FEATHER)
-df["idx"] = df.index.to_series().astype(int)
 
 # Create an MCP server
 mcp = FastMCP(
     "MCP supporting open-source project discovery in the sustainability field.",
 )
+_TS_CLIENT = typesense_io.generate_client()
 
 
 class ProjectDetails(BaseModel):
@@ -59,24 +55,29 @@ def read_project_details(url: str) -> ProjectDetails:
     """Provides the details of a project for which the URL is provided.
     This is meant to provide you context about projects from Github, Gitlab, Bitbucket and other Gitx places.
     """
-    r = df[df["url"] == url]
+    res = typesense_io.search_for_url(_TS_CLIENT, url)
+    r = [ProjectDetails.from_typesense_item(i) for i in res.results]
     if len(r) < 1:
         print(f"[read_project_details] url= {url} [NOT FOUND]")
         raise NotFoundError()
     else:
-        print(f"[read_project_details] url= {url} [FOUND]")
-        return ProjectDetails.from_row(r.iloc[0])
+        print(f"[read_project_details] url= {url} [FOUND] ({len(r)} results)")
+        return r[0]
 
 
 @mcp.tool()
 def search_for_projects(
-    topic: str, user_objective: str, n_max_results: int = 50
+    topic: str,
+    user_objective: str,
+    n_max_results: int = 50,
+    ts_client=Depends(typesense_io.generate_client),
 ) -> list[ProjectDetails]:
     """Searches for projects that are related to a topic.
     `user_objective` is a string that explains what the user is trying to achieve.
     `n_max_results` is an integer that sets the maximum number of results returned"""
 
-    res = typesense_io.search_in_typesense(
+    res = typesense_io.search_with_query(
+        ts_client,
         query=topic,
         results_per_page=n_max_results,
         page=1,
