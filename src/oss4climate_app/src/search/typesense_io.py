@@ -4,12 +4,13 @@ from enum import Enum
 import pandas as pd
 import typesense
 import typesense.exceptions
-from oss4climate.src.config import SETTINGS
 from pydantic import BaseModel
 from tqdm import tqdm
 from typesense.types.document import (
     SearchParameters,
 )
+
+from oss4climate.src.config import SETTINGS
 
 _TYPESENSE_EMBEDDING_MODEL = "ts/all-MiniLM-L12-v2"
 
@@ -63,6 +64,7 @@ _TYPESENSE_REPO_SCHEMA = {
             "type": "int64",
         },  # date is not supported by TypeSense
         {"name": "is_fork", "type": "bool", "facet": True},
+        {"name": "high_quality", "type": "bool", "facet": True},
         # TODO : add hints from the README files (just need to compress key information well enough there)
     ],
     "default_sorting_field": "idx",
@@ -108,6 +110,8 @@ def _date_to_timestamp(x: date | None) -> int:
 
 
 def index_data_in_typesense(ts_client: typesense.Client, df: pd.DataFrame) -> None:
+    if "high_quality" not in df.columns:
+        df["high_quality"] = True
     if "last_commit_timestamp" not in df.columns:
         df["last_commit_timestamp"] = df["last_commit"].apply(_date_to_timestamp)
 
@@ -130,7 +134,34 @@ class SearchResult(BaseModel):
     results: list[ResultItem]
 
 
-def search_for_url(ts_client: typesense.Client, url: str) -> SearchResult:
+def _search_kwargs(
+    languages: list[str] | str | None = None,
+    license_category: str | None = None,
+    high_quality_only: bool = True,
+) -> dict[str, str]:
+    kwargs_search = dict()
+    filter_by = []
+    if languages not in [None, "*"]:
+        if isinstance(languages, str):
+            languages = [languages]
+        filter_by.append(f"language: [{','.join(languages)}]")
+    if license_category not in [None, "*"]:
+        # TODO: this needs to be better aligned with actual usages
+        licenses = license_category.split(",")
+        filter_by.append(f"license: [{','.join(licenses)}]")
+    if high_quality_only:
+        filter_by.append("high_quality := true")
+
+    if filter_by:
+        kwargs_search["filter_by"] = " && ".join(filter_by)
+    return kwargs_search
+
+
+def search_for_url(
+    ts_client: typesense.Client,
+    url: str,
+    high_quality_only: bool = True,
+) -> SearchResult:
     results_per_page = 5  # Just to highlight that several results are found
     page = 1
     r = ts_client.collections["projects"].documents.search(
@@ -160,24 +191,21 @@ def search_with_query(
     page: int = 1,
     languages: list[str] | str | None = None,
     license_category: str | None = None,
+    high_quality_only: bool = True,
 ) -> SearchResult:
     if query is None:
         query = " "  # TODO: make this better
-
-    kwargs_search = dict()
-    if languages not in [None, "*"]:
-        if isinstance(languages, str):
-            languages = [languages]
-        kwargs_search["filter_by"] = f"language: [{','.join(languages)}]"
-    if license_category not in [None, "*"]:
-        # TODO: this needs to be better aligned with actual usages
-        licenses = license_category.split(",")
-        kwargs_search["filter_by"] = f"license: [{','.join(licenses)}]"
 
     # Enable hybrid search only if used in settings
     query_by = "name, organisation, description, readme"
     if SETTINGS.ENABLE_HYBRID_SEARCH:
         query_by = f"{query_by}, embedding_readme"
+
+    s_kwargs = _search_kwargs(
+        languages=languages,
+        license_category=license_category,
+        high_quality_only=high_quality_only,
+    )
 
     r = ts_client.collections["projects"].documents.search(
         SearchParameters(
@@ -190,7 +218,7 @@ def search_with_query(
             exclude_fields=["embedding_description", "embedding_readme"],
             per_page=results_per_page,
             page=page,
-            **kwargs_search,
+            **s_kwargs,
         )
     )
     return SearchResult(
@@ -206,14 +234,20 @@ class CountableFieldsEnum(Enum):
     organisation = "organisation"
 
 
-def count_values(ts_client: typesense.Client, field: CountableFieldsEnum) -> pd.Series:
+def count_values(
+    ts_client: typesense.Client,
+    field: CountableFieldsEnum,
+    high_quality_only: bool = True,
+) -> pd.Series:
     x_field = field.value
     # Facet on "type_id" with a wildcard query
     search_params = {
         "q": "*",  # Match all documents
         "facet_by": x_field,  # Facet on the field you want
         "max_facet_values": 250,  # Increase if you expect many unique values
-    }
+    } | _search_kwargs(
+        high_quality_only=high_quality_only,
+    )
     results = ts_client.collections["projects"].documents.search(search_params)
     d = {
         facet["value"]: facet["count"] for facet in results["facet_counts"][0]["counts"]
@@ -221,8 +255,14 @@ def count_values(ts_client: typesense.Client, field: CountableFieldsEnum) -> pd.
     return pd.Series(d)
 
 
-def list_values(ts_client: typesense.Client, field: CountableFieldsEnum) -> list[str]:
-    return count_values(ts_client, field).index.to_list()
+def list_values(
+    ts_client: typesense.Client,
+    field: CountableFieldsEnum,
+    high_quality_only: bool = True,
+) -> list[str]:
+    return count_values(
+        ts_client, field, high_quality_only=high_quality_only
+    ).index.to_list()
 
 
 if __name__ == "__main__":
