@@ -30,10 +30,13 @@ df = project_dataframe_loader(FILE_OUTPUT_LISTING_FEATHER)
 # ==============================================================================
 # Mark the OSSTech repos
 # ==============================================================================
+from datetime import timedelta
 
 from oss4climate.src.parsers.listings import opensustain_tech
 
-osst_targets = opensustain_tech.fetch_all_project_urls_from_opensustain_webpage()
+osst_targets = opensustain_tech.fetch_all_project_urls_from_opensustain_webpage(
+    cache_lifetime=timedelta(hours=6)
+)
 
 df["high_quality"] = df["url"].apply(lambda i: i in osst_targets)
 
