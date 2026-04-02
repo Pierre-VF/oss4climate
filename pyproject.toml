@@ -1,6 +1,6 @@
 [project]
 name = "oss4climate"
-version = "0.6.1"
+version = "0.6.2"
 readme = "README.md"
 description = "Package to create listings of Open Source for Energy"
 authors = [
@@ -17,13 +17,14 @@ dependencies = [
     "pyarrow>=23.0.1",
     "pydantic>=2.12.4",
     "pydantic-settings>=2.7.1",
-    "requests>=2.32.3",
+    "requests>=2.33.0",
     "sqlmodel>=0.0.27",
     "tomlkit>=0.13.3",
     "tqdm>=4.67.1",
     "typesense>=2.0.0",
     # Security forces below (not actual direct dependencies)
     "urllib3>=2.6.3",
+    "cryptography>=46.0.6",
 ]
 packages = [
     "src/oss4climate",
@@ -47,14 +48,18 @@ test = [
     "httpx>=0.28.1",
     "coverage>=7.11.3",
     "pytest-asyncio>=1.3.0",
+    # Security only:
+    "pygments>=2.20.0",
 ]
 app = [
     "fastapi>=0.135.1",
     "gunicorn>=23.0.0",
     "sentry-sdk[fastapi]>=2.19.2",
     "uvicorn[standard]>=0.42.0",
-    "fastmcp>=3.1, <4",
+    "fastmcp>=3.2, <4",
 ]
 mcp = [
     "pydantic-ai-slim[mistral,anthropic,fastmcp,cli]>=1.68.0",
+    # Security only:
+    "anthropic>=0.87.0"
 ]
