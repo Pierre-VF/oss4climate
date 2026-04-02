@@ -59,6 +59,7 @@ async def search(request: Request):
         template_file="v2/search.html",
         content={
             "n_repositories_indexed": characteristics.n_repositories_indexed,
+            "n_repositories_indexed_extended": characteristics.n_repositories_indexed_extended,
             "languages": characteristics.unique_languages,
             "licenses": characteristics.unique_licenses,
             "unique_license_categories": unique_license_categories(),
