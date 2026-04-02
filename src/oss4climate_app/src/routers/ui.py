@@ -76,6 +76,7 @@ async def search_results(
     license_category: Optional[str] = None,
     exclude_forks: Optional[bool] = None,
     exclude_inactive: Optional[bool] = None,
+    extended_search: bool = False,  # Allows lower quality results
     # For backwards compatibility of links
     n_results: Optional[int] = None,
     offset: Optional[int] = None,
@@ -100,6 +101,7 @@ async def search_results(
         page=page,
         languages=language,
         license_category=license_category,
+        high_quality_only=(not extended_search),
     )
 
     n_total_found = r.total_results

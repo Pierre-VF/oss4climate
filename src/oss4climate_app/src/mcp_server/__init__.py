@@ -81,6 +81,7 @@ def search_for_projects(
         query=topic,
         results_per_page=n_max_results,
         page=1,
+        high_quality_only=True,  # For now, MCP is restricted to high quality
     )
     print(
         f"""[search] keywords= {topic} / {len(res.results)} results (max={n_max_results})
