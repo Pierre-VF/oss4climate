@@ -8,6 +8,14 @@ import pandas as pd
 def project_dataframe_loader(
     documents: pd.DataFrame | str | None, limit: int | None = None
 ):
+    """
+    Load project data from DataFrame or Feather file
+
+    :param documents: DataFrame containing project data or path to Feather file
+    :param limit: Optional maximum number of rows to load
+    :return: DataFrame with project data
+    :raises AssertionError: If file path doesn't end with .feather extension
+    """
     if isinstance(documents, str):
         assert documents.endswith(".feather"), (
             f"Only accepting .feather files (not {documents})"

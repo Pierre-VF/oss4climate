@@ -17,6 +17,12 @@ class EnumDocumentationFileType(Enum):
 
     @staticmethod
     def from_filename(f: str) -> "EnumDocumentationFileType":
+        """
+        Determine documentation file type from filename extension
+
+        :param f: Filename to check (including file extension)
+        :return: Corresponding EnumDocumentationFileType
+        """
         f_lower = f.lower()
         if f_lower.endswith(".md"):
             return EnumDocumentationFileType.MARKDOWN

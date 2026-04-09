@@ -25,6 +25,13 @@ from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
 
 def _parse_readme(readme: str, readme_type: EnumDocumentationFileType) -> str | None:
+    """
+    Parse a README file and extract project URLs
+
+    :param readme: README content as string
+    :param readme_type: Type of documentation file
+    :return: Parsed content or None if file type is not supported
+    """
     if readme_type == EnumDocumentationFileType.MARKDOWN:
         return __fetch_from_markdown_str(readme)
     elif readme_type == EnumDocumentationFileType.RESTRUCTURED_TEXT:
@@ -36,6 +43,13 @@ def _parse_readme(readme: str, readme_type: EnumDocumentationFileType) -> str | 
 
 
 def _flexible_url_parse(i: str | dict[str, str]) -> str:
+    """
+    Parse URL from flexible input format
+
+    :param i: URL as string or dictionary with 'url' key
+    :return: Extracted URL string
+    :raises ValueError: If input format is not supported
+    """
     if isinstance(i, str):
         out = i
     elif isinstance(i, dict) and "url" in i:
@@ -56,6 +70,15 @@ def parse_listing(
     listing_type: EnumListingType,
     cache_lifetime: timedelta | None = None,
 ) -> ParsingTargets:
+    """
+    Parse a listing from various sources and extract project targets
+
+    :param url: URL or dictionary containing URL to parse
+    :param listing_type: Type of listing (GITHUB, GITLAB, or HTML)
+    :param cache_lifetime: Optional maximum age for cached data
+    :return: ParsingTargets containing extracted project URLs
+    :raises ValueError: If listing type is not supported
+    """
     i = _flexible_url_parse(url)
     if listing_type == EnumListingType.GITHUB:
         readme_i, readme_type_i = GithubScraper(
@@ -82,9 +105,12 @@ def fetch_all(
     cache_lifetime: timedelta | None = None,
 ) -> ParsingTargets:
     """
-    Fetches data for all of the listings in a TOML file
+    Fetches data for all of the listings in a TOML or JSON file
 
-    :return: sum of all listings targets (sorted and unique)
+    :param listings_file: Path to TOML or JSON file containing listings
+    :param cache_lifetime: Optional maximum age for cached data
+    :return: Sum of all listings targets (sorted and unique)
+    :raises ValueError: If file format is not supported (must be .toml or .json)
     """
     if listings_file.endswith(".toml"):
         listing = ResourceListing.from_toml(listings_file)

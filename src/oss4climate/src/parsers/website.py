@@ -21,6 +21,14 @@ def _web_get(
     cache_lifetime: timedelta | None = None,
     rate_limiting_wait_s: float = 0.1,
 ) -> str:
+    """
+    Perform a web GET request for website scraping
+
+    :param url: URL to fetch
+    :param cache_lifetime: Optional maximum age for cached data
+    :param rate_limiting_wait_s: Time to wait between requests to avoid rate limiting
+    :return: Response text
+    """
     headers = None
     res = cached_web_get_text(
         url=url,
@@ -32,6 +40,12 @@ def _web_get(
 
 
 def _is_interesting_internal_url(url: str) -> bool:
+    """
+    Check if an internal URL is interesting for scraping
+
+    :param url: URL to check
+    :return: True if URL is interesting for scraping, False otherwise
+    """
     if url.startswith("javascript:"):
         return False
     elif url.endswith(".css"):
@@ -46,6 +60,13 @@ def scrape_page(
     url: str,
     cache_lifetime: timedelta | None = None,
 ) -> tuple[ParsingTargets, list[str]]:
+    """
+    Scrape a webpage and extract internal links and external parsing targets
+
+    :param url: URL of webpage to scrape
+    :param cache_lifetime: Optional maximum age for cached data
+    :return: Tuple containing list of interesting internal links and ParsingTargets for external links
+    """
     page_str = _web_get(url, cache_lifetime=cache_lifetime)
     soup = BeautifulSoup(page_str, "html.parser")
 
@@ -75,6 +96,17 @@ def crawl_website(
     max_pages: int | None = None,
     ignore_path_regex: str | None = None,
 ) -> ParsingTargets:
+    """
+    Crawl a website and extract all relevant parsing targets
+
+    :param url: Starting URL for website crawling
+    :param remove_unknown: Whether to remove unknown targets from results
+    :param cache_lifetime: Optional maximum age for cached data
+    :param max_pages: Optional maximum number of pages to crawl
+    :param ignore_path_regex: Optional regex pattern for paths to ignore (not implemented)
+    :return: ParsingTargets containing all extracted project URLs
+    :raises NotImplementedError: If robots.txt exists or ignore_path_regex is provided
+    """
     try:
         url_raw = urlparse(url)
         _web_get(f"{url_raw.scheme}://{url_raw.hostname}/robots.txt")

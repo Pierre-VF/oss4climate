@@ -45,6 +45,11 @@ _ENGINE = _open_engine_and_create_database_if_missing()
 # Actual methods
 # -------------------------------------------------------------------------------------
 def __now() -> datetime:
+    """
+    Get current datetime in UTC timezone
+
+    :return: Current datetime with UTC timezone
+    """
     return datetime.now(tz=UTC)
 
 
@@ -53,6 +58,14 @@ def load_from_database(
     is_json: bool,
     cache_lifetime: timedelta | None = None,
 ) -> dict | None:
+    """
+    Load data from database cache
+
+    :param key: Cache key to retrieve
+    :param is_json: Whether the cached value is JSON data
+    :param cache_lifetime: Optional maximum age for cached data
+    :return: Cached data as dictionary or None if not found/expired
+    """
     with Session(_ENGINE) as session:
         res = session.exec(select(Cache).where(Cache.id == key)).first()
         if res is None:
@@ -73,6 +86,13 @@ def load_from_database(
 
 
 def save_to_database(key: str, value: dict, is_json: bool) -> None:
+    """
+    Save data to database cache
+
+    :param key: Cache key to store data under
+    :param value: Data to cache
+    :param is_json: Whether the value should be stored as JSON
+    """
     if is_json:
         value_to_write = json.dumps(value)
     else:
