@@ -29,7 +29,13 @@ class GitPlatformScraper:
         pass
 
     def minimalise_resource_url(self, url: str) -> str:
-        pass
+        """
+        Minimalise a resource URL to its canonical form
+
+        :param url: URL to minimalise
+        :return: Minimalised URL string
+        """
+        raise NotImplementedError("This needs to be implemented in children classes")
 
     @abstractmethod
     def split_across_target_sets(
@@ -123,7 +129,7 @@ def map_function_on_all_files_in_folder(
 
     :param f: function to map
     :param path: path of the directory
-    _param apply_on_file_content: if True, applies the function on the content (read in text mode) of the file,
+    :param apply_on_file_content: if True, applies the function on the content (read in text mode) of the file,
         else applies the function on the file path
     :param include_subfolders: if True, maps the function to all files in sub-directories too, defaults to True
     :return: dictionary of results of calling the function f on all files
