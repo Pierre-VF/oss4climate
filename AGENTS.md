@@ -15,9 +15,16 @@
 
 ## Code style
 
-- Docstrings use reStructuredText format
+
 - Use object-oriented patterns where meaningful
 - Code style is handled by pre-commits using the command above.
+
+
+## Code documentation
+
+- In Python code, make sure that all Docstrings use reStructuredText format (without type lines as these are covered by the type hints).
+
+- All public methods shall be documented.
 
 ## Tests
 
