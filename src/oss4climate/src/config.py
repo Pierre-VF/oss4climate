@@ -40,6 +40,12 @@ class Settings(pydantic_settings.BaseSettings):
 
     @property
     def typesense_config(self) -> dict[str, int | str]:
+        """
+        Get Typesense configuration from TYPESENSE_HOST environment variable
+
+        :return: Dictionary containing host, port, and protocol for Typesense connection
+        :raises EnvironmentError: If hostname, scheme, or port is missing from TYPESENSE_HOST
+        """
         url = urlsplit(self.TYPESENSE_HOST)
         if url.hostname in [None, ""]:
             raise EnvironmentError("Hostname must be provided in TYPESENSE_HOST")
@@ -57,6 +63,11 @@ class Settings(pydantic_settings.BaseSettings):
 
     @property
     def full_url_base(self) -> str:
+        """
+        Get the full URL base by combining APP_URL_BASE and APP_PROXY_PATH
+
+        :return: Combined URL base string
+        """
         if (self.APP_PROXY_PATH is None) or (self.APP_PROXY_PATH == ""):
             return self.APP_URL_BASE
         else:
@@ -64,10 +75,20 @@ class Settings(pydantic_settings.BaseSettings):
 
     @property
     def path_scraping_sqlite_db(self) -> str:
+        """
+        Get the full path to the scraping SQLite database
+
+        :return: Full path string to the scraping database
+        """
         return f"{self.LOCAL_FOLDER}/{self.SCRAPING_SQLITE_DB}"
 
     @property
     def path_app_sqlite_db(self) -> str:
+        """
+        Get the full path to the application SQLite database
+
+        :return: Full path string to the application database
+        """
         if self.APP_SQLITE_DB.startswith(self.LOCAL_FOLDER):
             # for backwards compatibility
             return self.APP_SQLITE_DB

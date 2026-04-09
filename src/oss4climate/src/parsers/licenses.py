@@ -40,10 +40,22 @@ _url_by_license = {
 
 
 def licence_url_from_license_name(name: str) -> str | None:
+    """
+    Get the canonical URL for a license by name
+
+    :param name: License name
+    :return: Canonical URL for the license, or None if not found
+    """
     return _url_by_license.get(name)
 
 
 def license_category_from_license_name(name: str) -> EnumLicenseCategories:
+    """
+    Determine the license category from a license name
+
+    :param name: License name to categorize
+    :return: Corresponding EnumLicenseCategories value
+    """
     if not isinstance(name, str):
         out = EnumLicenseCategories.UNKNOWN
     elif name in ["Apache License 2.0"]:

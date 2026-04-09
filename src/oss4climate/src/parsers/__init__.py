@@ -42,6 +42,20 @@ def _cached_web_get(
     rate_limiting_wait_s: float = 0.1,
     cache_lifetime: timedelta | None = None,
 ) -> dict | str:
+    """
+    Perform a cached web GET request
+
+    :param url: URL to fetch
+    :param headers: Optional headers to include in request
+    :param wait_after_web_query: Whether to wait after the query to avoid rate limiting
+    :param is_json: Whether to parse response as JSON
+    :param raise_rate_limit_error_on_403: Whether to raise RateLimitError on 403 status
+    :param rate_limiting_wait_s: Time to wait between requests to avoid rate limiting
+    :param cache_lifetime: Optional maximum age for cached data
+    :return: Response data as dictionary (if is_json=True) or string
+    :raises requests.exceptions.HTTPError: For 404 errors or other HTTP issues
+    :raises RateLimitError: If rate limit is hit and raise_rate_limit_error_on_403 is True
+    """
     # Uses the cache to ensure that requests are minimised
     out = load_from_database(url, is_json=is_json, cache_lifetime=cache_lifetime)
 
@@ -84,6 +98,17 @@ def cached_web_get_json(
     rate_limiting_wait_s: float = 0.1,
     cache_lifetime: timedelta | None = None,
 ) -> dict:
+    """
+    Perform a cached web GET request and parse response as JSON
+
+    :param url: URL to fetch
+    :param headers: Optional headers to include in request
+    :param wait_after_web_query: Whether to wait after the query to avoid rate limiting
+    :param raise_rate_limit_error_on_403: Whether to raise RateLimitError on 403 status
+    :param rate_limiting_wait_s: Time to wait between requests to avoid rate limiting
+    :param cache_lifetime: Optional maximum age for cached data
+    :return: Response data as dictionary
+    """
     return _cached_web_get(
         url=url,
         headers=headers,
@@ -103,6 +128,17 @@ def cached_web_get_text(
     rate_limiting_wait_s: float = 0.1,
     cache_lifetime: timedelta | None = None,
 ) -> str:
+    """
+    Perform a cached web GET request and return response as text
+
+    :param url: URL to fetch
+    :param headers: Optional headers to include in request
+    :param wait_after_web_query: Whether to wait after the query to avoid rate limiting
+    :param raise_rate_limit_error_on_403: Whether to raise RateLimitError on 403 status
+    :param rate_limiting_wait_s: Time to wait between requests to avoid rate limiting
+    :param cache_lifetime: Optional maximum age for cached data
+    :return: Response data as string
+    """
     return _cached_web_get(
         url=url,
         headers=headers,
