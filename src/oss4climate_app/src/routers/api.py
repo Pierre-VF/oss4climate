@@ -8,9 +8,9 @@ from typing import Optional
 
 from fastapi import BackgroundTasks, Depends, FastAPI, Request
 from fastapi.responses import PlainTextResponse, RedirectResponse
+
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info
-
 from oss4climate_app.src.config import URL_CODE_REPOSITORY, URL_LISTING_FEATHER
 from oss4climate_app.src.data_io import (
     clear_cache,
@@ -44,13 +44,18 @@ async def search(
     request: Request,
     background_tasks: BackgroundTasks,
     query: Optional[str] = None,
+    extended_search: bool = False,
     ts_client=Depends(typesense_io.generate_client),
 ) -> typesense_io.SearchResult:
     if query:
         query = query.strip().lower()
     if query is None:
         query = " "  # TODO : find a better solution
-    res = typesense_io.search_with_query(ts_client, query)
+    res = typesense_io.search_with_query(
+        ts_client,
+        query,
+        high_quality_only=(not extended_search),
+    )
     return res
 
 

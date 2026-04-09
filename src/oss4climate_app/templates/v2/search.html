@@ -13,6 +13,7 @@
 
         <div class="stats">
             <strong>{{ n_repositories_indexed }}</strong> open-source repositories in the {{ APPLICATION_FIELD }} space
+            (and {{ n_repositories_indexed_extended }} repositories in extended search (Beta) )
         </div>
 
         <form id="code_search_form" target="results" method="post">
@@ -48,6 +49,9 @@
                 <br/>
                 <input type="checkbox" id="exclude_inactive" name="exclude_inactive" />
                 <label for="exclude_inactive" title="Exclude project without commits in the last year">inactive projects</label>
+                <br/>
+                <input type="checkbox" id="extended_search" name="extended_search" />
+                <label for="extended_search" title="Extended search (Beta)">Extended search (Beta)</label>
             </div>
         </form>
 
@@ -77,11 +81,13 @@
             var languageValue = document.getElementById("language").value;
             var excludeForks = document.getElementById("exclude_forks").checked;
             var excludeInactive = document.getElementById("exclude_inactive").checked;
+            var extendedSearch = document.getElementById("extended_search").checked;
             window.location.href = "results?"
                 + "query=" + encodeURIComponent(queryValue)
                 + "&license_category=" + encodeURIComponent(licenseValue)
                 + "&language=" + encodeURIComponent(languageValue)
                 + "&exclude_forks=" + encodeURIComponent(excludeForks)
+                + "&extended_search=" + encodeURIComponent(extendedSearch)
                 + "&exclude_inactive=" + encodeURIComponent(excludeInactive);
         });
     </script>

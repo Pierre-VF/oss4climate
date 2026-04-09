@@ -7,7 +7,6 @@ from urllib.request import urlretrieve
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_warning
 from oss4climate.src.models import EnumLicenseCategories
-
 from oss4climate_app.src.config import (
     FILE_INPUT_LISTINGS_INDEX,
     FILE_OUTPUT_DIR,
@@ -54,6 +53,7 @@ class _RepositoryIndexCharacteristics:
     unique_licenses: list[str]
     unique_languages: list[str]
     n_repositories_indexed: int
+    n_repositories_indexed_extended: int
 
 
 @lru_cache(maxsize=1)
@@ -71,7 +71,8 @@ def repository_index_characteristics_from_documents() -> (
     return _RepositoryIndexCharacteristics(
         unique_licenses=sorted_list_of_unique_elements(licenses),
         unique_languages=sorted_list_of_unique_elements(languages),
-        n_repositories_indexed=n_repositories_indexed(),
+        n_repositories_indexed=n_repositories_indexed(extended=False),
+        n_repositories_indexed_extended=n_repositories_indexed(extended=True),
     )
 
 
@@ -80,12 +81,13 @@ def unique_license_categories() -> list[EnumLicenseCategories]:
     return [i for i in EnumLicenseCategories]
 
 
-@lru_cache(maxsize=1)
-def n_repositories_indexed() -> int:
+@lru_cache(maxsize=2)
+def n_repositories_indexed(extended: bool) -> int:
     # TODO : avoid on the fly client creation
     x = typesense_io.count_values(
         typesense_io.generate_client(),
         field=typesense_io.CountableFieldsEnum.license,
+        high_quality_only=(not extended),
     ).sum()
     return int(x)
 

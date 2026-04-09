@@ -59,6 +59,7 @@ async def search(request: Request):
         template_file="v2/search.html",
         content={
             "n_repositories_indexed": characteristics.n_repositories_indexed,
+            "n_repositories_indexed_extended": characteristics.n_repositories_indexed_extended,
             "languages": characteristics.unique_languages,
             "licenses": characteristics.unique_licenses,
             "unique_license_categories": unique_license_categories(),
@@ -76,6 +77,7 @@ async def search_results(
     license_category: Optional[str] = None,
     exclude_forks: Optional[bool] = None,
     exclude_inactive: Optional[bool] = None,
+    extended_search: bool = False,  # Allows lower quality results
     # For backwards compatibility of links
     n_results: Optional[int] = None,
     offset: Optional[int] = None,
@@ -100,6 +102,7 @@ async def search_results(
         page=page,
         languages=language,
         license_category=license_category,
+        high_quality_only=(not extended_search),
     )
 
     n_total_found = r.total_results
