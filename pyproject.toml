@@ -1,6 +1,6 @@
 [project]
 name = "oss4climate"
-version = "0.7.0"
+version = "0.7.1"
 readme = "README.md"
 description = "Package to create listings of Open Source for Energy"
 authors = [
@@ -24,7 +24,7 @@ dependencies = [
     "typesense>=2.0.0",
     # Security forces below (not actual direct dependencies)
     "urllib3>=2.6.3",
-    "cryptography>=46.0.6",
+    "cryptography>=46.0.7",
     "authlib>=1.6.11",
     "python-multipart>=0.0.26",
 ]
