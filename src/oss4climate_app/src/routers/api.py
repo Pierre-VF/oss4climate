@@ -4,6 +4,7 @@ Module containing the API code
 Note: For now, only redirects
 """
 
+from importlib.metadata import version
 from typing import Optional
 
 from fastapi import BackgroundTasks, Depends, FastAPI, Request
@@ -36,6 +37,7 @@ app = FastAPI(
 
     The service is provided without any guarantee and no liability will be accepted.
               """,
+    version=version("oss4climate"),
 )
 
 

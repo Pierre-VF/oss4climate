@@ -1,14 +1,15 @@
 import os
 from contextlib import asynccontextmanager
 from datetime import datetime
+from importlib.metadata import version
 from typing import Optional
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info
-
 from oss4climate_app.src import mcp_server
 from oss4climate_app.src.config import STATIC_FILES_PATH
 from oss4climate_app.src.data_io import download_listing_data_for_app
@@ -81,6 +82,7 @@ app = FastAPI(
     description="""
 A search engine for open-source code for climate applications
 """,
+    version=version("oss4climate"),
     lifespan=lifespan,
     openapi_url=None,
     redoc_url=None,
