@@ -25,6 +25,8 @@ dependencies = [
     # Security forces below (not actual direct dependencies)
     "urllib3>=2.6.3",
     "cryptography>=46.0.6",
+    "authlib>=1.6.11",
+    "python-multipart>=0.0.26",
 ]
 packages = [
     "src/oss4climate",
@@ -44,7 +46,7 @@ scripts = [
     "typer>=0.21.0",
 ]
 test = [
-    "pytest>=9.0.1",
+    "pytest>=9.0.3",
     "httpx>=0.28.1",
     "coverage>=7.11.3",
     "pytest-asyncio>=1.3.0",
