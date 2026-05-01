@@ -12,6 +12,7 @@ client = typesense.Client(
     }
 )
 
+print("Starting seeding of Typesense")
 
 # ==============================================================================
 # Seeding the search engine
