@@ -54,7 +54,7 @@ test = [
     "pygments>=2.20.0",
 ]
 app = [
-    "fastapi>=0.135.1",
+    "fastapi>=0.136.1",
     "gunicorn>=23.0.0",
     "sentry-sdk[fastapi]>=2.19.2",
     "uvicorn[standard]>=0.42.0",
