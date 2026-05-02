@@ -26,7 +26,7 @@ dependencies = [
     "urllib3>=2.6.3",
     "cryptography>=46.0.7",
     "authlib>=1.6.11",
-    "python-multipart>=0.0.26",
+    "python-multipart>=0.0.27",
 ]
 packages = [
     "src/oss4climate",
