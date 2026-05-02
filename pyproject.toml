@@ -42,7 +42,7 @@ build-backend = "hatchling.build"
 [dependency-groups]
 scripts = [
     "black>=26.3.1",
-    "ruff>=0.14.7",
+    "ruff>=0.15.12",
     "typer>=0.21.0",
 ]
 test = [
