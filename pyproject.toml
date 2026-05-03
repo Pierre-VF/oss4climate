@@ -22,6 +22,7 @@ dependencies = [
     "tomlkit>=0.13.3",
     "tqdm>=4.67.1",
     "typesense>=2.0.0",
+    "pyyaml>=6.0.3",
     # Security forces below (not actual direct dependencies)
     "cryptography>=46.0.7",
     "authlib>=1.6.11",
