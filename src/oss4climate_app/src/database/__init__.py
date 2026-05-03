@@ -40,10 +40,8 @@ class SearchLog(SQLModel, table=True):
 
 
 def _open_engine_and_create_database_if_missing():
-    db_folder, __ = os.path.split(SETTINGS.path_app_sqlite_db)
-    os.makedirs(db_folder, exist_ok=True)
     x = create_engine(
-        f"sqlite:///{SETTINGS.path_app_sqlite_db}",
+        SETTINGS.database_connection_string,
         echo=False,
     )
     # TODO : this currently also creates empty tables for the "oss4climate" part of the code,

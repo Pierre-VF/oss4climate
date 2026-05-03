@@ -111,3 +111,4 @@ jobs:
         env:
           TYPESENSE_API_KEY: DUMMY_TYPESENSE_API_KEY
           TYPESENSE_HOST: http://localhost:8108
+          DATABASE_HOST: test_db.sqlite
