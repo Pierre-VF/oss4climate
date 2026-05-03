@@ -25,7 +25,7 @@ dependencies = [
     # Security forces below (not actual direct dependencies)
     "cryptography>=46.0.7",
     "authlib>=1.6.11",
-    "python-multipart>=0.0.26",
+    "python-multipart>=0.0.27",
 ]
 packages = [
     "src/oss4climate",
@@ -41,8 +41,8 @@ build-backend = "hatchling.build"
 [dependency-groups]
 scripts = [
     "black>=26.3.1",
-    "ruff>=0.14.7",
-    "typer>=0.21.0",
+    "ruff>=0.15.12",
+    "typer>=0.25.1",
 ]
 test = [
     "pytest>=9.0.3",
@@ -53,9 +53,9 @@ test = [
     "pygments>=2.20.0",
 ]
 app = [
-    "fastapi>=0.135.1",
+    "fastapi>=0.136.1",
     "gunicorn>=23.0.0",
-    "sentry-sdk[fastapi]>=2.19.2",
+    "sentry-sdk[fastapi]>=2.58.0",
     "uvicorn[standard]>=0.42.0",
     "fastmcp>=3.2, <4",
 ]
