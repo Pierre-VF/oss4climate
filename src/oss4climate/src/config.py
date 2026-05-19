@@ -99,19 +99,22 @@ class Settings(pydantic_settings.BaseSettings):
         :return: Full database connection string
         """
 
-        if (
-            (self.DATABASE_USERNAME is None)
-            and (self.DATABASE_PASSWORD is None)
-            and (self.DATABASE_PORT is None)
-            and (self.DATABASE_NAME is None)
-        ):
-            # Sqlite case
-            out = f"{self.LOCAL_FOLDER}/{self.DATABASE_HOST}"
-            db_folder, __ = os.path.split(out)
-            os.makedirs(db_folder, exist_ok=True)
-        else:
+        if None not in {
+            self.DATABASE_USERNAME,
+            self.DATABASE_PASSWORD,
+            self.DATABASE_PORT,
+            self.DATABASE_NAME,
+        }:
             # Postgres case
             out = f"postgresql+psycopg2://{self.DATABASE_USERNAME}:{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
+        else:
+            # Sqlite case
+            out = f"{self.LOCAL_FOLDER}/{self.DATABASE_HOST}"
+            if not out.endswith(".sqlite"):
+                raise ValueError("Env DATABASE_HOST should point to a SQLite database")
+            db_folder, __ = os.path.split(out)
+            os.makedirs(db_folder, exist_ok=True)
+            out = "sqlite:///" + out
         return out
 
 
