@@ -38,7 +38,7 @@ def _render_ui_template(
     else:
         canonical_url = f"{url.scheme}://{url.netloc}{url.path}"
     resp = {
-        "UMAMI_SITE_ID": SETTINGS.UMAMI_SITE_ID,
+        "UMAMI_SITE_ID": SETTINGS.UMAMI_SITE_ID if SETTINGS.UMAMI_SITE_ID else "",
         "URL_CODE_REPOSITORY": URL_CODE_REPOSITORY,
         "URL_FEEDBACK_FORM": URL_FEEDBACK_FORM,
         "URL_BASE": SETTINGS.full_url_base,

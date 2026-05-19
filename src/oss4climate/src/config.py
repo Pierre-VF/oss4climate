@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Optional
 from urllib.parse import urlsplit
@@ -12,9 +13,14 @@ class Settings(pydantic_settings.BaseSettings):
     GITLAB_ACCESS_TOKEN: Optional[str] = None
     LOCAL_FOLDER: str = str(Path(__file__).parent.parent.parent.parent / ".data")
     SCRAPING_SQLITE_DB: str = "db.sqlite"
-    # For usage analytics
-    UMAMI_SITE_ID: str = ""
-    APP_SQLITE_DB: str = "app_db.sqlite"
+
+    # Database
+    DATABASE_USERNAME: str | None = None
+    DATABASE_PASSWORD: str | None = None
+    DATABASE_HOST: str
+    DATABASE_NAME: str | None = None
+    DATABASE_PORT: int | None = None
+
     # Identifiants of FTP for export (scripts only)
     EXPORT_FTP_URL: Optional[str] = None
     EXPORT_FTP_USER: Optional[str] = None
@@ -30,6 +36,9 @@ class Settings(pydantic_settings.BaseSettings):
     TYPESENSE_API_KEY: str = ""
     TYPESENSE_HOST: str = ""
     TYPESENSE_CONNECTION_TIMEOUT: int = 2
+
+    # For data and usage analytics
+    UMAMI_SITE_ID: str | None = None
 
     # Search parameters
     ENABLE_HYBRID_SEARCH: bool = False
@@ -83,16 +92,30 @@ class Settings(pydantic_settings.BaseSettings):
         return f"{self.LOCAL_FOLDER}/{self.SCRAPING_SQLITE_DB}"
 
     @property
-    def path_app_sqlite_db(self) -> str:
+    def database_connection_string(self) -> str:
         """
-        Get the full path to the application SQLite database
+        Get the full database connection string
 
-        :return: Full path string to the application database
+        :return: Full database connection string
         """
-        if self.APP_SQLITE_DB.startswith(self.LOCAL_FOLDER):
-            # for backwards compatibility
-            return self.APP_SQLITE_DB
-        return f"{self.LOCAL_FOLDER}/{self.APP_SQLITE_DB}"
+
+        if None not in {
+            self.DATABASE_USERNAME,
+            self.DATABASE_PASSWORD,
+            self.DATABASE_PORT,
+            self.DATABASE_NAME,
+        }:
+            # Postgres case
+            out = f"postgresql+psycopg2://{self.DATABASE_USERNAME}:{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
+        else:
+            # Sqlite case
+            out = f"{self.LOCAL_FOLDER}/{self.DATABASE_HOST}"
+            if not out.endswith(".sqlite"):
+                raise ValueError("Env DATABASE_HOST should point to a SQLite database")
+            db_folder, __ = os.path.split(out)
+            os.makedirs(db_folder, exist_ok=True)
+            out = "sqlite:///" + out
+        return out
 
 
 # Loading settings
