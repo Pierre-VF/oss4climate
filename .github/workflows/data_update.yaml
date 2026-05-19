@@ -44,7 +44,7 @@ jobs:
           version: "0.10.10"
 
       - name: Installing packages
-        run: uv sync --group=scripts
+        run: uv sync --group=scripts --group=app
 
       - name: Running discovery
         run: make discover
