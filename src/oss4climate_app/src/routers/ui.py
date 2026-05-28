@@ -78,6 +78,10 @@ async def search_results(
     exclude_forks: Optional[bool] = None,
     exclude_inactive: Optional[bool] = None,
     extended_search: bool = False,  # Allows lower quality results
+    use_fuzzy_search: bool = False,
+    use_hybrid_search: Optional[bool] = None,
+    sort_by: Optional[str] = None,
+    sort_order: str = "desc",
     # For backwards compatibility of links
     n_results: Optional[int] = None,
     offset: Optional[int] = None,
@@ -95,6 +99,17 @@ async def search_results(
         page = 1
     else:
         page = offset
+
+    # Convert exclude_forks and exclude_inactive from string to bool if needed
+    if isinstance(exclude_forks, str):
+        exclude_forks = exclude_forks.lower() == "true"
+    if isinstance(exclude_inactive, str):
+        exclude_inactive = exclude_inactive.lower() == "true"
+    if isinstance(extended_search, str):
+        extended_search = extended_search.lower() == "true"
+    if isinstance(use_fuzzy_search, str):
+        use_fuzzy_search = use_fuzzy_search.lower() == "true"
+
     r = typesense_io.search_with_query(
         ts_client,
         query,
@@ -103,6 +118,12 @@ async def search_results(
         languages=language,
         license_category=license_category,
         high_quality_only=(not extended_search),
+        exclude_forks=exclude_forks or False,
+        exclude_inactive=exclude_inactive or False,
+        use_fuzzy_search=use_fuzzy_search,
+        use_hybrid_search=use_hybrid_search,
+        sort_by=sort_by,
+        sort_order=sort_order,
     )
 
     n_total_found = r.total_results

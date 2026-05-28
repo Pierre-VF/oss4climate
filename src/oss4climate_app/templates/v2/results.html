@@ -33,6 +33,7 @@
                 <input type="hidden" name="exclude_forks" value="{{ request.query_params.get('exclude_forks', '') }}">
                 <input type="hidden" name="exclude_inactive" value="{{ request.query_params.get('exclude_inactive', '') }}">
                 <input type="hidden" name="extended_search" value="{{ request.query_params.get('extended_search', '') }}">
+                <input type="hidden" name="use_fuzzy_search" value="{{ request.query_params.get('use_fuzzy_search', '') }}">
             </form>
         </div>
 
@@ -102,6 +103,7 @@
             var excludeForks = "{{ request.query_params.get('exclude_forks', '') }}";
             var excludeInactive = "{{ request.query_params.get('exclude_inactive', '') }}";
             var extendedSearch = "{{ request.query_params.get('extended_search', '') }}";
+            var useFuzzySearch = "{{ request.query_params.get('use_fuzzy_search', '') }}";
 
             var url = "results?";
             if (queryValue) {
@@ -111,7 +113,8 @@
             url += "language=" + encodeURIComponent(languageValue) + "&";
             url += "exclude_forks=" + encodeURIComponent(excludeForks) + "&";
             url += "extended_search=" + encodeURIComponent(extendedSearch) + "&";
-            url += "exclude_inactive=" + encodeURIComponent(excludeInactive);
+            url += "exclude_inactive=" + encodeURIComponent(excludeInactive) + "&";
+            url += "use_fuzzy_search=" + encodeURIComponent(useFuzzySearch);
 
             window.location.href = url;
         });
