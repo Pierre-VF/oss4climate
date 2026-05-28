@@ -32,7 +32,7 @@ def discover_repositories_in_existing_organisations(output_file: str) -> None:
 
     # Extract organisation to screen for new repositories
     ghs = GithubScraper()
-    orgs = [ghs.extract_repository_organisation(i) for i in targets.github_repositories]
+    orgs = {ghs.extract_repository_organisation(i) for i in targets.github_repositories}
 
     extended_targets = ParsingTargets(
         github_organisations=orgs,
@@ -76,18 +76,18 @@ def discover_repositories_in_existing_readmes(output_file: str) -> None:
         return x
 
     # Removing problematic resources
-    full_targets.github_organisations = [
+    full_targets.github_organisations = {
         i for i in full_targets.github_organisations if "?" not in i
-    ]
-    full_targets.github_repositories = [
+    }
+    full_targets.github_repositories = {
         _url_cleanup(i) for i in full_targets.github_repositories if url_qualifies(i)
-    ]
-    full_targets.gitlab_projects = [
+    }
+    full_targets.gitlab_projects = {
         _url_cleanup(i) for i in full_targets.gitlab_projects if url_qualifies(i)
-    ]
-    full_targets.unknown = [
+    }
+    full_targets.unknown = {
         _url_cleanup(i) for i in full_targets.unknown if url_qualifies(i)
-    ]
+    }
     full_targets.invalid = [
         _url_cleanup(i) for i in full_targets.invalid if url_qualifies(i)
     ]

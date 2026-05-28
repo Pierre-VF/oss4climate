@@ -66,12 +66,12 @@ def scrape_all_targets(
             url2check = url2check[:-1]
         if url2check.count("/") > 1:
             log_info(f"SKIPPING repo {org_url}")
-            targets.github_repositories.append(org_url)  # Mapping it to repos instead
+            targets.github_repositories.add(org_url)  # Mapping it to repos instead
             continue  # Skip
 
         try:
             x = github_s.fetch_repositories_in_organisation(org_url)
-            [targets.github_repositories.append(i) for i in x.values()]
+            targets.github_repositories.update(x.values())
         except Exception as e:
             scrape_failures["GITHUB_ORGANISATION:" + org_url] = e
             log_warning(f" > Error with organisation ({e})")
@@ -84,12 +84,12 @@ def scrape_all_targets(
             url2check = url2check[:-1]
         if url2check.count("/") > 1:
             log_info(f"SKIPPING repo {org_url}")
-            targets.gitlab_projects.append(org_url)  # Mapping it to repos instead
+            targets.gitlab_projects.add(org_url)  # Mapping it to repos instead
             continue  # Skip
 
         try:
             x = gitlab_s.fetch_repositories_in_group(org_url)
-            [targets.gitlab_projects.append(i) for i in x.values()]
+            targets.gitlab_projects.update(x.values())
         except Exception as e:
             scrape_failures["GITLAB_GROUP:" + org_url] = e
             log_warning(f" > Error with organisation ({e})")
@@ -102,14 +102,12 @@ def scrape_all_targets(
             url2check = url2check[:-1]
         if url2check.count("/") > 1:
             log_info(f"SKIPPING repo {org_url}")
-            targets.bitbucket_repositories.append(
-                org_url
-            )  # Mapping it to repos instead
+            targets.bitbucket_repositories.add(org_url)  # Mapping it to repos instead
             continue  # Skip
 
         try:
             x = bitbucket_s.fetch_repositories_in_group(org_url)
-            [targets.bitbucket_repositories.append(i) for i in x.values()]
+            targets.bitbucket_repositories.update(x.values())
         except Exception as e:
             scrape_failures["BITBUCKET_ORGANISATION:" + org_url] = e
             log_warning(f" > Error with organisation ({e})")
@@ -122,12 +120,12 @@ def scrape_all_targets(
             url2check = url2check[:-1]
         if url2check.count("/") > 1:
             log_info(f"SKIPPING repo {org_url}")
-            targets.codeberg_repositories.append(org_url)  # Mapping it to repos instead
+            targets.codeberg_repositories.add(org_url)  # Mapping it to repos instead
             continue  # Skip
 
         try:
             x = codeberg_s.fetch_repositories_in_group(org_url)
-            [targets.codeberg_repositories.append(i) for i in x.values()]
+            targets.codeberg_repositories.update(x.values())
         except Exception as e:
             scrape_failures["CODEBERG_GROUP:" + org_url] = e
             log_warning(f" > Error with organisation ({e})")

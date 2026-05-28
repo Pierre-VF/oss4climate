@@ -152,8 +152,8 @@ def fetch_all(
 
     # Marking the invalid listings input for tracing
     res += ParsingTargets(
-        unknown=[_flexible_url_parse(i) for i in listing.fault_urls],
-        invalid=[
+        unknown={_flexible_url_parse(i) for i in listing.fault_urls},
+        invalid={
             _flexible_url_parse(i)
             for i in (
                 listing.fault_invalid_urls
@@ -161,7 +161,7 @@ def fetch_all(
                 + failed_gitlab_readme_listings
                 + failed_webpage_listings
             )
-        ],
+        },
     )
 
     res.ensure_sorted_cleaned_and_unique_elements()

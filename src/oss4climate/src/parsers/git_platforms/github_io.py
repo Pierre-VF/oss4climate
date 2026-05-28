@@ -189,17 +189,17 @@ class GithubScraper(_GPScraper):
         self,
         x: list[str],
     ) -> ParsingTargets:
-        orgs = []
-        repos = []
-        others = []
+        orgs = set()
+        repos = set()
+        others = set()
         for i in x:
             tt_i = self.identify_target_type(i)
             if tt_i is _GithubTargetType.ORGANISATION:
-                orgs.append(i)
+                orgs.add(i)
             elif tt_i is _GithubTargetType.REPOSITORY:
-                repos.append(i)
+                repos.add(i)
             else:
-                others.append(i)
+                others.add(i)
         return ParsingTargets(
             github_organisations=orgs,
             github_repositories=repos,

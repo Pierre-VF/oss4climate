@@ -214,17 +214,17 @@ class ParsingTargets:
     Class to make aggregation of parsings across targets easier to manage and work with
     """
 
-    github_repositories: list[str] = field(default_factory=list)
-    github_organisations: list[str] = field(default_factory=list)
-    gitlab_projects: list[str] = field(default_factory=list)
-    gitlab_groups: list[str] = field(default_factory=list)
-    bitbucket_projects: list[str] = field(default_factory=list)
-    bitbucket_repositories: list[str] = field(default_factory=list)
-    codeberg_organisations: list[str] = field(default_factory=list)
-    codeberg_repositories: list[str] = field(default_factory=list)
+    github_repositories: set[str] = field(default_factory=set)
+    github_organisations: set[str] = field(default_factory=set)
+    gitlab_projects: set[str] = field(default_factory=set)
+    gitlab_groups: set[str] = field(default_factory=set)
+    bitbucket_projects: set[str] = field(default_factory=set)
+    bitbucket_repositories: set[str] = field(default_factory=set)
+    codeberg_organisations: set[str] = field(default_factory=set)
+    codeberg_repositories: set[str] = field(default_factory=set)
 
-    unknown: list[str] = field(default_factory=list)
-    invalid: list[str] = field(default_factory=list)
+    unknown: set[str] = field(default_factory=set)
+    invalid: set[str] = field(default_factory=set)
 
     def __contains__(self, project_url: str) -> bool:
         # Return True if item is in the object, False otherwise
@@ -232,32 +232,32 @@ class ParsingTargets:
 
     def __add__(self, other: "ParsingTargets") -> "ParsingTargets":
         return ParsingTargets(
-            github_organisations=self.github_organisations + other.github_organisations,
-            github_repositories=self.github_repositories + other.github_repositories,
-            bitbucket_projects=self.bitbucket_projects + other.bitbucket_projects,
+            github_organisations=self.github_organisations | other.github_organisations,
+            github_repositories=self.github_repositories | other.github_repositories,
+            bitbucket_projects=self.bitbucket_projects | other.bitbucket_projects,
             bitbucket_repositories=self.bitbucket_repositories
-            + other.bitbucket_repositories,
-            gitlab_groups=self.gitlab_groups + other.gitlab_groups,
-            gitlab_projects=self.gitlab_projects + other.gitlab_projects,
-            unknown=self.unknown + other.unknown,
-            invalid=self.invalid + other.invalid,
+            | other.bitbucket_repositories,
+            gitlab_groups=self.gitlab_groups | other.gitlab_groups,
+            gitlab_projects=self.gitlab_projects | other.gitlab_projects,
+            unknown=self.unknown | other.unknown,
+            invalid=self.invalid | other.invalid,
             codeberg_organisations=self.codeberg_organisations
-            + other.codeberg_organisations,
+            | other.codeberg_organisations,
             codeberg_repositories=self.codeberg_repositories
-            + other.codeberg_repositories,
+            | other.codeberg_repositories,
         )
 
     def __iadd__(self, other: "ParsingTargets") -> "ParsingTargets":
-        self.github_repositories += other.github_repositories
-        self.github_organisations += other.github_organisations
-        self.gitlab_groups += other.gitlab_groups
-        self.gitlab_projects += other.gitlab_projects
-        self.bitbucket_projects += other.bitbucket_projects
-        self.bitbucket_repositories += other.bitbucket_repositories
-        self.unknown += other.unknown
-        self.invalid += other.invalid
-        self.codeberg_organisations += other.codeberg_organisations
-        self.codeberg_repositories += other.codeberg_repositories
+        self.github_repositories |= other.github_repositories
+        self.github_organisations |= other.github_organisations
+        self.gitlab_groups |= other.gitlab_groups
+        self.gitlab_projects |= other.gitlab_projects
+        self.bitbucket_projects |= other.bitbucket_projects
+        self.bitbucket_repositories |= other.bitbucket_repositories
+        self.unknown |= other.unknown
+        self.invalid |= other.invalid
+        self.codeberg_organisations |= other.codeberg_organisations
+        self.codeberg_repositories |= other.codeberg_repositories
         return self
 
     def __len__(self) -> int:
@@ -276,19 +276,19 @@ class ParsingTargets:
 
     def as_url_list(self, known_repositories_only: bool = True) -> list[str]:
         out = (
-            self.github_repositories
-            + self.gitlab_projects
-            + self.bitbucket_repositories
-            + self.codeberg_repositories
+            list(self.github_repositories)
+            + list(self.gitlab_projects)
+            + list(self.bitbucket_repositories)
+            + list(self.codeberg_repositories)
         )
         if not known_repositories_only:
             out += (
-                self.github_organisations
-                + self.gitlab_groups
-                + self.bitbucket_projects
-                + self.codeberg_organisations
-                + self.unknown
-                + self.invalid
+                list(self.github_organisations)
+                + list(self.gitlab_groups)
+                + list(self.bitbucket_projects)
+                + list(self.codeberg_organisations)
+                + list(self.unknown)
+                + list(self.invalid)
             )
         return out
 
@@ -296,36 +296,39 @@ class ParsingTargets:
         """
         Sorts all fields alphabetically and ensures that there is no redundancies in them
         """
-        self.github_repositories = sorted_list_of_cleaned_urls(self.github_repositories)
-        self.github_organisations = sorted_list_of_cleaned_urls(
-            self.github_organisations
+        self.github_repositories = set(
+            sorted_list_of_cleaned_urls(self.github_repositories)
         )
-        self.gitlab_groups = sorted_list_of_cleaned_urls(self.gitlab_groups)
-        self.gitlab_projects = sorted_list_of_cleaned_urls(self.gitlab_projects)
-        self.bitbucket_projects = sorted_list_of_cleaned_urls(self.bitbucket_projects)
-        self.bitbucket_repositories = sorted_list_of_cleaned_urls(
-            self.bitbucket_repositories
+        self.github_organisations = set(
+            sorted_list_of_cleaned_urls(self.github_organisations)
         )
-        self.codeberg_organisations = sorted_list_of_cleaned_urls(
-            self.codeberg_organisations
+        self.gitlab_groups = set(sorted_list_of_cleaned_urls(self.gitlab_groups))
+        self.gitlab_projects = set(sorted_list_of_cleaned_urls(self.gitlab_projects))
+        self.bitbucket_projects = set(
+            sorted_list_of_cleaned_urls(self.bitbucket_projects)
         )
-        self.codeberg_repositories = sorted_list_of_cleaned_urls(
-            self.codeberg_repositories
+        self.bitbucket_repositories = set(
+            sorted_list_of_cleaned_urls(self.bitbucket_repositories)
         )
-        self.unknown = sorted_list_of_cleaned_urls(self.unknown)
-        self.invalid = sorted_list_of_cleaned_urls(self.invalid)
+        self.codeberg_organisations = set(
+            sorted_list_of_cleaned_urls(self.codeberg_organisations)
+        )
+        self.codeberg_repositories = set(
+            sorted_list_of_cleaned_urls(self.codeberg_repositories)
+        )
+        self.unknown = set(sorted_list_of_cleaned_urls(self.unknown))
+        self.invalid = set(sorted_list_of_cleaned_urls(self.invalid))
 
     def __included_in_valid_targets(self, url: str) -> bool:
         return (
-            url
-            in self.github_organisations
-            + self.github_repositories
-            + self.gitlab_groups
-            + self.gitlab_projects
-            + self.bitbucket_projects
-            + self.bitbucket_repositories
-            + self.codeberg_organisations
-            + self.codeberg_repositories
+            url in self.github_organisations
+            or url in self.github_repositories
+            or url in self.gitlab_groups
+            or url in self.gitlab_projects
+            or url in self.bitbucket_projects
+            or url in self.bitbucket_repositories
+            or url in self.codeberg_organisations
+            or url in self.codeberg_repositories
         )
 
     def _target_is_valid(self, url: str) -> bool:
@@ -334,13 +337,13 @@ class ParsingTargets:
         else:
             return url_qualifies(url)
 
-    def _check_targets_validity(self, x: list[str]) -> list[str]:
-        out = []
+    def _check_targets_validity(self, x: set[str]) -> set[str]:
+        out = set()
         for i in x:
             if self._target_is_valid(i):
-                out.append(i)
+                out.add(i)
             else:
-                self.invalid.append(i)
+                self.invalid.add(i)
         return out
 
     def ensure_targets_validity(self) -> None:
@@ -371,33 +374,27 @@ class ParsingTargets:
         # Ensuring that only valid targets are used
         self.ensure_targets_validity()
         # Removing all repos that are listed in organisations/groups
-        self.github_repositories = [
-            i for i in self.github_repositories if i not in self.github_organisations
-        ]
-        self.gitlab_projects = [
-            i for i in self.gitlab_projects if i not in self.gitlab_groups
-        ]
-        self.bitbucket_repositories = [
-            i for i in self.bitbucket_repositories if i not in self.bitbucket_projects
-        ]
-        self.codeberg_repositories = [
-            i
-            for i in self.codeberg_repositories
-            if i not in self.codeberg_organisations
-        ]
+        self.github_repositories = self.github_repositories - self.github_organisations
+        self.gitlab_projects = self.gitlab_projects - self.gitlab_groups
+        self.bitbucket_repositories = (
+            self.bitbucket_repositories - self.bitbucket_projects
+        )
+        self.codeberg_repositories = (
+            self.codeberg_repositories - self.codeberg_organisations
+        )
         if drop_invalid:
-            self.invalid = []
+            self.invalid = set()
         else:
-            self.invalid = [
+            self.invalid = {
                 i for i in self.invalid if not self.__included_in_valid_targets(i)
-            ]
+            }
         if drop_unknown:
-            self.unknown = []
+            self.unknown = set()
         else:
             # Removing unknown repos
-            self.unknown = [
+            self.unknown = {
                 i for i in self.unknown if not self.__included_in_valid_targets(i)
-            ]
+            }
 
     @staticmethod
     def from_toml(toml_file_path: str) -> "ParsingTargets":
@@ -417,16 +414,16 @@ class ParsingTargets:
                 x[i] = {}
 
         return ParsingTargets(
-            github_organisations=x["github_hosted"].get("organisations", []),
-            github_repositories=x["github_hosted"].get("repositories", []),
-            gitlab_groups=x["gitlab_hosted"].get("groups", []),
-            gitlab_projects=x["gitlab_hosted"].get("projects", []),
-            bitbucket_projects=x["bitbucket_hosted"].get("projects", []),
-            bitbucket_repositories=x["bitbucket_hosted"].get("repositories", []),
-            codeberg_organisations=x["codeberg_hosted"].get("organisations", []),
-            codeberg_repositories=x["codeberg_hosted"].get("repositories", []),
-            unknown=x["dropped_targets"].get("urls", []),
-            invalid=x["dropped_targets"].get("invalid_urls", []),
+            github_organisations=set(x["github_hosted"].get("organisations", [])),
+            github_repositories=set(x["github_hosted"].get("repositories", [])),
+            gitlab_groups=set(x["gitlab_hosted"].get("groups", [])),
+            gitlab_projects=set(x["gitlab_hosted"].get("projects", [])),
+            bitbucket_projects=set(x["bitbucket_hosted"].get("projects", [])),
+            bitbucket_repositories=set(x["bitbucket_hosted"].get("repositories", [])),
+            codeberg_organisations=set(x["codeberg_hosted"].get("organisations", [])),
+            codeberg_repositories=set(x["codeberg_hosted"].get("repositories", [])),
+            unknown=set(x["dropped_targets"].get("urls", [])),
+            invalid=set(x["dropped_targets"].get("invalid_urls", [])),
         )
 
     def to_toml(self, toml_file_path: str) -> None:
@@ -437,24 +434,24 @@ class ParsingTargets:
         doc = document()
         toml_ready_dict = {
             "bitbucket_hosted": {
-                "projects": self.bitbucket_projects,
-                "repositories": self.bitbucket_repositories,
+                "projects": sorted(self.bitbucket_projects),
+                "repositories": sorted(self.bitbucket_repositories),
             },
             "codeberg_hosted": {
-                "organisations": self.codeberg_organisations,
-                "repositories": self.codeberg_repositories,
+                "organisations": sorted(self.codeberg_organisations),
+                "repositories": sorted(self.codeberg_repositories),
             },
             "github_hosted": {
-                "organisations": self.github_organisations,
-                "repositories": self.github_repositories,
+                "organisations": sorted(self.github_organisations),
+                "repositories": sorted(self.github_repositories),
             },
             "gitlab_hosted": {
-                "groups": self.gitlab_groups,
-                "projects": self.gitlab_projects,
+                "groups": sorted(self.gitlab_groups),
+                "projects": sorted(self.gitlab_projects),
             },
             "dropped_targets": {
-                "urls": self.unknown,
-                "invalid_urls": self.invalid,
+                "urls": sorted(self.unknown),
+                "invalid_urls": sorted(self.invalid),
             },
         }
 
