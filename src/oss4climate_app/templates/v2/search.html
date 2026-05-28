@@ -53,6 +53,9 @@
                 <br/>
                 <input type="checkbox" id="extended_search" name="extended_search" />
                 <label for="extended_search" title="Extended search (Beta)">Extended search (Beta)</label>
+                <br/>
+                <input type="checkbox" id="use_fuzzy_search" name="use_fuzzy_search" />
+                <label for="use_fuzzy_search" title="Enable fuzzy search for typo tolerance">Fuzzy search (typo tolerance)</label>
             </div>
         </form>
 
@@ -86,6 +89,7 @@
             var excludeForks = document.getElementById("exclude_forks").checked;
             var excludeInactive = document.getElementById("exclude_inactive").checked;
             var extendedSearch = document.getElementById("extended_search").checked;
+            var useFuzzySearch = document.getElementById("use_fuzzy_search").checked;
 
             // Build URL with all parameters
             var url = "results?";
@@ -96,7 +100,8 @@
             url += "language=" + encodeURIComponent(languageValue) + "&";
             url += "exclude_forks=" + encodeURIComponent(excludeForks) + "&";
             url += "extended_search=" + encodeURIComponent(extendedSearch) + "&";
-            url += "exclude_inactive=" + encodeURIComponent(excludeInactive);
+            url += "exclude_inactive=" + encodeURIComponent(excludeInactive) + "&";
+            url += "use_fuzzy_search=" + encodeURIComponent(useFuzzySearch);
 
             window.location.href = url;
         });

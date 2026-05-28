@@ -47,18 +47,189 @@ async def search(
     background_tasks: BackgroundTasks,
     query: Optional[str] = None,
     extended_search: bool = False,
+    languages: Optional[str] = None,
+    license_category: Optional[str] = None,
+    use_fuzzy_search: bool = False,
+    use_hybrid_search: Optional[bool] = None,
+    sort_by: Optional[str] = None,
+    sort_order: str = "desc",
+    exclude_forks: bool = False,
+    exclude_inactive: bool = False,
+    min_last_commit_days: Optional[int] = None,
+    results_per_page: int = 50,
+    page: int = 1,
     ts_client=Depends(typesense_io.generate_client),
 ) -> typesense_io.SearchResult:
+    """
+    Perform a search with advanced options
+
+    Parameters:
+    - query: Search query string
+    - extended_search: Include lower quality results
+    - languages: Comma-separated list of languages to filter by
+    - license_category: License category to filter by
+    - use_fuzzy_search: Enable fuzzy search for typo tolerance
+    - use_hybrid_search: Enable hybrid search (keyword + vector). If None, uses server settings
+    - sort_by: Field to sort by (e.g., "last_commit_timestamp", "name")
+    - sort_order: Sort order ("asc" or "desc")
+    - exclude_forks: Exclude forked repositories
+    - exclude_inactive: Exclude inactive repositories
+    - min_last_commit_days: Minimum days since last commit to include
+    - results_per_page: Number of results per page
+    - page: Page number
+    """
     if query:
         query = query.strip().lower()
     if query is None:
-        query = " "  # TODO : find a better solution
+        query = " "
+
+    # Parse languages parameter
+    languages_list = None
+    if languages:
+        languages_list = [lang.strip() for lang in languages.split(",") if lang.strip()]
+        if len(languages_list) == 1:
+            languages_list = languages_list[0]  # Single language as string
+
     res = typesense_io.search_with_query(
         ts_client,
-        query,
+        query=query,
+        results_per_page=results_per_page,
+        page=page,
+        languages=languages_list,
+        license_category=license_category,
         high_quality_only=(not extended_search),
+        use_fuzzy_search=use_fuzzy_search,
+        use_hybrid_search=use_hybrid_search,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        exclude_forks=exclude_forks,
+        exclude_inactive=exclude_inactive,
+        min_last_commit_days=min_last_commit_days,
     )
     return res
+
+
+@app.get("/search/advanced")
+async def advanced_search(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    query: Optional[str] = None,
+    extended_search: bool = False,
+    languages: Optional[str] = None,
+    license_category: Optional[str] = None,
+    use_fuzzy_search: bool = False,
+    use_hybrid_search: Optional[bool] = None,
+    hybrid_alpha: float = 0.5,
+    sort_by: Optional[str] = None,
+    sort_order: str = "desc",
+    exclude_forks: bool = False,
+    exclude_inactive: bool = False,
+    min_last_commit_days: Optional[int] = None,
+    facet_by: Optional[str] = None,
+    max_facet_values: int = 100,
+    results_per_page: int = 50,
+    page: int = 1,
+    ts_client=Depends(typesense_io.generate_client),
+) -> typesense_io.SearchResult:
+    """
+    Perform an advanced search with faceting and more options
+
+    This endpoint provides additional search capabilities including:
+    - Hybrid search (keyword + vector)
+    - Faceting for filtering
+    - Advanced sorting and filtering
+    """
+    if query:
+        query = query.strip().lower()
+    if query is None:
+        query = " "
+
+    # Parse languages parameter
+    languages_list = None
+    if languages:
+        languages_list = [lang.strip() for lang in languages.split(",") if lang.strip()]
+        if len(languages_list) == 1:
+            languages_list = languages_list[0]
+
+    # Parse facet_by parameter
+    facet_by_list = None
+    if facet_by:
+        facet_by_list = [
+            field.strip() for field in facet_by.split(",") if field.strip()
+        ]
+
+    res = typesense_io.search_with_query(
+        ts_client,
+        query=query,
+        results_per_page=results_per_page,
+        page=page,
+        languages=languages_list,
+        license_category=license_category,
+        high_quality_only=(not extended_search),
+        use_fuzzy_search=use_fuzzy_search,
+        use_hybrid_search=use_hybrid_search,
+        hybrid_alpha=hybrid_alpha,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        exclude_forks=exclude_forks,
+        exclude_inactive=exclude_inactive,
+        min_last_commit_days=min_last_commit_days,
+        facet_by=facet_by_list,
+        max_facet_values=max_facet_values,
+    )
+    return res
+
+
+@app.get("/search/autocomplete")
+async def search_autocomplete(
+    query: str,
+    limit: int = 10,
+    extended_search: bool = False,
+    ts_client=Depends(typesense_io.generate_client),
+) -> list[str]:
+    """
+    Get autocomplete suggestions for a search query
+
+    Parameters:
+    - query: Partial search query
+    - limit: Maximum number of suggestions to return
+    - extended_search: Include suggestions from lower quality results
+
+    Returns:
+    - List of autocomplete suggestions
+    """
+    return typesense_io.autocomplete(
+        ts_client,
+        query,
+        limit=limit,
+        high_quality_only=(not extended_search),
+    )
+
+
+@app.get("/search/suggestions")
+async def search_suggestions(
+    query: str,
+    limit: int = 5,
+    extended_search: bool = False,
+    ts_client=Depends(typesense_io.generate_client),
+) -> list[dict[str, str]]:
+    """
+    Get search suggestions with context for a search query
+
+    Parameters:
+    - query: Search query
+    - limit: Maximum number of suggestions to return
+    - extended_search: Include suggestions from lower quality results
+
+    Returns:
+    - List of suggestion objects with name, organisation, url, and description
+    """
+    return typesense_io.get_search_suggestions(
+        ts_client,
+        query,
+        limit=limit,
+        high_quality_only=(not extended_search),
+    )
 
 
 @app.get("/code")
