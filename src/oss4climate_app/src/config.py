@@ -4,6 +4,7 @@ import uuid
 from oss4climate.src.config import (
     SETTINGS,
 )
+from oss4climate_app.src.theme import THEME  # noqa (force easy reimport from here)
 
 _script_dir = pathlib.Path(__file__).resolve().parent.parent
 TEMPLATES_PATH = _script_dir / "templates"
@@ -15,9 +16,6 @@ APP_VERSION = str(uuid.uuid4())
 # Configuration (for avoidance of information duplication)
 URL_CODE_REPOSITORY = "https://github.com/Pierre-VF/oss4climate"
 URL_FEEDBACK_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSeei-0V5CobVNX-qOX3lI11FuvTBv1JV77fcUZOideeDtcEhA/viewform?usp=sf_link"
-
-# Theme configuration - import from theme module
-from oss4climate_app.src.theme import THEME
 
 
 # Link to all documents

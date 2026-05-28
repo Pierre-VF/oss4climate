@@ -64,10 +64,10 @@
                 <div class="source-item">
                     <div class="source-content">
                         <div class="source-name">
-                            <a href="{{r.url}}" target="_blank" rel="noopener noreferrer">{{r.url | replace("https://", "") | replace("http://", "") | replace("www.", "") | truncate(40, True, "...")}}</a>
+                            <a href="{{r.url}}" target="_blank" rel="noopener">{{r.url | replace("https://", "") | replace("http://", "") | replace("www.", "") | truncate(40, True, "...")}}</a>
                         </div>
                         <div class="source-license">
-                            Licensed under <a href="{{ r.license_url }}" target="_blank" rel="noopener noreferrer">{{r.license}}</a>
+                            Licensed under <a href="{{ r.license_url }}" target="_blank" rel="noopener">{{r.license}}</a>
                         </div>
                     </div>
                     <div class="source-count">{{r.target_count}} projects</div>
