@@ -30,6 +30,7 @@ dependencies = [
     "python-multipart>=0.0.27",
     "psycopg2-binary>=2.9.12",
     "urllib3>=2.7.0",
+    "idna>=3.15",
 ]
 packages = [
     "src/oss4climate",
@@ -61,9 +62,11 @@ app = [
     "sentry-sdk[fastapi]>=2.58.0",
     "uvicorn[standard]>=0.42.0",
     "fastmcp>=3.2, <4",
+    # Security forces below (not actual direct dependencies)
+    "starlette>=1.0.1"
 ]
 mcp = [
-    "pydantic-ai-slim[mistral,anthropic,fastmcp,cli]>=1.68.0",
+    "pydantic-ai-slim[mistral,anthropic,fastmcp,cli]>=1.99.0",
     # Security only:
     "anthropic>=0.87.0"
 ]
