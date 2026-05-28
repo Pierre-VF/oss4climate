@@ -14,14 +14,14 @@ def test_parsing_target_set(
     unknown_url_2,
 ):
     a = ParsingTargets(
-        github_organisations=[gitlab_group_url],
-        github_repositories=[gitlab_repo_url],
-        unknown=[unknown_url],
+        github_organisations={gitlab_group_url},
+        github_repositories={gitlab_repo_url},
+        unknown={unknown_url},
     )
     b = ParsingTargets(
-        github_organisations=[gitlab_group_url_2],
-        github_repositories=[gitlab_repo_url_2],
-        unknown=[unknown_url_2],
+        github_organisations={gitlab_group_url_2},
+        github_repositories={gitlab_repo_url_2},
+        unknown={unknown_url_2},
     )
     # Testing + operator
     c = a + b
