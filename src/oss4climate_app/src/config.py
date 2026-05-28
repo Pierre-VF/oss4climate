@@ -31,7 +31,7 @@ URL_LISTINGS_INDEX = f"{__URL_GITHUB_BASE}/listings.json"
 
 
 # For data hosted outside of Github
-URL_BASE = "https://data.pierrevf.consulting/oss4climate"
+URL_BASE = "https://data.pierrevf.com/oss4climate"
 URL_RAW_INDEX = f"{URL_BASE}/summary.toml"
 URL_LISTING_FEATHER = f"{URL_BASE}/listing_data.feather"
 

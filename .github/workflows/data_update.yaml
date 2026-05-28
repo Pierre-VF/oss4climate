@@ -60,7 +60,7 @@ jobs:
       - name: Defining Git identity
         run: |
           git config user.name github_actions
-          git config user.email github_actions@pierrevf.consulting
+          git config user.email github_actions@pierrevf.com
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7

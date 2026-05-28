@@ -129,4 +129,4 @@ Note: the indexing is heavy and involves a series of web (and API) calls. A cach
 
 Please open an issue on the repository [here](https://github.com/Pierre-VF/oss4climate/issues).
 
-If you have a use-case that you would like to develop based upon this, or need new features, please get in touch with [PierreVF Consulting](https://www.pierrevf.com/) for support.
+If you have a use-case that you would like to develop based upon this, or need new features, please get in touch with [PierreVF UG](https://www.pierrevf.com/) for support.

@@ -36,7 +36,7 @@ network:
   allowed:
     - defaults # Basic infrastructure
     - python # Python/PyPI ecosystem
-    - "data.pierrevf.consulting"
+    - "data.pierrevf.com"
     - "gitlab.com"
 
 safe-outputs:
