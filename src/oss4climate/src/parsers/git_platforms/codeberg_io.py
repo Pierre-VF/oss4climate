@@ -73,21 +73,21 @@ class CodebergScraper(_GPScraper):
         self,
         x: list[str],
     ) -> ParsingTargets:
-        orgs = []
-        repos = []
-        others = []
+        orgs = set()
+        repos = set()
+        others = set()
         for i in x:
             tt_i = self.identify_target_type(i)
             if tt_i is CodebergTargetType.ORGANISATION:
-                orgs.append(i)
+                orgs.add(i)
             elif tt_i is CodebergTargetType.REPOSITORY:
-                repos.append(i)
+                repos.add(i)
             else:
-                others.append(i)
+                others.add(i)
 
         return ParsingTargets(
-            codeberg_organisations=[self.minimalise_resource_url(i) for i in orgs],
-            codeberg_repositories=[self.minimalise_resource_url(i) for i in repos],
+            codeberg_organisations={self.minimalise_resource_url(i) for i in orgs},
+            codeberg_repositories={self.minimalise_resource_url(i) for i in repos},
             unknown=others,
         )
 

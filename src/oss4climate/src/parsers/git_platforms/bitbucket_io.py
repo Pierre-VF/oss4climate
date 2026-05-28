@@ -70,21 +70,21 @@ class BitbucketScraper(_GPScraper):
         self,
         x: list[str],
     ) -> ParsingTargets:
-        projs = []
-        repos = []
-        others = []
+        projs = set()
+        repos = set()
+        others = set()
         for i in x:
             tt_i = self.identify_target_type(i)
             if tt_i is BitbucketTargetType.PROJECT:
-                projs.append(i)
+                projs.add(i)
             elif tt_i is BitbucketTargetType.REPOSITORY:
-                repos.append(i)
+                repos.add(i)
             else:
-                others.append(i)
+                others.add(i)
 
         return ParsingTargets(
-            bitbucket_projects=[self.minimalise_resource_url(i) for i in projs],
-            bitbucket_repositories=[self.minimalise_resource_url(i) for i in repos],
+            bitbucket_projects={self.minimalise_resource_url(i) for i in projs},
+            bitbucket_repositories={self.minimalise_resource_url(i) for i in repos},
             unknown=others,
         )
 

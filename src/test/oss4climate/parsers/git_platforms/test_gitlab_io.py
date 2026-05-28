@@ -25,36 +25,36 @@ def test_parsing_target_set(
     )
     # Testing + operator
     c = a + b
-    assert c.github_organisations == [
+    assert c.github_organisations == {
         gitlab_group_url,
         gitlab_group_url_2,
-    ]
-    assert c.github_repositories == [gitlab_repo_url, gitlab_repo_url_2]
-    assert c.unknown == [unknown_url, unknown_url_2]
+    }
+    assert c.github_repositories == {gitlab_repo_url, gitlab_repo_url_2}
+    assert c.unknown == {unknown_url, unknown_url_2}
 
     # Testing += operator
     a += b
-    assert a.github_organisations == [
+    assert a.github_organisations == {
         gitlab_group_url,
         gitlab_group_url_2,
-    ]
-    assert a.github_repositories == [gitlab_repo_url, gitlab_repo_url_2]
-    assert a.unknown == [unknown_url, unknown_url_2]
+    }
+    assert a.github_repositories == {gitlab_repo_url, gitlab_repo_url_2}
+    assert a.unknown == {unknown_url, unknown_url_2}
 
     # Testing cleanup of redundancies
     x = ParsingTargets(
-        github_organisations=[gitlab_group_url_2, gitlab_group_url],
-        github_repositories=[gitlab_repo_url_2, gitlab_repo_url],
-        unknown=[unknown_url_2, unknown_url],
+        github_organisations={gitlab_group_url_2, gitlab_group_url},
+        github_repositories={gitlab_repo_url_2, gitlab_repo_url},
+        unknown={unknown_url_2, unknown_url},
     )
     x += x
     x.ensure_sorted_cleaned_and_unique_elements()
-    assert x.github_organisations == [
+    assert x.github_organisations == {
         gitlab_group_url,
         gitlab_group_url_2,
-    ]
-    assert x.github_repositories == [gitlab_repo_url, gitlab_repo_url_2]
-    assert x.unknown == [unknown_url, unknown_url_2]
+    }
+    assert x.github_repositories == {gitlab_repo_url, gitlab_repo_url_2}
+    assert x.unknown == {unknown_url, unknown_url_2}
 
 
 def test_fetch_functions(gitlab_repo_url, gitlab_group_url):

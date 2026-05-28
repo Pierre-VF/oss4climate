@@ -149,17 +149,17 @@ class GitlabScraper(_GPScraper):
         self,
         x: list[str],
     ) -> ParsingTargets:
-        groups = []
-        projects = []
-        others = []
+        groups = set()
+        projects = set()
+        others = set()
         for i in x:
             tt_i, clean_url_i = self.identify_target_type_and_repo_url(i)
             if tt_i is GitlabTargetType.GROUP:
-                groups.append(clean_url_i)
+                groups.add(clean_url_i)
             elif tt_i is GitlabTargetType.PROJECT:
-                projects.append(clean_url_i)
+                projects.add(clean_url_i)
             else:
-                others.append(i)
+                others.add(i)
         return ParsingTargets(
             gitlab_groups=groups,
             gitlab_projects=projects,
