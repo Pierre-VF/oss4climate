@@ -4,6 +4,7 @@ import uuid
 from oss4climate.src.config import (
     SETTINGS,
 )
+from oss4climate_app.src.theme import THEME  # noqa (force easy reimport from here)
 
 _script_dir = pathlib.Path(__file__).resolve().parent.parent
 TEMPLATES_PATH = _script_dir / "templates"

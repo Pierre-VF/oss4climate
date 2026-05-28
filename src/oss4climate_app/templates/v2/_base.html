@@ -3,18 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search results for "solar pv"</title>
-    <link href="{{ URL_BASE }}/static/css/styles-v2.css?version={{ APP_VERSION }}" rel="stylesheet">
     <title>
         {% block title %}
             OSS4Climate - Open-source search for climate applications
         {% endblock %}
     </title>
+    <link href="{{ URL_BASE }}/static/css/styles-v2.css?version={{ APP_VERSION }}" rel="stylesheet">
     {% if UMAMI_SITE_ID != "" %}
         <script defer src="https://cloud.umami.is/script.js" data-website-id="{{ UMAMI_SITE_ID }}"></script>
     {% endif %}
-
     <link rel="canonical" href="{{ canonical_url }}">
+
+    {# Theme CSS variables - dynamically generated from theme.py #}
+    <style>
+        :root {
+            {{ THEME_CSS | safe }}
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -31,7 +36,6 @@
 
     {% block content %}
     {% endblock %}
-
 
     <script>
         function toggleNav() {

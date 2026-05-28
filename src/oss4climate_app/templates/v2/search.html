@@ -8,7 +8,8 @@
         <h1>Open-source code search for climate applications</h1>
 
         <p class="mcp-link">
-            This search tool is also available as an MCP tool for your favourite LLM: <a href="{{ URL_BASE }}/mcp/sse">{{ URL_BASE }}/mcp/sse</a>
+            This search tool is also available as an MCP tool for your favourite LLM:
+            <a href="{{ URL_BASE }}/mcp/sse">{{ URL_BASE }}/mcp/sse</a>
         </p>
 
         <div class="stats">
@@ -16,10 +17,10 @@
             (and {{ n_repositories_indexed_extended }} repositories in extended search (Beta) )
         </div>
 
-        <form id="code_search_form" target="results" method="post">
+        <form id="code_search_form" method="get" action="results">
             <div class="search-container" id="search-section">
-                    <input type="text" id="query" placeholder="Search repositories...">
-                    <button type="submit" class="search_button" data-umami-event="search-click">Search</button>
+                <input type="text" id="query" name="query" placeholder="Search repositories..." autocomplete="off">
+                <button type="submit" class="search_button" data-umami-event="search-click">Search</button>
             </div>
 
             <div class="search_refining_form">
@@ -57,19 +58,22 @@
 
 
         <div class="sources">
-            <h2>Data Sources</h2>
-            <ul class="source-list">
-
+            <h2>📚 Data Sources</h2>
+            <div class="source-list">
                 {% for i, r in credits_df.iterrows() %}
-                <li class="source-item">
-                    <div>
-                        <div class="source-name"><a href="{{r.url}}">{{r.url}}</a></div>
-                        <div class="source-license">Licensed under <a href="{{ r.license_url }}">{{r.license}}</a></div>
+                <div class="source-item">
+                    <div class="source-content">
+                        <div class="source-name">
+                            <a href="{{r.url}}" target="_blank" rel="noopener">{{r.url | replace("https://", "") | replace("http://", "") | replace("www.", "") | truncate(40, True, "...")}}</a>
+                        </div>
+                        <div class="source-license">
+                            Licensed under <a href="{{ r.license_url }}" target="_blank" rel="noopener">{{r.license}}</a>
+                        </div>
                     </div>
                     <div class="source-count">{{r.target_count}} projects</div>
-                </li>
+                </div>
                 {% endfor %}
-            </ul>
+            </div>
         </div>
     </div>
 
@@ -82,13 +86,19 @@
             var excludeForks = document.getElementById("exclude_forks").checked;
             var excludeInactive = document.getElementById("exclude_inactive").checked;
             var extendedSearch = document.getElementById("extended_search").checked;
-            window.location.href = "results?"
-                + "query=" + encodeURIComponent(queryValue)
-                + "&license_category=" + encodeURIComponent(licenseValue)
-                + "&language=" + encodeURIComponent(languageValue)
-                + "&exclude_forks=" + encodeURIComponent(excludeForks)
-                + "&extended_search=" + encodeURIComponent(extendedSearch)
-                + "&exclude_inactive=" + encodeURIComponent(excludeInactive);
+
+            // Build URL with all parameters
+            var url = "results?";
+            if (queryValue) {
+                url += "query=" + encodeURIComponent(queryValue) + "&";
+            }
+            url += "license_category=" + encodeURIComponent(licenseValue) + "&";
+            url += "language=" + encodeURIComponent(languageValue) + "&";
+            url += "exclude_forks=" + encodeURIComponent(excludeForks) + "&";
+            url += "extended_search=" + encodeURIComponent(extendedSearch) + "&";
+            url += "exclude_inactive=" + encodeURIComponent(excludeInactive);
+
+            window.location.href = url;
         });
     </script>
 {% endblock %}

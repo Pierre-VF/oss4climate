@@ -474,11 +474,11 @@ def identify_parsing_targets(urls: list[str]) -> ParsingTargets:
 
     out_github = GithubScraper().split_across_target_sets(urls)
     out_gitlab = GitlabScraper().split_across_target_sets(out_github.unknown)
-    out_github.unknown = []
+    out_github.unknown = set()
     out_bitbucket = BitbucketScraper().split_across_target_sets(out_gitlab.unknown)
-    out_gitlab.unknown = []
+    out_gitlab.unknown = set()
     out_codeberg = CodebergScraper().split_across_target_sets(out_bitbucket.unknown)
-    out_bitbucket.unknown = []
+    out_bitbucket.unknown = set()
 
     out = out_bitbucket + out_github + out_gitlab + out_codeberg
     return out

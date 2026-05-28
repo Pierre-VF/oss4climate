@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from oss4climate_app.src.config import (
     APP_VERSION,
     TEMPLATES_PATH,
+    THEME,
 )
 
 templates = Jinja2Templates(directory=str(TEMPLATES_PATH))
@@ -13,6 +14,8 @@ def render_template(request: Request, template_file: str, content: dict | None =
     resp = {
         "request": request,
         "APP_VERSION": APP_VERSION,
+        "THEME": THEME,
+        "THEME_CSS": THEME.to_css_variables(),
     }
     if content is not None:
         resp = resp | content
