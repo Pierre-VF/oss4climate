@@ -34,14 +34,14 @@ jobs:
 
     steps:
       - name: "Checkout code"
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Create UV installation"
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
-          version: "0.10.10"
+          version: "0.11.17"
 
       - name: Installing packages
         run: uv sync --group=scripts --group=app
@@ -60,10 +60,10 @@ jobs:
       - name: Defining Git identity
         run: |
           git config user.name github_actions
-          git config user.email github_actions@pierrevf.consulting
+          git config user.email github_actions@pierrevf.com
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: "index-update/${{ github.run_id }}"

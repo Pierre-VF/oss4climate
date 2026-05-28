@@ -32,22 +32,22 @@ jobs:
 
     steps:
       - name: "Checkout code"
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Create UV installation"
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
-          version: "0.10.10"
+          version: "0.11.17"
 
       # Check and fix the code
       - name: Defining Git identity
         run: |
           git config user.name github_actions
-          git config user.email github_actions@pierrevf.consulting
+          git config user.email github_actions@pierrevf.com
 
       #- name: Generate requirements files for app
       #  run: |
@@ -59,7 +59,7 @@ jobs:
           make code_cleanup || echo "Precommits modified the files"
 
       - name: Commit changes back
-        uses: EndBug/add-and-commit@v9
+        uses: EndBug/add-and-commit@290ea2c423ad77ca9c62ae0f5b224379612c0321 # v10.0.0
         with:
           author_name: github_actions
           message: "Automatic code reformatting and requirements update"

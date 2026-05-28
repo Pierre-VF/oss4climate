@@ -17,7 +17,7 @@ class Settings(pydantic_settings.BaseSettings):
     # Database
     DATABASE_USERNAME: str | None = None
     DATABASE_PASSWORD: str | None = None
-    DATABASE_HOST: str
+    DATABASE_HOST: str = "db.sqlite"
     DATABASE_NAME: str | None = None
     DATABASE_PORT: int | None = None
 
