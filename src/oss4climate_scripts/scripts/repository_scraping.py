@@ -15,7 +15,7 @@ from oss4climate_scripts.src.config import (
 
 
 def scrape_all(
-    target_output_file: str = FILE_OUTPUT_LISTING_FEATHER,
+    target_output_file: str | None = None,
     fail_on_issue=False,
 ) -> None:
     """
@@ -29,6 +29,13 @@ def scrape_all(
     :raises ValueError: if output file type is not supported (CSV, JSON)
     :return: /
     """
+    if target_output_file is None:
+        # This should only be needed when actually needed (as it's a side feature)
+        from oss4climate_app.src.config import (
+            FILE_OUTPUT_LISTING_FEATHER,
+        )
+
+        target_output_file = FILE_OUTPUT_LISTING_FEATHER
 
     log_info("Loading organisations and repositories to be indexed")
     targets = ParsingTargets.from_toml(FILE_INPUT_INDEX)
