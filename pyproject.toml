@@ -59,7 +59,7 @@ test = [
 app = [
     "fastapi>=0.136.1",
     "gunicorn>=23.0.0",
-    "sentry-sdk[fastapi]>=2.58.0",
+    "sentry-sdk[fastapi]>=2.61.1",
     "uvicorn[standard]>=0.42.0",
     "fastmcp>=3.2, <4",
     # Security forces below (not actual direct dependencies)
