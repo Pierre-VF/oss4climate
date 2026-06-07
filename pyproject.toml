@@ -16,10 +16,10 @@ dependencies = [
     "pandas>=3.0,<4",
     "pyarrow>=23.0.1",
     "pydantic>=2.12.4",
-    "pydantic-settings>=2.7.1",
+    "pydantic-settings>=2.14.1",
     "requests>=2.33.1",
     "sqlmodel>=0.0.27",
-    "tomlkit>=0.13.3",
+    "tomlkit>=0.15.0",
     "tqdm>=4.67.1",
     "typesense>=2.0.0",
     "pyyaml>=6.0.3",
@@ -68,5 +68,5 @@ app = [
 mcp = [
     "pydantic-ai-slim[mistral,anthropic,fastmcp,cli]>=1.99.0",
     # Security only:
-    "anthropic>=0.87.0"
+    "anthropic>=0.105.2"
 ]
