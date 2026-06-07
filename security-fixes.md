@@ -40,9 +40,9 @@
 
 ## MEDIUM
 
-### M1: Timing-Attack Vulnerable Secret Comparison
+### M1: Timing-Attack Vulnerable Secret Comparison [FIXED]
 
-- **File:** `oss4climate_app/src/routers/api.py:91`
+- **File:** `src/oss4climate_app/src/routers/api.py:91`
 - **Issue:** `key != SETTINGS.DATA_REFRESH_KEY` uses standard string comparison, which is not constant-time. An attacker could brute-force the key character by character via response timing.
 - **Fix:** Use `secrets.compare_digest(key, SETTINGS.DATA_REFRESH_KEY)`.
 

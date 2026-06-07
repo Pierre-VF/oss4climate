@@ -4,6 +4,7 @@ Module containing the API code
 Note: For now, only redirects
 """
 
+import secrets
 from importlib.metadata import version
 from typing import Optional
 
@@ -88,7 +89,7 @@ def _permission_admin(key: Optional[str] = None):
         raise ForbiddenError(
             "Not allowed to refresh when passkey is not set",
         )
-    if key != SETTINGS.DATA_REFRESH_KEY:
+    if not secrets.compare_digest(key or "", SETTINGS.DATA_REFRESH_KEY):
         raise ForbiddenError(
             "You are not allowed to refresh the data (invalid key)",
         )
