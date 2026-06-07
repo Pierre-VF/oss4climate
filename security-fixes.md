@@ -2,7 +2,7 @@
 
 ## CRITICAL
 
-### C1: Command Injection
+### C1: Command Injection [FIXED]
 
 - **File:** `oss4climate_scripts/scripts/__init__.py:34`
 - **Issue:** `os.system(f"black {file_path}")` passes a file path directly to the shell without escaping. If `file_path` is attacker-controlled (it is a public parameter), commands can be injected via `;`, `&`, or `$()`. For example, a path like `/tmp/evil; rm -rf /` would execute arbitrary commands.
@@ -12,7 +12,7 @@
 
 ## HIGH
 
-### H1: Reflected XSS in JavaScript Context
+### H1: Reflected XSS in JavaScript Context [FIXED]
 
 - **File:** `oss4climate_app/templates/v2/results.html:100-104`
 - **Issue:** Query parameters are interpolated into JavaScript string literals:
