@@ -33,8 +33,8 @@ class Settings(pydantic_settings.BaseSettings):
     APP_URL_FAVICON: str | None = None
 
     # Typesense settings
-    TYPESENSE_API_KEY: str = ""
-    TYPESENSE_HOST: str = ""
+    TYPESENSE_API_KEY: str | None = None
+    TYPESENSE_HOST: str | None = None
     TYPESENSE_CONNECTION_TIMEOUT: int = 2
 
     # For data and usage analytics
