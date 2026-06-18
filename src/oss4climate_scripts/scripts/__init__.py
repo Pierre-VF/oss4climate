@@ -36,7 +36,10 @@ def format_individual_file(file_path: str) -> None:
 
 def format_all_files():
     format_individual_file(FILE_INPUT_INDEX)
-    format_individual_file(FILE_OUTPUT_SUMMARY_TOML)
+    try:
+        format_individual_file(FILE_OUTPUT_SUMMARY_TOML)
+    except Exception as e:
+        print(f"Failed to reprocess the summary : {e}")
 
 
 def _add_projects_to_listing_file(
