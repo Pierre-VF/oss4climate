@@ -97,11 +97,11 @@
         document.getElementById("search_again_form").addEventListener("submit", function (event) {
             event.preventDefault();
             var queryValue = document.getElementById("query").value;
-            var licenseValue = "{{ request.query_params.get('license_category', '*') }}";
-            var languageValue = "{{ request.query_params.get('language', '*') }}";
-            var excludeForks = "{{ request.query_params.get('exclude_forks', '') }}";
-            var excludeInactive = "{{ request.query_params.get('exclude_inactive', '') }}";
-            var extendedSearch = "{{ request.query_params.get('extended_search', '') }}";
+            var licenseValue = {{ request.query_params.get('license_category', '*') | tojson }};
+            var languageValue = {{ request.query_params.get('language', '*') | tojson }};
+            var excludeForks = {{ request.query_params.get('exclude_forks', '') | tojson }};
+            var excludeInactive = {{ request.query_params.get('exclude_inactive', '') | tojson }};
+            var extendedSearch = {{ request.query_params.get('extended_search', '') | tojson }};
 
             var url = "results?";
             if (queryValue) {

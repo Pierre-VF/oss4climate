@@ -62,12 +62,6 @@ def generate_listing():
 
 
 @app.command()
-def search():
-    """Searches in the listing"""
-    utils.search_in_listing()
-
-
-@app.command()
 def download_data():
     """Downloads the latest listing"""
     utils.download_data()

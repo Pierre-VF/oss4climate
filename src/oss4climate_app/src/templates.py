@@ -11,14 +11,14 @@ templates = Jinja2Templates(directory=str(TEMPLATES_PATH))
 
 
 def render_template(request: Request, template_file: str, content: dict | None = None):
-    resp = {
+    context = {
         "request": request,
         "APP_VERSION": APP_VERSION,
         "THEME": THEME,
         "THEME_CSS": THEME.to_css_variables(),
     }
     if content is not None:
-        resp = resp | content
+        context = context | content
 
     if template_file.endswith(".html"):
         media_type = "text/html"
@@ -32,6 +32,6 @@ def render_template(request: Request, template_file: str, content: dict | None =
     return templates.TemplateResponse(
         request,
         template_file,
-        resp,
+        context=context,
         media_type=media_type,
     )

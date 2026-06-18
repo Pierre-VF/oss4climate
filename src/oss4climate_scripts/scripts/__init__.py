@@ -2,7 +2,7 @@
 Module containing methods to be run in scripts
 """
 
-import os
+import subprocess
 from datetime import timedelta
 
 from oss4climate.src.log import log_info
@@ -31,12 +31,15 @@ from oss4climate_scripts.src.config import (
 
 
 def format_individual_file(file_path: str) -> None:
-    os.system(f"black {file_path}")
+    subprocess.run(["black", file_path], check=True)
 
 
 def format_all_files():
     format_individual_file(FILE_INPUT_INDEX)
-    format_individual_file(FILE_OUTPUT_SUMMARY_TOML)
+    try:
+        format_individual_file(FILE_OUTPUT_SUMMARY_TOML)
+    except Exception as e:
+        print(f"Failed to reprocess the summary : {e}")
 
 
 def _add_projects_to_listing_file(

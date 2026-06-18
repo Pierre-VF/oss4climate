@@ -11,13 +11,14 @@
     <link href="{{ URL_BASE }}/static/css/styles-v2.css?version={{ APP_VERSION }}" rel="stylesheet">
     {% if UMAMI_SITE_ID != "" %}
         <script defer src="https://cloud.umami.is/script.js" data-website-id="{{ UMAMI_SITE_ID }}"></script>
+        <!-- <script defer src="https://cloud.umami.is/script.js" integrity="sha384-DCWdwYp9BA8848i6w0Y5RQh8ANWh1jp1+NjJ/a+jqFZi1nvw6st1t+bFQ9+hhNXe" crossorigin="anonymous" data-website-id="{{ UMAMI_SITE_ID }}"></script> -->
     {% endif %}
     <link rel="canonical" href="{{ canonical_url }}">
 
     {# Theme CSS variables - dynamically generated from theme.py #}
     <style>
         :root {
-            {{ THEME_CSS | safe }}
+            {{ THEME_CSS }}
         }
     </style>
 </head>
