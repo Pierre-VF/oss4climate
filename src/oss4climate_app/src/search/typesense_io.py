@@ -117,12 +117,7 @@ def index_data_in_typesense(ts_client: typesense.Client, df: pd.DataFrame) -> No
 
     [
         ts_client.collections["projects"].documents.import_(
-            [
-                {k: r[k] for k in _TYPESENSE_REPO_SCHEMA_FIELDS}
-                | {
-                    "readme": r["readme"][:3000]
-                }  # Cutting the readme for RAM preservation
-            ]
+            [{k: r[k] for k in _TYPESENSE_REPO_SCHEMA_FIELDS}]
         )
         for __, r in tqdm(df.iterrows())
     ]
@@ -168,10 +163,7 @@ def search_for_url(
         SearchParameters(
             q=url,
             query_by="url",
-            # For hybrid search
-            # rerank_hybrid_matches=True,
-            # vector_query="embedding_readme:([], k: 200)",  # Here, reduce the relevant fields
-            # sort_by="idx:asc",
+            sort_by="idx:asc",
             exclude_fields=["embedding_description", "embedding_readme"],
             per_page=results_per_page,
             page=page,
@@ -194,12 +186,22 @@ def search_with_query(
     high_quality_only: bool = True,
 ) -> SearchResult:
     if query is None:
-        query = " "  # TODO: make this better
+        query = " "
 
-    # Enable hybrid search only if used in settings
-    query_by = "name, organisation, description, readme"
-    if SETTINGS.ENABLE_HYBRID_SEARCH:
-        query_by = f"{query_by}, embedding_readme"
+    # Keyword search with field weights: name > description > organisation > readme.
+    # This ensures title matches rank highest, followed by description,
+    # then organisation, and finally the full readme text.
+    keyword_fields = "name, organisation, description, readme"
+    keyword_weights = [4, 2, 3, 1]
+    hybrid_params: dict[str, str | bool] = {}
+    use_hybrid = SETTINGS.ENABLE_HYBRID_SEARCH
+    if use_hybrid:
+        keyword_fields = f"{keyword_fields}, embedding_readme"
+        keyword_weights = [*keyword_weights, 2]
+        hybrid_params = {
+            "rerank_hybrid_matches": True,
+            "vector_query": "embedding_readme:([], k: 100)",
+        }
 
     s_kwargs = _search_kwargs(
         languages=languages,
@@ -207,20 +209,44 @@ def search_with_query(
         high_quality_only=high_quality_only,
     )
 
-    r = ts_client.collections["projects"].documents.search(
-        SearchParameters(
-            q=query,
-            query_by=query_by,
-            # For hybrid search
-            # rerank_hybrid_matches=True,
-            # vector_query="embedding_readme:([], k: 200)",  # Here, reduce the relevant fields
-            # sort_by="idx:asc",
-            exclude_fields=["embedding_description", "embedding_readme"],
-            per_page=results_per_page,
-            page=page,
-            **s_kwargs,
+    try:
+        r = ts_client.collections["projects"].documents.search(
+            SearchParameters(
+                q=query,
+                query_by=keyword_fields,
+                query_by_weights=keyword_weights,
+                prefix=True,
+                typo_tolerance="false",
+                exclude_fields=["embedding_description", "embedding_readme"],
+                per_page=results_per_page,
+                page=page,
+                **s_kwargs,
+                **hybrid_params,
+            )
         )
-    )
+    except typesense.exceptions.RequestMalformed as e:
+        # Hybrid search failed (e.g. embeddings not yet generated).
+        # Fall back to keyword-only search.
+        if use_hybrid:
+            keyword_fields = "name, organisation, description, readme"
+            keyword_weights = [4, 2, 3, 1]
+            hybrid_params = {}
+            r = ts_client.collections["projects"].documents.search(
+                SearchParameters(
+                    q=query,
+                    query_by=keyword_fields,
+                    query_by_weights=keyword_weights,
+                    prefix=True,
+                    typo_tolerance="false",
+                    exclude_fields=["embedding_description", "embedding_readme"],
+                    per_page=results_per_page,
+                    page=page,
+                    **s_kwargs,
+                )
+            )
+        else:
+            raise RuntimeError("Failed Typesense query") from e
+
     return SearchResult(
         page=r["page"],
         total_results=r["found"],
