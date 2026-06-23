@@ -188,6 +188,11 @@
                 "url": "https://github.com/NEONScience/NEON-utilities"
             },
             {
+                "license": "GNU General Public License v2.0",
+                "license_url": "https://raw.githubusercontent.com/OliverSherouse/wbdata/refs/heads/master/LICENSE.txt",
+                "url": "https://github.com/OliverSherouse/wbdata"
+            },
+            {
                 "license": "MIT License",
                 "license_url": "https://raw.githubusercontent.com/Pierre-VF/OpenClimateResources/main/LICENSE",
                 "target_count": 3,
