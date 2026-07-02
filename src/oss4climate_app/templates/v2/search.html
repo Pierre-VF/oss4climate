@@ -70,7 +70,7 @@
                             Licensed under <a href="{{ r.license_url }}" target="_blank" rel="noopener">{{r.license}}</a>
                         </div>
                     </div>
-                    <div class="source-count">{{r.target_count}} projects</div>
+                    <div class="source-count{% if r.target_count > 1000 %} source-count--gold{% elif r.target_count > 50 %} source-count--silver{% else %} source-count--bronze{% endif %}">{{r.target_count}} projects</div>
                 </div>
                 {% endfor %}
             </div>

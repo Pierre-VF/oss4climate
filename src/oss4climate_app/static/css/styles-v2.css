@@ -384,6 +384,21 @@ button[type="submit"]:active {
     margin-left: var(--spacing-sm, 8px);
 }
 
+.source-count--gold {
+    background-color: #e7c91f;
+    color: #1a1a1a;
+}
+
+.source-count--silver {
+    background-color: #C0C0C0;
+    color: #1a1a1a;
+}
+
+.source-count--bronze {
+    background-color: #CD7F32;
+    color: #ffffff;
+}
+
 /* ============================================
  * Results Page Styles
  * ============================================ */
