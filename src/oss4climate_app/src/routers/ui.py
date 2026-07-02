@@ -4,6 +4,7 @@ Module containing the UI code
 
 from datetime import date, timedelta
 from typing import Optional
+from urllib.parse import urlencode
 
 import pandas as pd
 from fastapi import APIRouter, BackgroundTasks, Depends, Request
@@ -107,6 +108,12 @@ async def search_results(
 
     n_total_found = r.total_results
     n_found = len(r.results)
+    total_pages = max(1, ((n_total_found - 1) // n_results) + 1)
+
+    # Build base query string (all params except offset) for pagination links
+    base_params = {k: v for k, v in request.query_params.items() if k != "offset"}
+    base_params = {k: v for k, v in base_params.items() if v is not None and v != ""}
+    base_query = urlencode(base_params)
 
     # TODO: make this neater (and remove the below)
     df_out = pd.DataFrame(
@@ -153,6 +160,10 @@ async def search_results(
             "n_total_found": n_total_found,
             "results": df_out,
             "query": query,
+            "page": page,
+            "n_results": n_results,
+            "total_pages": total_pages,
+            "base_query": base_query,
         },
     )
 

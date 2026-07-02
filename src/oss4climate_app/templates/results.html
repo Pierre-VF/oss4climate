@@ -56,6 +56,15 @@
             {% endfor %}
         </table>
 
+        <div class="pagination">
+            {% if page > 1 %}
+                <a href="results?{% if base_query %}{{ base_query }}&{% endif %}offset={{ page - 1 }}" class="pagination-btn">&laquo; Previous</a>
+            {% endif %}
+            {% if page < total_pages %}
+                <a href="results?{% if base_query %}{{ base_query }}&{% endif %}offset={{ page + 1 }}" class="pagination-btn">Next &raquo;</a>
+            {% endif %}
+        </div>
+
         <p>Not finding what you were looking for? Please give us <b><a href="{{ URL_FEEDBACK_FORM }}">your feedback</a></b>.</p>
     {% endif %}
 
