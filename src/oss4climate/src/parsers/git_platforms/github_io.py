@@ -166,8 +166,10 @@ class GithubScraper(_GPScraper):
 
     # Private methods first
     def _extract_organisation_and_repository_as_url_block(self, x: str) -> str:
-        # Cleaning up Github prefix
-        if self.is_relevant_url(x):
+        # Strip host prefix if present (handles host-prefixed IDs like "github.com/org/repo")
+        if x.startswith(f"{_GITHUB_DOMAIN}/"):
+            x = x[len(_GITHUB_DOMAIN) :].lstrip("/")
+        elif self.is_relevant_url(x):
             x = x.replace(_GITHUB_URL_BASE, "")
         fixed_x = "/".join(x.split("/")[:2])
         # Removing eventual extra information in URL
@@ -346,7 +348,7 @@ class GithubScraper(_GPScraper):
         languages = list(raw_languages.keys())
 
         details = ProjectDetails(
-            id=repo_path,
+            id=repo_id,
             name=r["name"],
             organisation=self.extract_repository_organisation(repo_path),
             url=r["html_url"],

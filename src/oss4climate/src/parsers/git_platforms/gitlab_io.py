@@ -44,8 +44,12 @@ def _extract_host_organisation_and_repository_as_url_block(x: str) -> tuple[str,
     parsed_url = urlparse(url)
     host = parsed_url.hostname
     if host is None:
-        # If no host is found, then use Gitlab as default
-        host = GITLAB_DOMAIN
+        # No protocol — extract host from path prefix (e.g., "gitlab.com/org/repo")
+        first_segment = x.split("/")[0]
+        if first_segment.startswith("gitlab.") or first_segment.startswith("git."):
+            host = first_segment
+        else:
+            host = GITLAB_DOMAIN
 
     # Then focus on the project
     # Cleaning up Gitlab prefix
@@ -254,7 +258,7 @@ class GitlabScraper(_GPScraper):
                 n_open_prs = len([i for i in r_open_pr if i.get("state") == "open"])
 
         details = ProjectDetails(
-            id=repo_id_min,
+            id=repo_id,
             name=r["name"],
             organisation=organisation,
             url=r["web_url"],

@@ -42,8 +42,10 @@ class BitbucketScraper(_GPScraper):
         super().__init__(cache_lifetime=cache_lifetime)
 
     def _extract_organisation_and_repository_as_url_block(self, x: str) -> str:
-        # Cleaning up Bitbucket prefix
-        if self.is_relevant_url(x):
+        # Strip host prefix if present (handles host-prefixed IDs like "bitbucket.org/org/repo")
+        if x.startswith(f"{BITBUCKET_DOMAIN}/"):
+            x = x[len(BITBUCKET_DOMAIN) :].lstrip("/")
+        elif self.is_relevant_url(x):
             x = x.replace(BITBUCKET_URL_BASE, "")
         # Not keeping more than 2 slashes
         fixed_x = "/".join(x.split("/")[:2])

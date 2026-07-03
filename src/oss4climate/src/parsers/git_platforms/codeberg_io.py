@@ -27,8 +27,10 @@ CODEBERG_URL_BASE = f"https://{CODEBERG_DOMAIN}/"
 
 
 def _extract_organisation_and_repository_as_url_block(x: str) -> str:
-    # Cleaning up Bitbucket prefix
-    if CodebergScraper().is_relevant_url(x):
+    # Strip host prefix if present (handles host-prefixed IDs like "codeberg.org/org/repo")
+    if x.startswith(f"{CODEBERG_DOMAIN}/"):
+        x = x[len(CODEBERG_DOMAIN) :].lstrip("/")
+    elif CodebergScraper().is_relevant_url(x):
         x = x.replace(CODEBERG_URL_BASE, "")
     # Not keeping more than 2 slashes
     fixed_x = "/".join(x.split("/")[:2])

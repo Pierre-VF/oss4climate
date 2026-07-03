@@ -424,17 +424,15 @@ class RepositoryScraper:
             # Parse the repo ID to determine platform and add to targets
             repo_id = repo.id
             if repo_id.startswith("github.com/"):
-                targets.github_repositories.add(repo_id.replace("github.com/", ""))
+                targets.github_repositories.add(repo_id)
             elif repo_id.startswith("gitlab.com/") or repo_id.startswith("git."):
                 # For GitLab, we need the full path
                 if repo.url:
                     targets.gitlab_projects.add(repo.url)
             elif repo_id.startswith("codeberg.org/"):
-                targets.codeberg_repositories.add(repo_id.replace("codeberg.org/", ""))
+                targets.codeberg_repositories.add(repo_id)
             elif repo_id.startswith("bitbucket.org/"):
-                targets.bitbucket_repositories.add(
-                    repo_id.replace("bitbucket.org/", "")
-                )
+                targets.bitbucket_repositories.add(repo_id)
 
         # Use the existing scrape_all_targets for the actual scraping
         # This reuses all the caching, rate limiting, and platform dispatch logic
