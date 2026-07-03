@@ -51,7 +51,7 @@ async def search(
     ts_client=Depends(typesense_io.generate_client),
 ) -> typesense_io.SearchResult:
     if query:
-        query = query.strip().lower()
+        query = query.strip()
     if query is None:
         query = " "  # TODO : find a better solution
     res = typesense_io.search_with_query(

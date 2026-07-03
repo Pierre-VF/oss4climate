@@ -384,6 +384,21 @@ button[type="submit"]:active {
     margin-left: var(--spacing-sm, 8px);
 }
 
+.source-count--gold {
+    background-color: #e7c91f;
+    color: #1a1a1a;
+}
+
+.source-count--silver {
+    background-color: #C0C0C0;
+    color: #1a1a1a;
+}
+
+.source-count--bronze {
+    background-color: #CD7F32;
+    color: #ffffff;
+}
+
 /* ============================================
  * Results Page Styles
  * ============================================ */
@@ -563,6 +578,31 @@ button[type="submit"]:active {
 
 .feedback-link::before {
     content: "💬";
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md, 16px);
+    margin: var(--spacing-lg, 24px) 0;
+}
+
+.pagination-btn {
+    display: inline-block;
+    padding: var(--spacing-sm, 8px) var(--spacing-lg, 24px);
+    background-color: var(--color-primary, #2e8b57);
+    color: var(--color-text-light, #ffffff);
+    border-radius: var(--border-radius-full, 25px);
+    text-decoration: none;
+    font-size: var(--font-size-base, 16px);
+    font-weight: var(--font-weight-medium, 500);
+    transition: background-color var(--transition-normal, 0.3s ease), transform var(--transition-fast, 0.15s ease);
+}
+
+.pagination-btn:hover {
+    background-color: var(--color-primary-dark, #1b5e20);
+    transform: translateY(-1px);
 }
 
 /* ============================================

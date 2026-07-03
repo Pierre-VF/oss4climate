@@ -63,6 +63,10 @@ cli_help:
 	uv run typer $(CLI_NAME) run --help
 
 
+.PHONY: seed_typesense
+seed_typesense:
+	uv run src/oss4climate_app/seed_typesense.py
+
 
 # ----------------------------------------------------------------------------
 # Kept for legacy reasons (backwards compatibility)
