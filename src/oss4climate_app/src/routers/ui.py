@@ -85,7 +85,7 @@ async def search_results(
     ts_client=Depends(typesense_io.generate_client),
 ):
     if query:
-        query = query.strip().lower()
+        query = query.strip()
     else:
         # Return all results
         query = "*"

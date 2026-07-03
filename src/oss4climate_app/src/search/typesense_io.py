@@ -188,19 +188,19 @@ def search_with_query(
     if query is None:
         query = " "
 
-    # Keyword search with field weights: name > description > organisation > readme.
-    # This ensures title matches rank highest, followed by description,
-    # then organisation, and finally the full readme text.
+    # Keyword search with field weights: name > organisation > description > readme.
+    # This ensures title matches rank highest, followed by organisation,
+    # then description, and finally the full readme text.
     keyword_fields = "name, organisation, description, readme"
-    keyword_weights = [4, 2, 3, 1]
+    keyword_weights = [5, 4, 3, 2]
     hybrid_params: dict[str, str | bool] = {}
     use_hybrid = SETTINGS.ENABLE_HYBRID_SEARCH
     if use_hybrid:
         keyword_fields = f"{keyword_fields}, embedding_readme"
-        keyword_weights = [*keyword_weights, 2]
+        keyword_weights = [*keyword_weights, 1]
         hybrid_params = {
             "rerank_hybrid_matches": True,
-            "vector_query": "embedding_readme:([], k: 100)",
+            "vector_query": "embedding_description:([], k: 100)",
         }
 
     s_kwargs = _search_kwargs(
@@ -229,7 +229,7 @@ def search_with_query(
         # Fall back to keyword-only search.
         if use_hybrid:
             keyword_fields = "name, organisation, description, readme"
-            keyword_weights = [4, 2, 3, 1]
+            keyword_weights = [5, 4, 3, 2]
             hybrid_params = {}
             r = ts_client.collections["projects"].documents.search(
                 SearchParameters(
