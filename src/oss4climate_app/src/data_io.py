@@ -99,6 +99,15 @@ def clear_cache():
 
 
 def refresh_data(force_refresh: bool = False):
-    if force_refresh or not os.path.exists(FILE_OUTPUT_LISTING_FEATHER):
-        log_warning("- Listing not found, downloading again")
-        download_listing_data_for_app()
+    """
+    Refresh the data for the app.
+
+    Note: The feather file is no longer used as the primary data source.
+    The app now reads from the repository database. This function is kept
+    for backward compatibility but only downloads the listings index.
+    """
+    if force_refresh:
+        log_warning("- Force refresh requested, downloading listings index")
+    download_listing_data_for_app(
+        force_refresh=force_refresh, load_feather_listing=False
+    )

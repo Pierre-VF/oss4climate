@@ -21,6 +21,9 @@ class Settings(pydantic_settings.BaseSettings):
     DATABASE_NAME: str | None = None
     DATABASE_PORT: int | None = None
 
+    # Repository database URL (SQLite or PostgreSQL)
+    REPOS_DATABASE_URL: str = "sqlite:///.data/repos.sqlite"
+
     # Identifiants of FTP for export (scripts only)
     EXPORT_FTP_URL: Optional[str] = None
     EXPORT_FTP_USER: Optional[str] = None

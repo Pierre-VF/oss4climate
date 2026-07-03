@@ -18,15 +18,24 @@ print("Starting seeding of Typesense")
 # Seeding the search engine
 # ==============================================================================
 
-from oss4climate.src.database.projects import project_dataframe_loader
+from datetime import date
+
+import pandas as pd
+
+from oss4climate.src.database.repos import get_engine, get_repos_for_typesense
 from oss4climate_app.src.search.typesense_io import (
     generate_client,
     index_data_in_typesense,
     reset_typesense_schema,
 )
+from sqlmodel import Session
 
-# Full indexing of the files
-df = project_dataframe_loader(FILE_OUTPUT_LISTING_FEATHER)
+# Load repos from database
+with Session(get_engine()) as session:
+    repo_dicts = get_repos_for_typesense(session)
+
+# Convert to DataFrame (matching the expected schema from the old feather-based pipeline)
+df = pd.DataFrame(repo_dicts)
 
 # ==============================================================================
 # Mark the OSSTech repos
