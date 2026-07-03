@@ -7,7 +7,9 @@ functions for database access.
 """
 
 from datetime import UTC, date, datetime, timedelta
+from typing import Any
 
+from pydantic import model_validator
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 from oss4climate.src.config import SETTINGS
@@ -42,6 +44,15 @@ class Organisation(SQLModel, table=True):
     last_scraped_at: datetime | None = None
     last_error: str | None = None
     error_count: int | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_model_before(cls, d: Any):
+        if isinstance(d, dict):
+            for i in ["created_at", "updated_at", "last_scraped_at"]:
+                if isinstance(d.get(i), str):
+                    d[i] = datetime.fromisoformat(d[i])
+        return d
 
 
 class Repository(SQLModel, table=True):
@@ -79,6 +90,14 @@ class Repository(SQLModel, table=True):
     error_count: int | None = None
     disappeared_on: date | None = None
     active: bool = Field(default=True)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _validate(cls, d: dict):
+        for i in ["last_scraped_at"]:
+            if isinstance(d.get(i), str):
+                d[i] = datetime.fromisoformat(d[i])
+        return d
 
 
 # -------------------------------------------------------------------------------------
@@ -143,12 +162,13 @@ def upsert_organisation(session: Session, org_data: dict) -> Organisation:
     ).first()
 
     if existing is None:
-        org = Organisation(**org_data)
+        org = Organisation.model_validate(org_data)
         session.add(org)
     else:
+        new_org = Organisation.model_validate(org_data)  # For datetime fix
         for key, value in org_data.items():
             if hasattr(existing, key) and value is not None:
-                setattr(existing, key, value)
+                setattr(existing, key, getattr(new_org, key))
 
     session.commit()
     return existing if existing else org
@@ -169,12 +189,13 @@ def upsert_repository(session: Session, repo_data: dict) -> Repository:
     existing = session.exec(select(Repository).where(Repository.id == repo_id)).first()
 
     if existing is None:
-        repo = Repository(**repo_data)
+        repo = Repository.model_validate(repo_data)
         session.add(repo)
     else:
+        new_repo = Repository.model_validate(repo_data)
         for key, value in repo_data.items():
             if hasattr(existing, key) and value is not None:
-                setattr(existing, key, value)
+                setattr(existing, key, getattr(new_repo, key))
 
     session.commit()
     return existing if existing else repo

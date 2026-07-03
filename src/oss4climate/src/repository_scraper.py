@@ -220,6 +220,7 @@ class RepositoryScraper:
                             },
                         )
                 except Exception as e:
+                    session.rollback()
                     log_warning(f"Failed to sync GitHub org {org_url}: {e}")
                     # Still upsert the org with error info
                     org_id = self._get_org_id(org_url)
@@ -279,6 +280,7 @@ class RepositoryScraper:
                             },
                         )
                 except Exception as e:
+                    session.rollback()
                     log_warning(f"Failed to sync GitLab group {group_url}: {e}")
                     host, group_path = self._extract_host_and_path(group_url)
                     org_id = f"{host}/{group_path.split('/')[0]}"
@@ -317,6 +319,7 @@ class RepositoryScraper:
                         },
                     )
                 except Exception as e:
+                    session.rollback()
                     log_warning(f"Failed to sync Codeberg org {org_url}: {e}")
 
             # Process Codeberg explicit repos

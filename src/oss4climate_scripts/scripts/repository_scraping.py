@@ -85,3 +85,7 @@ def scrape_all(
 
     file_failures_toml = f"{FILE_OUTPUT_DIR}/failures_scraping.toml"
     scripts.format_individual_file(file_failures_toml)
+
+
+if __name__ == "__main__":
+    scrape_all()
