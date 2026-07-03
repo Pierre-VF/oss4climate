@@ -164,5 +164,4 @@ def fetch_all(
         },
     )
 
-    res.ensure_sorted_cleaned_and_unique_elements()
     return res

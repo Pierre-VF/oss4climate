@@ -48,7 +48,6 @@ def test_parsing_target_set(
         unknown={unknown_url_2, unknown_url},
     )
     x += x
-    x.ensure_sorted_cleaned_and_unique_elements()
     assert x.github_organisations == {
         github_organisation_url,
         github_organisation_url_2,
