@@ -115,19 +115,15 @@ class RepositoryScraper:
         :return: Repository ID (e.g., "github.com/oss4climate/oss4climate")
         """
         platform, path = self._get_platform_from_url(url)
+        host = url.split("://")[1].split("/")[0]
         if platform == "unknown":
             # Try to extract host from URL
             if "://" in url:
-                host = url.split("://")[1].split("/")[0]
                 return (
                     f"{host}/{url.split('/', 3)[-1] if len(url.split('/')) > 3 else ''}"
                 )
             return url
-        return (
-            f"{platform}.{'com' if platform != 'gitlab' else ''}/{path}"
-            if platform != "gitlab"
-            else path
-        )
+        return f"{host}/{path}" if platform != "gitlab" else path
 
     def _get_org_id(self, url: str) -> str:
         """
@@ -137,9 +133,9 @@ class RepositoryScraper:
         :return: Organisation ID (e.g., "github.com/oss4climate")
         """
         platform, path = self._get_platform_from_url(url)
+        host = url.split("://")[1].split("/")[0]
         if platform == "unknown":
             if "://" in url:
-                host = url.split("://")[1].split("/")[0]
                 org_path = (
                     url.split("/", 3)[-1].split("/")[0]
                     if len(url.split("/")) > 3
@@ -148,7 +144,7 @@ class RepositoryScraper:
                 return f"{host}/{org_path}"
             return url
         return (
-            f"{platform}.{'com' if platform != 'gitlab' else ''}/{path.split('/')[0]}"
+            f"{host}/{path.split('/')[0]}"
             if platform != "gitlab"
             else f"{path.split('/')[0]}"
         )
