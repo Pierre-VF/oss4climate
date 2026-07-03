@@ -9,7 +9,7 @@ scraping lifecycle:
 """
 
 import json
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from sqlmodel import Session, select
@@ -543,8 +543,6 @@ class RepositoryScraper:
 
         :return: Current UTC datetime as ISO string
         """
-        from datetime import UTC
-
         return datetime.now(tz=UTC).isoformat()
 
     def export_to_feather(
