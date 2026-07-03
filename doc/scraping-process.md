@@ -51,7 +51,6 @@ Stores metadata about organisations/groups from Git hosting platforms.
 | `blog` | string | Organisation blog URL |
 | `location` | string | Organisation location |
 | `email` | string | Organisation email |
-| `twitter_username` | string | Twitter/X username |
 | `last_scraped_at` | datetime | Last successful scrape timestamp |
 | `last_error` | string | Last error message (NULL if no error) |
 | `error_count` | integer | Number of consecutive errors (NULL if no error) |

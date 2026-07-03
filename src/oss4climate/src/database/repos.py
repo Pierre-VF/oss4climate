@@ -6,15 +6,12 @@ and organisation metadata, along with engine initialization and helper
 functions for database access.
 """
 
-import json
-import os
 from datetime import UTC, date, datetime, timedelta
 
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.log import log_info
-
 
 # -------------------------------------------------------------------------------------
 # Models
@@ -42,7 +39,6 @@ class Organisation(SQLModel, table=True):
     blog: str | None = None
     location: str | None = None
     email: str | None = None
-    twitter_username: str | None = None
     last_scraped_at: datetime | None = None
     last_error: str | None = None
     error_count: int | None = None

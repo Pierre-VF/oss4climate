@@ -9,20 +9,17 @@ scraping lifecycle:
 """
 
 import json
-from datetime import date, timedelta
+from datetime import timedelta
 from typing import Any
 
 from sqlmodel import Session, select
 
-from oss4climate.src.config import SETTINGS
 from oss4climate.src.crawler import scrape_all_targets
 from oss4climate.src.database.repos import (
-    Organisation,
     Repository,
     get_active_repos_to_scrape,
     get_all_active_repos,
     get_engine,
-    get_all_organisations,
     mark_repos_inactive,
     reset_repo_error,
     set_repo_error,
@@ -37,7 +34,6 @@ from oss4climate.src.parsers.git_platforms.bitbucket_io import BitbucketScraper
 from oss4climate.src.parsers.git_platforms.codeberg_io import CodebergScraper
 from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
 from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
-
 
 # Platform scraper mapping
 PLATFORM_SCRAPERS = {
@@ -558,7 +554,6 @@ class RepositoryScraper:
         :param output_path: Path to the output feather file
         """
         import pandas as pd
-        from datetime import UTC
 
         with Session(get_engine()) as session:
             repos = get_all_active_repos(session)
