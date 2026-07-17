@@ -50,7 +50,7 @@ class EnumLicenceCategories(Enum):
 class ProjectDetails(BaseModel):
     id: str
     name: str
-    organisation: Optional[str]
+    organisation_id: Optional[str]
     url: str
     website: Optional[str]
     description: Optional[str]

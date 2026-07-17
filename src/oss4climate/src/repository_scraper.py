@@ -630,8 +630,8 @@ class RepositoryScraper:
         )
 
         stats = {
-            "repositories": len(repos),
-            "organisations": len(repos),  # Simplified - would need distinct count
+            "repositories": len({i.id for i in repos}),
+            "organisations": len({i.organisation_id for i in repos}),
         }
 
         doc = document()

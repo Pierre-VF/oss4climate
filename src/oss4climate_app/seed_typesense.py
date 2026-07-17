@@ -35,6 +35,8 @@ if __name__ == "__main__":
 
     # Convert to DataFrame (matching the expected schema from the old feather-based pipeline)
     df = pd.DataFrame(repo_dicts)
+    if df.empty:
+        raise ValueError("No data to index")
 
     # ==============================================================================
     # Mark the OSSTech repos
@@ -43,9 +45,7 @@ if __name__ == "__main__":
     osst_targets = opensustain_tech.fetch_all_project_urls_from_opensustain_webpage(
         cache_lifetime=timedelta(hours=6)
     )
-
     df["high_quality"] = df["url"].apply(lambda i: i in osst_targets)
-
     print(osst_targets)
 
     # ==============================================================================
@@ -53,8 +53,8 @@ if __name__ == "__main__":
     # ==============================================================================
     ts_client = generate_client()
     reset_typesense_schema(ts_client)
-    df["idx"] = df.index.to_series().astype(int)
 
+    df["idx"] = df.index.to_series().astype(int)
     index_data_in_typesense(ts_client, df)
 
     print("DONE")

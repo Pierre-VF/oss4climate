@@ -260,7 +260,7 @@ class GitlabScraper(_GPScraper):
         details = ProjectDetails(
             id=repo_id,
             name=r["name"],
-            organisation=organisation,
+            organisation_id=organisation,
             url=r["web_url"],
             website=None,
             description=r["description"],

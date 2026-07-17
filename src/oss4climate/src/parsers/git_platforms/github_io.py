@@ -350,7 +350,7 @@ class GithubScraper(_GPScraper):
         details = ProjectDetails(
             id=repo_id,
             name=r["name"],
-            organisation=self.extract_repository_organisation(repo_path),
+            organisation_id=self.extract_repository_organisation(repo_path),
             url=r["html_url"],
             website=r["homepage"],
             description=r["description"],

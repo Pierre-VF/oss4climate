@@ -17,7 +17,7 @@ _TYPESENSE_EMBEDDING_MODEL = "ts/all-MiniLM-L12-v2"
 
 class ResultItem(BaseModel):
     name: str
-    organisation: str
+    organisation_id: str
     licence: str = "?"
     description: str
     language: str | None = None
