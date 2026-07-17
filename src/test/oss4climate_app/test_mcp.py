@@ -1,10 +1,11 @@
 import pytest
 from fastmcp.client import Client
+
 from oss4climate_app.src.mcp_server import ProjectDetails, mcp
 
 
 @pytest.mark.asyncio
-async def test_list_tools():
+async def test_list_tools(initialised_typesense_client):
     async with Client(transport=mcp) as mcp_client:
         list_tools = await mcp_client.list_tools()
         list_resources = await mcp_client.list_resources()

@@ -6,10 +6,12 @@ from oss4climate_app.src.search import typesense_io
 
 
 @pytest.fixture
-def app_test_client(typesense_client):
+def app_test_client(initialised_typesense_client):
     mark_test_mode()
     # Override dependencies
-    app.dependency_overrides[typesense_io.generate_client] = lambda: typesense_client
+    app.dependency_overrides[typesense_io.generate_client] = lambda: (
+        initialised_typesense_client
+    )
     with TestClient(app=app) as tc:
         yield tc
 

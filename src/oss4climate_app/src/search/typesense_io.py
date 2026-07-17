@@ -17,7 +17,7 @@ _TYPESENSE_EMBEDDING_MODEL = "ts/all-MiniLM-L12-v2"
 
 class ResultItem(BaseModel):
     name: str
-    organisation_id: str
+    organisation_id: str | None = None
     licence: str = "?"
     description: str
     language: str | None = None
@@ -46,7 +46,7 @@ _TYPESENSE_REPO_SCHEMA = {
                 "model_config": {"model_name": _TYPESENSE_EMBEDDING_MODEL},
             },
         },
-        {"name": "readme", "type": "string"},
+        {"name": "readme", "type": "string", "optional": True},
         {
             "name": "embedding_readme",
             "type": "float[]",
@@ -54,17 +54,18 @@ _TYPESENSE_REPO_SCHEMA = {
                 "from": ["readme"],
                 "model_config": {"model_name": _TYPESENSE_EMBEDDING_MODEL},
             },
+            "optional": True,
         },
-        {"name": "organisation_id", "type": "string", "facet": True},
-        {"name": "licence", "type": "string", "facet": True},
-        {"name": "language", "type": "string", "facet": True},
-        {"name": "url", "type": "string"},
+        {"name": "organisation_id", "type": "string", "facet": True, "optional": True},
+        {"name": "licence", "type": "string", "facet": True, "optional": True},
+        {"name": "language", "type": "string", "facet": True, "optional": True},
+        {"name": "url", "type": "string", "optional": True},
         {
             "name": "last_commit_timestamp",
             "type": "int64",
         },  # date is not supported by TypeSense
-        {"name": "is_fork", "type": "bool", "facet": True},
-        {"name": "high_quality", "type": "bool", "facet": True},
+        {"name": "is_fork", "type": "bool", "facet": True, "optional": True},
+        {"name": "high_quality", "type": "bool", "facet": True, "optional": True},
         # TODO : add hints from the README files (just need to compress key information well enough there)
     ],
     "default_sorting_field": "idx",
@@ -115,12 +116,11 @@ def index_data_in_typesense(ts_client: typesense.Client, df: pd.DataFrame) -> No
     if "last_commit_timestamp" not in df.columns:
         df["last_commit_timestamp"] = df["last_commit"].apply(_date_to_timestamp)
 
-    [
-        ts_client.collections["projects"].documents.import_(
-            [{k: r.get(k) for k in _TYPESENSE_REPO_SCHEMA_FIELDS}]
-        )
+    docs = [
+        {k: r.get(k) for k in _TYPESENSE_REPO_SCHEMA_FIELDS}
         for __, r in tqdm(df.iterrows())
     ]
+    ts_client.collections["projects"].documents.import_(docs)
 
 
 class SearchResult(BaseModel):

@@ -1,6 +1,12 @@
 from pathlib import Path
 
 import pytest
+from sqlmodel import Session
+
+from oss4climate.src.database.repos import (
+    get_engine,
+    upsert_repository,
+)
 
 
 # Test data path
@@ -63,3 +69,20 @@ def unknown_url() -> str:
 @pytest.fixture
 def unknown_url_2() -> str:
     return "https://badlab.com/2"
+
+
+@pytest.fixture(scope="session")
+def filled_database_engine():
+    engine = get_engine()
+    with Session(engine) as session:
+        upsert_repository(
+            session,
+            {
+                "id": "github.com/Pierre-VF/oss4climate",
+                "organisation_id": "github.com/Pierre-VF",
+                "name": "oss4climate",
+                "url": "https://github.com/Pierre-VF/oss4climate",
+            },
+        )
+        session.commit()
+    yield engine
