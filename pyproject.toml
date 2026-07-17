@@ -48,7 +48,6 @@ build-backend = "hatchling.build"
 scripts = [
     "black>=26.3.1",
     "ruff>=0.15.15",
-    "typer>=0.25.1",
 ]
 test = [
     "pytest>=9.0.3",
@@ -71,3 +70,12 @@ mcp = [
     # Security only:
     "anthropic>=0.105.2"
 ]
+
+# scripts
+[project.scripts]
+add = "oss4climate_scripts.cli:add"
+discover = "oss4climate_scripts.cli:discover"
+download_data = "oss4climate_scripts.cli:download_data"
+format = "oss4climate_scripts.cli:format"
+generate_listing = "oss4climate_scripts.cli:generate_listing"
+publish = "oss4climate_scripts.cli:publish"
