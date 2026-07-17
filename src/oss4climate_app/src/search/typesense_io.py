@@ -117,7 +117,7 @@ def index_data_in_typesense(ts_client: typesense.Client, df: pd.DataFrame) -> No
 
     [
         ts_client.collections["projects"].documents.import_(
-            [{k: r[k] for k in _TYPESENSE_REPO_SCHEMA_FIELDS}]
+            [{k: r.get(k) for k in _TYPESENSE_REPO_SCHEMA_FIELDS}]
         )
         for __, r in tqdm(df.iterrows())
     ]
@@ -188,10 +188,10 @@ def search_with_query(
     if query is None:
         query = " "
 
-    # Keyword search with field weights: name > organisation > description > readme.
-    # This ensures title matches rank highest, followed by organisation,
+    # Keyword search with field weights: name > organisation_id > description > readme.
+    # This ensures title matches rank highest, followed by organisation_id,
     # then description, and finally the full readme text.
-    keyword_fields = "name, organisation, description, readme"
+    keyword_fields = "name, organisation_id, description, readme"
     keyword_weights = [5, 4, 3, 2]
     hybrid_params: dict[str, str | bool] = {}
     use_hybrid = SETTINGS.ENABLE_HYBRID_SEARCH
@@ -228,7 +228,7 @@ def search_with_query(
         # Hybrid search failed (e.g. embeddings not yet generated).
         # Fall back to keyword-only search.
         if use_hybrid:
-            keyword_fields = "name, organisation, description, readme"
+            keyword_fields = "name, organisation_id, description, readme"
             keyword_weights = [5, 4, 3, 2]
             hybrid_params = {}
             r = ts_client.collections["projects"].documents.search(
