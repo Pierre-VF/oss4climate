@@ -12,6 +12,7 @@ import json
 from datetime import timedelta
 from typing import Any
 
+import pandas as pd
 from sqlmodel import Session, select
 
 from oss4climate.src.crawler import scrape_all_targets
@@ -545,7 +546,6 @@ class RepositoryScraper:
 
         :param output_path: Path to the output feather file
         """
-        import pandas as pd
 
         with Session(get_engine()) as session:
             repos = get_all_active_repos(session)
@@ -559,7 +559,7 @@ class RepositoryScraper:
             record = {
                 "id": repo.id,
                 "name": repo.name,
-                "organisation_id": None,  # Would need to join with organisations table
+                "organisation_id": repo.organisation_id,
                 "url": repo.url,
                 "website": repo.website,
                 "description": repo.description,
