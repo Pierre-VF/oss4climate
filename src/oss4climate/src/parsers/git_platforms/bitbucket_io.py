@@ -17,6 +17,8 @@ from oss4climate.src.helpers import url_base_matches_domain
 from oss4climate.src.models import EnumDocumentationFileType, ProjectDetails
 from oss4climate.src.parsers import (
     ParsingTargets,
+    cached_web_get_json,
+    cached_web_get_text,
 )
 from oss4climate.src.parsers.git_platforms.common import (
     GitPlatformScraper as _GPScraper,
@@ -24,6 +26,37 @@ from oss4climate.src.parsers.git_platforms.common import (
 
 BITBUCKET_DOMAIN = "bitbucket.org"
 BITBUCKET_URL_BASE = f"https://{BITBUCKET_DOMAIN}/"
+
+
+def web_get(
+    url: str,
+    with_headers: bool = True,
+    is_json: bool = True,
+    raise_rate_limit_error_on_403: bool = True,
+    cache_lifetime: timedelta | None = None,
+) -> dict:
+    headers = dict()
+    # Based upon 5000 requests per hour
+    #   (also taking into account the extra side computations that spend time on other things than calls)
+    rate_limiting_wait_s = 0.5
+
+    if is_json:
+        res = cached_web_get_json(
+            url=url,
+            headers=headers,
+            raise_rate_limit_error_on_403=raise_rate_limit_error_on_403,
+            rate_limiting_wait_s=rate_limiting_wait_s,
+            cache_lifetime=cache_lifetime,
+        )
+    else:
+        res = cached_web_get_text(
+            url=url,
+            headers=headers,
+            raise_rate_limit_error_on_403=raise_rate_limit_error_on_403,
+            rate_limiting_wait_s=rate_limiting_wait_s,
+            cache_lifetime=cache_lifetime,
+        )
+    return res
 
 
 class BitbucketTargetType(Enum):

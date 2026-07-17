@@ -55,7 +55,7 @@ _TYPESENSE_REPO_SCHEMA = {
                 "model_config": {"model_name": _TYPESENSE_EMBEDDING_MODEL},
             },
         },
-        {"name": "organisation", "type": "string", "facet": True},
+        {"name": "organisation_id", "type": "string", "facet": True},
         {"name": "licence", "type": "string", "facet": True},
         {"name": "language", "type": "string", "facet": True},
         {"name": "url", "type": "string"},
@@ -257,7 +257,7 @@ def search_with_query(
 class CountableFieldsEnum(Enum):
     licence = "licence"
     language = "language"
-    organisation = "organisation"
+    organisation = "organisation_id"
 
 
 def count_values(

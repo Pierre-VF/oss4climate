@@ -325,7 +325,7 @@ def get_repos_for_typesense(session: Session) -> list[dict]:
             "name": repo.name or "",
             "description": repo.description or "",
             "readme": repo.readme or "",
-            "organisation": repo.organisation_id or "",
+            "organisation_id": repo.organisation_id or "",
             "licence": repo.licence or "",
             "language": repo.language or "",
             "url": repo.url or "",

@@ -89,7 +89,7 @@ def _github_headers() -> dict[str, str]:
     return headers
 
 
-def _web_get(
+def web_get(
     url: str,
     with_headers: bool = True,
     is_json: bool = True,
@@ -133,7 +133,7 @@ def _master_branch_name(
     branches_names = []
     page = 1
     while more_data_needed:
-        r_branches = _web_get(
+        r_branches = web_get(
             f"https://api.github.com/repos/{cleaned_repo_path}/branches?per_page=100&page={page}",
             cache_lifetime=cache_lifetime,
         )
@@ -245,7 +245,7 @@ class GithubScraper(_GPScraper):
                         )
                     else:
                         readme_url = f"https://raw.githubusercontent.com/{repo_name}/refs/heads/{branch}/{i}"
-                    md_content = _web_get(
+                    md_content = web_get(
                         readme_url,
                         with_headers=None,
                         is_json=False,
@@ -277,7 +277,7 @@ class GithubScraper(_GPScraper):
         cache_lifetime = self.cache_lifetime
         repo_path = self._extract_organisation_and_repository_as_url_block(repo_id)
 
-        r = _web_get(
+        r = web_get(
             f"https://api.github.com/repos/{repo_path}",
             cache_lifetime=cache_lifetime,
         )
@@ -295,7 +295,7 @@ class GithubScraper(_GPScraper):
         else:
             # If ever getting issues with the size here, "?per_page=10" can be added to the URL
             #  (just need to ensure that all latest commits are included)
-            r_last_commit_to_master = _web_get(
+            r_last_commit_to_master = web_get(
                 f"https://api.github.com/repos/{repo_path}/commits/{branch2use}",
                 cache_lifetime=cache_lifetime,
             )
@@ -316,7 +316,7 @@ class GithubScraper(_GPScraper):
             forked_from = None
 
         # Note: this does not work well as the limit is set to 30
-        r_pull_requests = _web_get(
+        r_pull_requests = web_get(
             f"https://api.github.com/repos/{repo_path}/pulls",
             cache_lifetime=cache_lifetime,
         )
@@ -375,7 +375,7 @@ class GithubScraper(_GPScraper):
         repo_id: str,
     ) -> dict[Any, float | int]:
         repo_path = self._extract_organisation_and_repository_as_url_block(repo_id)
-        r = _web_get(
+        r = web_get(
             f"https://api.github.com/repos/{repo_path}/languages",
             cache_lifetime=self.cache_lifetime,
         )
@@ -396,7 +396,7 @@ class GithubScraper(_GPScraper):
         per_page = 100
         while get_more:
             try:
-                res = _web_get(
+                res = web_get(
                     f"https://api.github.com/orgs/{organisation_name}/repos?per_page={per_page}&page={page}",
                     cache_lifetime=cache_lifetime,
                 )
@@ -405,7 +405,7 @@ class GithubScraper(_GPScraper):
                 if page > 1:
                     raise e
                 # Where orgs do not work, one is potentially looking at a user instead (not supporting several pages on users)
-                res = _web_get(
+                res = web_get(
                     f"https://api.github.com/users/{organisation_name}/repos",
                     cache_lifetime=cache_lifetime,
                 )
@@ -434,7 +434,7 @@ class GithubScraper(_GPScraper):
         if branch is None:
             return "ERROR with file tree (unclear master branch)"
         try:
-            r = _web_get(
+            r = web_get(
                 url=f"https://api.github.com/repos/{repo_name}/git/trees/{branch}?recursive=1",
                 with_headers=True,
                 is_json=True,
@@ -462,7 +462,7 @@ class GithubScraper(_GPScraper):
         page = 1
         per_page = 100
         while more_to_fetch:
-            r = _web_get(
+            r = web_get(
                 url=f"https://api.github.com/repos/{repo_name}/pulls?state={state}&per_page={per_page}&page={page}",
                 with_headers=True,
                 is_json=True,
@@ -529,7 +529,7 @@ class GithubScraper(_GPScraper):
         organisation_id = self._extract_organisation_and_repository_as_url_block(
             organisation_id
         ).split("/")[0]
-        r = _web_get(
+        r = web_get(
             url=f"https://api.github.com/orgs/{organisation_id}",
             with_headers=True,
             is_json=True,

@@ -78,7 +78,7 @@ def _gitlab_headers() -> dict[str, str]:
     return headers
 
 
-def _web_get(
+def web_get(
     url: str,
     with_headers: bool = True,
     is_json: bool = True,
@@ -179,14 +179,14 @@ class GitlabScraper(_GPScraper):
         if branch:
             raise NotImplementedError()
         host, repo_id = _extract_host_organisation_and_repository_as_url_block(repo_id)
-        r = _web_get(
+        r = web_get(
             f"https://{host}/api/v4/projects/{quote_plus(repo_id)}?license=yes",
             is_json=True,
             cache_lifetime=self.cache_lifetime,
         )
         try:
             url_readme_file = r["readme_url"].replace("/blob/", "/raw/")
-            readme = _web_get(
+            readme = web_get(
                 url_readme_file + "?inline=false", with_headers=False, is_json=False
             )
             readme_type = EnumDocumentationFileType.from_filename(url_readme_file)
@@ -209,7 +209,7 @@ class GitlabScraper(_GPScraper):
         host, repo_id_min = _extract_host_organisation_and_repository_as_url_block(
             repo_id
         )
-        r = _web_get(
+        r = web_get(
             f"https://{host}/api/v4/projects/{quote_plus(repo_id_min)}?license=yes",
             is_json=True,
             cache_lifetime=cache_lifetime,
@@ -252,7 +252,7 @@ class GitlabScraper(_GPScraper):
         if url_open_pr_raw:
             url_open_pr = url_open_pr_raw.get("merge_requests")
             if url_open_pr:
-                r_open_pr = _web_get(
+                r_open_pr = web_get(
                     url_open_pr, is_json=True, cache_lifetime=cache_lifetime
                 )
                 n_open_prs = len([i for i in r_open_pr if i.get("state") == "open"])
@@ -285,7 +285,7 @@ class GitlabScraper(_GPScraper):
         repo_id: str,
     ) -> dict[Any, float | int]:
         host, repo_id = _extract_host_organisation_and_repository_as_url_block(repo_id)
-        r = _web_get(
+        r = web_get(
             f"https://{host}/api/v4/projects/{quote_plus(repo_id)}/languages",
             cache_lifetime=self.cache_lifetime,
         )
@@ -298,7 +298,7 @@ class GitlabScraper(_GPScraper):
         host, group_id = _extract_host_organisation_and_repository_as_url_block(
             organisation_name
         )
-        res = _web_get(
+        res = web_get(
             f"https://{host}/api/v4/groups/{group_id}/projects",
             cache_lifetime=self.cache_lifetime,
         )

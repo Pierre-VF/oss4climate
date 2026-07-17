@@ -176,6 +176,8 @@ class RepositoryScraper:
 
         :param toml_path: Path to the TOML index file
         """
+        from oss4climate.src.parsers.git_platforms import bitbucket_io, gitlab_io
+
         log_info(f"Syncing from TOML: {toml_path}")
 
         # Load targets from TOML
@@ -251,9 +253,7 @@ class RepositoryScraper:
                     active_org_ids.add(org_id)
 
                     # Fetch group metadata
-                    from oss4climate.src.parsers.git_platforms.gitlab_io import _web_get
-
-                    group_data = _web_get(
+                    group_data = gitlab_io.web_get(
                         f"https://{host}/api/v4/groups/{group_path}",
                         is_json=True,
                         cache_lifetime=self.cache_lifetime,
@@ -338,11 +338,7 @@ class RepositoryScraper:
                     active_org_ids.add(org_id)
 
                     # Fetch project/org metadata
-                    from oss4climate.src.parsers.git_platforms.bitbucket_io import (
-                        _web_get,
-                    )
-
-                    project_data = _web_get(
+                    project_data = bitbucket_io.web_get(
                         f"https://api.bitbucket.org/2.0/workspaces/{project_url.split('/')[-1]}",
                         is_json=True,
                         cache_lifetime=self.cache_lifetime,
@@ -497,7 +493,7 @@ class RepositoryScraper:
             d = {
                 "id": getattr(details, "id", None),
                 "name": getattr(details, "name", None),
-                "organisation": getattr(details, "organisation", None),
+                "organisation_id": getattr(details, "organisation_id", None),
                 "url": getattr(details, "url", None),
                 "website": getattr(details, "website", None),
                 "description": getattr(details, "description", None),
@@ -563,7 +559,7 @@ class RepositoryScraper:
             record = {
                 "id": repo.id,
                 "name": repo.name,
-                "organisation": None,  # Would need to join with organisations table
+                "organisation_id": None,  # Would need to join with organisations table
                 "url": repo.url,
                 "website": repo.website,
                 "description": repo.description,
@@ -620,7 +616,7 @@ class RepositoryScraper:
         repo_dicts = [
             {
                 "language": repo.language,
-                "organisation": None,  # Would need join
+                "organisation_id": None,  # Would need join
                 "licence": repo.licence,
             }
             for repo in repos

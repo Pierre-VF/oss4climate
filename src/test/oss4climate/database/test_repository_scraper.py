@@ -208,7 +208,7 @@ def _make_project_details(**overrides):
     defaults = {
         "id": "github.com/test/repo",
         "name": "Test Repo",
-        "organisation": "test",
+        "organisation_id": "https://github.com/test",
         "url": "https://github.com/test/repo",
         "website": None,
         "description": "A test repo",
@@ -265,7 +265,7 @@ class TestProjectDetailsToDict:
                 {
                     "id": "github.com/df/repo",
                     "name": "DF Repo",
-                    "organisation": "df",
+                    "organisation_id": "github.com/df",
                     "url": "https://github.com/df/repo",
                     "description": "DataFrame repo",
                     "licence": "Apache",
@@ -347,7 +347,7 @@ class TestProjectDetailsToDict:
         expected_fields = {
             "id",
             "name",
-            "organisation",
+            "organisation_id",
             "url",
             "website",
             "description",
