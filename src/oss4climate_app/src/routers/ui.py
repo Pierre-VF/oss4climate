@@ -18,7 +18,7 @@ from oss4climate_app.src.config import (
 )
 from oss4climate_app.src.data_io import (
     repository_index_characteristics_from_documents,
-    unique_license_categories,
+    unique_licence_categories,
 )
 from oss4climate_app.src.log_activity import log_search
 from oss4climate_app.src.routers import listing_credits_df
@@ -62,8 +62,8 @@ async def search(request: Request):
             "n_repositories_indexed": characteristics.n_repositories_indexed,
             "n_repositories_indexed_extended": characteristics.n_repositories_indexed_extended,
             "languages": characteristics.unique_languages,
-            "licenses": characteristics.unique_licenses,
-            "unique_license_categories": unique_license_categories(),
+            "licences": characteristics.unique_licences,
+            "unique_licence_categories": unique_licence_categories(),
             "free_text": "",
         },
     )
@@ -75,7 +75,7 @@ async def search_results(
     background_tasks: BackgroundTasks,
     query: Optional[str] = None,
     language: Optional[str] = None,
-    license_category: Optional[str] = None,
+    licence_category: Optional[str] = None,
     exclude_forks: Optional[bool] = None,
     exclude_inactive: Optional[bool] = None,
     extended_search: bool = False,  # Allows lower quality results
@@ -102,7 +102,7 @@ async def search_results(
         results_per_page=n_results,
         page=page,
         languages=language,
-        license_category=license_category,
+        licence_category=licence_category,
         high_quality_only=(not extended_search),
     )
 
@@ -119,7 +119,7 @@ async def search_results(
     df_out = pd.DataFrame(
         [(i.__dict__ | {"last_commit": i.last_commit_as_date()}) for i in r.results]
     )
-    for i in ["description", "language", "license", "license_category"]:
+    for i in ["description", "language", "licence", "licence_category"]:
         if i not in df_out:
             df_out[i] = "?"
 
@@ -130,7 +130,7 @@ async def search_results(
         df_out = df_out[df_out["last_commit"] >= t_limit]
 
     # Filling the gaps for clean display
-    cols_to_clean = ["description", "language", "license"]
+    cols_to_clean = ["description", "language", "licence"]
     df_out.loc[:, cols_to_clean] = (
         df_out[cols_to_clean]
         .replace(

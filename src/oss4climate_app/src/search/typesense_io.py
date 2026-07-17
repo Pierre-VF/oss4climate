@@ -18,7 +18,7 @@ _TYPESENSE_EMBEDDING_MODEL = "ts/all-MiniLM-L12-v2"
 class ResultItem(BaseModel):
     name: str
     organisation: str
-    license: str = "?"
+    licence: str = "?"
     description: str
     language: str | None = None
     url: str
@@ -29,7 +29,7 @@ class ResultItem(BaseModel):
     def last_commit_as_date(self) -> date:
         return datetime.fromtimestamp(self.last_commit_timestamp).date()
 
-    # Remaining options: id;website;license_url;latest_update;all_languages;open_pull_requests;master_branch;is_fork;forked_from;readme_type
+    # Remaining options: id;website;licence_url;latest_update;all_languages;open_pull_requests;master_branch;is_fork;forked_from;readme_type
 
 
 _TYPESENSE_REPO_SCHEMA = {
@@ -56,7 +56,7 @@ _TYPESENSE_REPO_SCHEMA = {
             },
         },
         {"name": "organisation", "type": "string", "facet": True},
-        {"name": "license", "type": "string", "facet": True},
+        {"name": "licence", "type": "string", "facet": True},
         {"name": "language", "type": "string", "facet": True},
         {"name": "url", "type": "string"},
         {
@@ -131,7 +131,7 @@ class SearchResult(BaseModel):
 
 def _search_kwargs(
     languages: list[str] | str | None = None,
-    license_category: str | None = None,
+    licence_category: str | None = None,
     high_quality_only: bool = True,
 ) -> dict[str, str]:
     kwargs_search = dict()
@@ -140,10 +140,10 @@ def _search_kwargs(
         if isinstance(languages, str):
             languages = [languages]
         filter_by.append(f"language: [{','.join(languages)}]")
-    if license_category not in [None, "*"]:
+    if licence_category not in [None, "*"]:
         # TODO: this needs to be better aligned with actual usages
-        licenses = license_category.split(",")
-        filter_by.append(f"license: [{','.join(licenses)}]")
+        licences = licence_category.split(",")
+        filter_by.append(f"licence: [{','.join(licences)}]")
     if high_quality_only:
         filter_by.append("high_quality := true")
 
@@ -182,7 +182,7 @@ def search_with_query(
     results_per_page: int = 50,
     page: int = 1,
     languages: list[str] | str | None = None,
-    license_category: str | None = None,
+    licence_category: str | None = None,
     high_quality_only: bool = True,
 ) -> SearchResult:
     if query is None:
@@ -205,7 +205,7 @@ def search_with_query(
 
     s_kwargs = _search_kwargs(
         languages=languages,
-        license_category=license_category,
+        licence_category=licence_category,
         high_quality_only=high_quality_only,
     )
 
@@ -255,7 +255,7 @@ def search_with_query(
 
 
 class CountableFieldsEnum(Enum):
-    license = "license"
+    licence = "licence"
     language = "language"
     organisation = "organisation"
 
@@ -293,7 +293,7 @@ def list_values(
 
 if __name__ == "__main__":
     ts_client = generate_client()
-    c1 = list_values(ts_client, CountableFieldsEnum.license)
+    c1 = list_values(ts_client, CountableFieldsEnum.licence)
     c2 = list_values(ts_client, CountableFieldsEnum.language)
 
     r = search_with_query(ts_client, "wind power")  # , languages="C++")

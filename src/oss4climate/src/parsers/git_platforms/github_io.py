@@ -325,11 +325,11 @@ class GithubScraper(_GPScraper):
         if n_open_pull_requests == 30:
             n_open_pull_requests = None
 
-        license = r["license"]
-        if license is not None:
-            license = license.get("name")
+        licence = r["license"]
+        if licence is not None:
+            licence = licence.get("name")
 
-        license_url = self.fetch_license_url(
+        licence_url = self.fetch_licence_url(
             repo_path,
             branch=branch2use,
             fail_on_issue=fail_on_issue,
@@ -354,8 +354,8 @@ class GithubScraper(_GPScraper):
             url=r["html_url"],
             website=r["homepage"],
             description=r["description"],
-            license=license,
-            license_url=license_url,
+            licence=licence,
+            licence_url=licence_url,
             language=dominant_language,
             all_languages=languages,
             latest_update=datetime.fromisoformat(r["updated_at"]).date(),
@@ -493,7 +493,7 @@ class GithubScraper(_GPScraper):
     # --------------------------------------------------------------------------------
     # Not part of the abstract class
     # --------------------------------------------------------------------------------
-    def fetch_license_url(
+    def fetch_licence_url(
         self,
         repo_id: str,
         branch: str | None = None,
@@ -505,22 +505,22 @@ class GithubScraper(_GPScraper):
         if branch is None:
             branch = _master_branch_name(repo_id, cache_lifetime=cache_lifetime)
 
-        license_url = None
+        licence_url = None
         file_tree = self.fetch_repository_file_tree(
             repo_id,
             fail_on_issue=fail_on_issue,
         )
         for i in file_tree:
             lower_i = i.lower()
-            if lower_i.startswith("license"):
+            if lower_i.startswith(("license", "licence")):
                 if branch == "main":
                     # Keeping what worked well so far
-                    license_url = (
+                    licence_url = (
                         f"https://raw.githubusercontent.com/{repo_id}/main/{i}"
                     )
                 else:
-                    license_url = f"https://raw.githubusercontent.com/{repo_id}/refs/heads/{branch}/{i}"
-        return license_url
+                    licence_url = f"https://raw.githubusercontent.com/{repo_id}/refs/heads/{branch}/{i}"
+        return licence_url
 
     def fetch_organisation_details(
         self,

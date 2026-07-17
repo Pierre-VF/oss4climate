@@ -24,7 +24,7 @@ class ProjectDetails(BaseModel):
     language: str
     url: str
     readme_preview: str | None = None
-    license: str | None = None
+    licence: str | None = None
 
     @staticmethod
     def from_typesense_item(r: typesense_io.ResultItem) -> "ProjectDetails":
@@ -35,7 +35,7 @@ class ProjectDetails(BaseModel):
             language=str(r.language),
             url=r.url,
             readme_preview=str(r.readme)[:2000],
-            license=r.license,
+            licence=r.licence,
         )
 
     @staticmethod

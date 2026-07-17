@@ -216,8 +216,8 @@ class GitlabScraper(_GPScraper):
         )
         # organisation_url = f"https://{gitlab_host}/{repo_id.split('/')[0]}"
         organisation = repo_id_min.split("/")[0]
-        license = _get_from_dict_with_default(r, "license", {}).get("name")
-        license_url = r.get("license_url")
+        licence = _get_from_dict_with_default(r, "license", {}).get("name")
+        licence_url = r.get("license_url")
         (
             readme,
             readme_type,
@@ -264,8 +264,8 @@ class GitlabScraper(_GPScraper):
             url=r["web_url"],
             website=None,
             description=r["description"],
-            license=license,
-            license_url=license_url,
+            licence=licence,
+            licence_url=licence_url,
             language=dominant_language,
             all_languages=languages,
             latest_update=latest_update,

@@ -212,8 +212,8 @@ def _make_project_details(**overrides):
         "url": "https://github.com/test/repo",
         "website": None,
         "description": "A test repo",
-        "license": "MIT",
-        "license_url": None,
+        "licence": "MIT",
+        "licence_url": None,
         "latest_update": date(2025, 1, 15),
         "language": "Python",
         "all_languages": ["Python"],
@@ -244,7 +244,7 @@ class TestProjectDetailsToDict:
         assert result["id"] == "github.com/test/repo"
         assert result["name"] == "Test Repo"
         assert result["description"] == "A test repo"
-        assert result["license"] == "MIT"
+        assert result["licence"] == "MIT"
         assert result["language"] == "Python"
         assert result["all_languages"] == '["Python", "JavaScript"]'
         assert result["master_branch"] == "main"
@@ -268,7 +268,7 @@ class TestProjectDetailsToDict:
                     "organisation": "df",
                     "url": "https://github.com/df/repo",
                     "description": "DataFrame repo",
-                    "license": "Apache",
+                    "licence": "Apache",
                     "language": "Java",
                     "all_languages": ["Java", "XML"],
                     "master_branch": "master",
@@ -351,8 +351,8 @@ class TestProjectDetailsToDict:
             "url",
             "website",
             "description",
-            "license",
-            "license_url",
+            "licence",
+            "licence_url",
             "latest_update",
             "last_commit",
             "language",

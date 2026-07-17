@@ -67,8 +67,8 @@ Stores metadata about individual repositories.
 | `url` | string | Full repository URL |
 | `website` | string | Project website URL |
 | `description` | string | Repository description |
-| `license` | string | License name |
-| `license_url` | string | License file URL |
+| `licence` | string | Licence name |
+| `licence_url` | string | Licence file URL |
 | `latest_update` | date | Last update date |
 | `last_commit` | date | Last commit date |
 | `language` | string | Dominant programming language |

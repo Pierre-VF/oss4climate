@@ -497,13 +497,13 @@ _type_listing_entry = str | dict[str, str]
 
 def _flexible_sorted_list_of_targets(x: _type_listing_entry) -> list[dict[str, str]]:
     urls = []
-    urls_with_licenses = dict()
+    urls_with_licences = dict()
     for i in x:
         if isinstance(i, dict):
             if "url" in i:
                 cleaned_url_i = cleaned_url(i["url"])
                 urls.append(cleaned_url_i)
-                urls_with_licenses[cleaned_url_i] = i
+                urls_with_licences[cleaned_url_i] = i
             else:
                 raise ValueError(f"Entry does not have a 'url' field ({i})")
 
@@ -515,10 +515,10 @@ def _flexible_sorted_list_of_targets(x: _type_listing_entry) -> list[dict[str, s
 
     out = []
     for i in sorted_list_of_cleaned_urls(urls):
-        if i in urls_with_licenses:
-            out.append(urls_with_licenses[i])
+        if i in urls_with_licences:
+            out.append(urls_with_licences[i])
         else:
-            out.append({"url": i, "license": "?"})
+            out.append({"url": i, "licence": "?"})
     return out
 
 
@@ -588,15 +588,15 @@ class ResourceListing:
             + self.gitlab_readme_listings
         )
 
-    def targets_by_license(self) -> dict[list[str, Any]]:
-        r_by_license = dict()
+    def targets_by_licence(self) -> dict[list[str, Any]]:
+        r_by_licence = dict()
         for res in self.all_targets():
-            i = res["license"]
-            if i not in r_by_license:
-                r_by_license[i] = []
+            i = res["licence"]
+            if i not in r_by_licence:
+                r_by_licence[i] = []
 
-            r_by_license[i].append(res["url"])
-        return r_by_license
+            r_by_licence[i].append(res["url"])
+        return r_by_licence
 
     @staticmethod
     def from_toml(toml_file_path: str) -> "ResourceListing":
@@ -708,37 +708,37 @@ class ResourceListing:
         )
         return df
 
-    def fetch_all_licenses(self, force_update: bool = False) -> None:
+    def fetch_all_licences(self, force_update: bool = False) -> None:
         from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
         from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
         gitlab_s = GitlabScraper()
         github_s = GithubScraper()
 
-        def _f_license_missing(i):
-            return i.get("license") in ["?", None] or (i.get("license_url") is None)
+        def _f_licence_missing(i):
+            return i.get("licence") in ["?", None] or (i.get("licence_url") is None)
 
         for i in self.github_readme_listings:
             if isinstance(i, dict):
-                if force_update or _f_license_missing(i):
+                if force_update or _f_licence_missing(i):
                     try:
                         x = github_s.fetch_project_details(i["url"])
-                        if x.license:
-                            i["license"] = x.license
-                        if x.license_url:
-                            i["license_url"] = x.license_url
+                        if x.licence:
+                            i["licence"] = x.licence
+                        if x.licence_url:
+                            i["licence_url"] = x.licence_url
                     except Exception:
                         pass
 
         for i in self.gitlab_readme_listings:
             if isinstance(i, dict):
-                if force_update or _f_license_missing(i):
+                if force_update or _f_licence_missing(i):
                     try:
                         x = gitlab_s.fetch_project_details(i["url"])
-                        if x.license:
-                            i["license"] = x.license
-                        if x.license_url:
-                            i["license_url"] = x.license_url
+                        if x.licence:
+                            i["licence"] = x.licence
+                        if x.licence_url:
+                            i["licence_url"] = x.licence_url
                     except Exception:
                         pass
 

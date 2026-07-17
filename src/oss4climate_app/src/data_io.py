@@ -6,7 +6,7 @@ from urllib.request import urlretrieve
 
 from oss4climate.src.helpers import sorted_list_of_unique_elements
 from oss4climate.src.log import log_warning
-from oss4climate.src.models import EnumLicenseCategories
+from oss4climate.src.models import EnumLicenceCategories
 from oss4climate_app.src.config import (
     FILE_INPUT_LISTINGS_INDEX,
     FILE_OUTPUT_DIR,
@@ -50,7 +50,7 @@ def _f_none_to_unknown(x: str | date | None) -> str:
 
 @dataclass
 class _RepositoryIndexCharacteristics:
-    unique_licenses: list[str]
+    unique_licences: list[str]
     unique_languages: list[str]
     n_repositories_indexed: int
     n_repositories_indexed_extended: int
@@ -62,14 +62,14 @@ def repository_index_characteristics_from_documents() -> (
 ):
     # TOODO: generate this better (doesn't get patched in tests) - in a way that works with cache
     ts_client = typesense_io.generate_client()
-    licenses = typesense_io.list_values(
-        ts_client, typesense_io.CountableFieldsEnum.license
+    licences = typesense_io.list_values(
+        ts_client, typesense_io.CountableFieldsEnum.licence
     )
     languages = typesense_io.list_values(
         ts_client, typesense_io.CountableFieldsEnum.language
     )
     return _RepositoryIndexCharacteristics(
-        unique_licenses=sorted_list_of_unique_elements(licenses),
+        unique_licences=sorted_list_of_unique_elements(licences),
         unique_languages=sorted_list_of_unique_elements(languages),
         n_repositories_indexed=n_repositories_indexed(extended=False),
         n_repositories_indexed_extended=n_repositories_indexed(extended=True),
@@ -77,8 +77,8 @@ def repository_index_characteristics_from_documents() -> (
 
 
 @lru_cache(maxsize=1)
-def unique_license_categories() -> list[EnumLicenseCategories]:
-    return [i for i in EnumLicenseCategories]
+def unique_licence_categories() -> list[EnumLicenceCategories]:
+    return [i for i in EnumLicenceCategories]
 
 
 @lru_cache(maxsize=2)
@@ -86,7 +86,7 @@ def n_repositories_indexed(extended: bool) -> int:
     # TODO : avoid on the fly client creation
     x = typesense_io.count_values(
         typesense_io.generate_client(),
-        field=typesense_io.CountableFieldsEnum.license,
+        field=typesense_io.CountableFieldsEnum.licence,
         high_quality_only=(not extended),
     ).sum()
     return int(x)
@@ -95,7 +95,7 @@ def n_repositories_indexed(extended: bool) -> int:
 def clear_cache():
     repository_index_characteristics_from_documents.cache_clear()
     n_repositories_indexed.cache_clear()
-    unique_license_categories.cache_clear()
+    unique_licence_categories.cache_clear()
 
 
 def refresh_data(force_refresh: bool = False):

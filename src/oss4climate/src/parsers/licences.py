@@ -1,12 +1,12 @@
 """
-Module to manage licenses
+Module to manage licences
 """
 
 from oss4climate.src.log import log_warning
-from oss4climate.src.models import EnumLicenseCategories
+from oss4climate.src.models import EnumLicenceCategories
 
 # Using https://opensource.org/license/ to determine canonical URLs
-_url_by_license = {
+_url_by_licence = {
     "Apache License 2.0": "https://www.apache.org/licenses/LICENSE-2.0.txt",
     'BSD 2-Clause "Simplified" License': "https://opensource.org/license/bsd-2-clause",  # Not ideal
     "BSD 3-Clause Clear License": "https://opensource.org/license/bsd-3-clause",  # Not ideal
@@ -39,61 +39,61 @@ _url_by_license = {
 }
 
 
-def licence_url_from_license_name(name: str) -> str | None:
+def licence_url_from_licence_name(name: str) -> str | None:
     """
-    Get the canonical URL for a license by name
+    Get the canonical URL for a licence by name
 
-    :param name: License name
-    :return: Canonical URL for the license, or None if not found
+    :param name: Licence name
+    :return: Canonical URL for the licence, or None if not found
     """
-    return _url_by_license.get(name)
+    return _url_by_licence.get(name)
 
 
-def license_category_from_license_name(name: str) -> EnumLicenseCategories:
+def licence_category_from_licence_name(name: str) -> EnumLicenceCategories:
     """
-    Determine the license category from a license name
+    Determine the licence category from a licence name
 
-    :param name: License name to categorize
-    :return: Corresponding EnumLicenseCategories value
+    :param name: Licence name to categorize
+    :return: Corresponding EnumLicenceCategories value
     """
     if not isinstance(name, str):
-        out = EnumLicenseCategories.UNKNOWN
+        out = EnumLicenceCategories.UNKNOWN
     elif name in ["Apache License 2.0"]:
-        out = EnumLicenseCategories.APACHE
+        out = EnumLicenceCategories.APACHE
     elif name in [
         'BSD 2-Clause "Simplified" License',
         "BSD 3-Clause Clear License",
         'BSD 3-Clause "New" or "Revised" License',
     ]:
-        out = EnumLicenseCategories.BSD
+        out = EnumLicenceCategories.BSD
     elif name in [
         "Creative Commons Attribution 4.0 International",
         "Creative Commons Attribution Share Alike 4.0 International",
         "Creative Commons Attribution Non Commercial No Derivatives 4.0 International",
         "Creative Commons Zero v1.0 Universal",
     ]:
-        out = EnumLicenseCategories.CREATIVE_COMMON
+        out = EnumLicenceCategories.CREATIVE_COMMON
     elif name in ["Eclipse Public License 1.0", "Eclipse Public License 2.0"]:
-        out = EnumLicenseCategories.ECLIPSE
+        out = EnumLicenceCategories.ECLIPSE
     elif name in [
         "GNU Affero General Public License v3.0",
     ]:
-        out = EnumLicenseCategories.GNU_AGPL
+        out = EnumLicenceCategories.GNU_AGPL
     elif name in [
         "GNU General Public License v2.0",
         "GNU General Public License v3.0",
         "GNU General Public License v3.0 only",
         "GNU General Public License v3.0 or later",
     ]:
-        out = EnumLicenseCategories.GNU_GPL
+        out = EnumLicenceCategories.GNU_GPL
     elif name in [
         "GNU Lesser General Public License v2.1",
         "GNU Lesser General Public License v2.1 only",
         "GNU Lesser General Public License v3.0",
     ]:
-        out = EnumLicenseCategories.GNU_LGPL
+        out = EnumLicenceCategories.GNU_LGPL
     elif name in ["MIT License", "MIT No Attribution"]:
-        out = EnumLicenseCategories.MIT
+        out = EnumLicenceCategories.MIT
     elif name in [
         None,
         "Academic Free License v3.0",
@@ -106,8 +106,8 @@ def license_category_from_license_name(name: str) -> EnumLicenseCategories:
         "Other",
         "The Unlicense",
     ]:
-        out = EnumLicenseCategories.OTHER
+        out = EnumLicenceCategories.OTHER
     else:
-        log_warning(f"License not covered by enum classification ({name})")
-        out = EnumLicenseCategories.UNKNOWN
+        log_warning(f"Licence not covered by enum classification ({name})")
+        out = EnumLicenceCategories.UNKNOWN
     return out

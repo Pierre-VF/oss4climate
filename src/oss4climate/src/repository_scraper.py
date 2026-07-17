@@ -9,7 +9,7 @@ scraping lifecycle:
 """
 
 import json
-from datetime import UTC, datetime, timedelta
+from datetime import timedelta
 from typing import Any
 
 from sqlmodel import Session, select
@@ -26,7 +26,7 @@ from oss4climate.src.database.repos import (
     upsert_organisation,
     upsert_repository,
 )
-from oss4climate.src.helpers import sorted_list_of_unique_elements
+from oss4climate.src.helpers import now, sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
 from oss4climate.src.models import EnumDocumentationFileType, ProjectDetails
 from oss4climate.src.parsers import ParsingTargets
@@ -365,6 +365,7 @@ class RepositoryScraper:
                             },
                         )
                 except Exception as e:
+                    session.rollback()
                     log_warning(f"Failed to sync Bitbucket project {project_url}: {e}")
                     org_id = self._get_org_id(project_url)
                     active_org_ids.add(org_id)
@@ -500,8 +501,8 @@ class RepositoryScraper:
                 "url": getattr(details, "url", None),
                 "website": getattr(details, "website", None),
                 "description": getattr(details, "description", None),
-                "license": getattr(details, "license", None),
-                "license_url": getattr(details, "license_url", None),
+                "licence": getattr(details, "licence", None),
+                "licence_url": getattr(details, "licence_url", None),
                 "latest_update": getattr(details, "latest_update", None),
                 "last_commit": getattr(details, "last_commit", None),
                 "language": getattr(details, "language", None),
@@ -537,7 +538,7 @@ class RepositoryScraper:
 
         :return: Current UTC datetime as ISO string
         """
-        return datetime.now(tz=UTC).isoformat()
+        return now().isoformat()
 
     def export_to_feather(
         self,
@@ -566,8 +567,8 @@ class RepositoryScraper:
                 "url": repo.url,
                 "website": repo.website,
                 "description": repo.description,
-                "license": repo.license,
-                "license_url": repo.license_url,
+                "licence": repo.licence,
+                "licence_url": repo.licence_url,
                 "latest_update": repo.latest_update,
                 "last_commit": repo.last_commit,
                 "language": repo.language,
@@ -620,7 +621,7 @@ class RepositoryScraper:
             {
                 "language": repo.language,
                 "organisation": None,  # Would need join
-                "license": repo.license,
+                "licence": repo.licence,
             }
             for repo in repos
         ]
@@ -629,7 +630,7 @@ class RepositoryScraper:
             [r["language"] for r in repo_dicts if r["language"]]
         )
         licences = sorted_list_of_unique_elements(
-            [r["license"] for r in repo_dicts if r["license"]]
+            [r["licence"] for r in repo_dicts if r["licence"]]
         )
 
         stats = {

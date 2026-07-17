@@ -34,7 +34,7 @@ class EnumDocumentationFileType(Enum):
             return EnumDocumentationFileType.UNKNOWN
 
 
-class EnumLicenseCategories(Enum):
+class EnumLicenceCategories(Enum):
     APACHE = "Apache"
     BSD = "BSD"
     CREATIVE_COMMON = "Creative Common"
@@ -54,8 +54,8 @@ class ProjectDetails(BaseModel):
     url: str
     website: Optional[str]
     description: Optional[str]
-    license: Optional[str]
-    license_url: Optional[str]
+    licence: Optional[str]
+    licence_url: Optional[str]
     latest_update: Optional[date]
     language: Optional[str]
     all_languages: Optional[list[str]]

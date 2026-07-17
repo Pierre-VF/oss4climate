@@ -2,10 +2,20 @@
 Module with convenience helper functions
 """
 
+from datetime import UTC, datetime
 from typing import Any
 from urllib.parse import urlparse
 
 import pandas as pd
+
+
+def now() -> datetime:
+    """
+    Get current datetime in UTC timezone
+
+    :return: Current datetime with UTC timezone
+    """
+    return datetime.now(tz=UTC)
 
 
 def sorted_list_of_unique_elements(x: list | pd.Series):

@@ -32,7 +32,7 @@ def project_dataframe_loader(
                     "organisation",
                     "url",
                     "website",
-                    "license",
+                    "licence",
                     "latest_update",
                     "language",
                     "last_commit",
@@ -51,7 +51,7 @@ def project_dataframe_loader(
             {
                 "description",
                 "language",
-                "license",
+                "licence",
                 readme_col,
                 description_col,
             }

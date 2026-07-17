@@ -22,7 +22,6 @@ from oss4climate.src.parsers.listings.opensustain_tech import (
     fetch_all_project_urls_from_opensustain_webpage,
     fetch_listing_of_listings_from_opensustain_webpage,
 )
-
 from oss4climate_scripts.src.config import (
     FILE_INPUT_INDEX,
     FILE_INPUT_LISTINGS_INDEX,
@@ -136,8 +135,8 @@ def update_listing_of_listings(
     list_of_listings += listings_open_sustain
     list_of_listings.ensure_sorted_cleaned_and_unique_elements()
 
-    # Fetch licenses
-    list_of_listings.fetch_all_licenses()
+    # Fetch licences
+    list_of_listings.fetch_all_licences()
     list_of_listings.fetch_all_target_counts()
 
     list_of_listings.to_json(target_output_file)

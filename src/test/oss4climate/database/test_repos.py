@@ -13,10 +13,9 @@ from sqlmodel import Session, SQLModel, create_engine, select
 from oss4climate.src.database.repos import (
     Organisation,
     Repository,
+    get_active_repos_to_scrape,
     get_all_active_repos,
     get_all_organisations,
-    get_active_repos_to_scrape,
-    get_engine,
     get_repos_for_typesense,
     mark_repos_inactive,
     reset_repo_error,
@@ -24,7 +23,6 @@ from oss4climate.src.database.repos import (
     upsert_organisation,
     upsert_repository,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -120,8 +118,8 @@ def test_repository_model_full(session):
         url="https://github.com/full/repo",
         website="https://full.example.com",
         description="A test repository",
-        license="MIT",
-        license_url="https://opensource.org/licenses/MIT",
+        licence="MIT",
+        licence_url="https://opensource.org/licenses/MIT",
         latest_update=date(2025, 1, 15),
         last_commit=date(2025, 1, 10),
         language="Python",
@@ -460,7 +458,7 @@ def test_get_repos_for_typesense_basic(session):
             "url": "https://github.com/ts/repo",
             "description": "A test repo",
             "language": "Python",
-            "license": "MIT",
+            "licence": "MIT",
             "readme": "# Hello",
             "is_fork": False,
             "active": True,
@@ -475,7 +473,7 @@ def test_get_repos_for_typesense_basic(session):
     assert record["name"] == "TS Repo"
     assert record["description"] == "A test repo"
     assert record["language"] == "Python"
-    assert record["license"] == "MIT"
+    assert record["licence"] == "MIT"
     assert record["readme"] == "# Hello"
     assert record["is_fork"] is False
 
@@ -511,7 +509,7 @@ def test_get_repos_for_typesense_null_defaults(session):
             "name": None,
             "description": None,
             "language": None,
-            "license": None,
+            "licence": None,
             "readme": None,
             "is_fork": None,
             "active": True,
@@ -523,6 +521,6 @@ def test_get_repos_for_typesense_null_defaults(session):
     assert record["name"] == ""
     assert record["description"] == ""
     assert record["language"] == ""
-    assert record["license"] == ""
+    assert record["licence"] == ""
     assert record["readme"] == ""
     assert record["is_fork"] is False

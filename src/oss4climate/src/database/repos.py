@@ -6,13 +6,15 @@ and organisation metadata, along with engine initialization and helper
 functions for database access.
 """
 
-from datetime import UTC, date, datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from pydantic import model_validator
+from sqlalchemy import Engine
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 from oss4climate.src.config import SETTINGS
+from oss4climate.src.helpers import now
 from oss4climate.src.log import log_info
 
 # -------------------------------------------------------------------------------------
@@ -47,7 +49,7 @@ class Organisation(SQLModel, table=True):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_model_before(cls, d: Any):
+    def _validate_model_before(cls, d: Any):
         if isinstance(d, dict):
             for i in ["created_at", "updated_at", "last_scraped_at"]:
                 if isinstance(d.get(i), str):
@@ -73,8 +75,8 @@ class Repository(SQLModel, table=True):
     url: str | None = None
     website: str | None = None
     description: str | None = None
-    license: str | None = None
-    license_url: str | None = None
+    licence: str | None = None
+    licence_url: str | None = None
     latest_update: date | None = None
     last_commit: date | None = None
     language: str | None = None
@@ -127,16 +129,7 @@ _ENGINE = _open_engine_and_create_database_if_missing()
 # -------------------------------------------------------------------------------------
 
 
-def __now() -> datetime:
-    """
-    Get current datetime in UTC timezone.
-
-    :return: Current datetime with UTC timezone
-    """
-    return datetime.now(tz=UTC)
-
-
-def get_engine():
+def get_engine() -> Engine:
     """
     Get the database engine.
 
@@ -217,7 +210,7 @@ def get_active_repos_to_scrape(
     :param refresh_days: Number of days since last scrape before re-scraping
     :return: List of Repository objects that need scraping
     """
-    threshold = __now() - timedelta(days=refresh_days)
+    threshold = now() - timedelta(days=refresh_days)
     result = session.exec(
         select(Repository).where(
             Repository.active == True,  # noqa: E712
@@ -333,7 +326,7 @@ def get_repos_for_typesense(session: Session) -> list[dict]:
             "description": repo.description or "",
             "readme": repo.readme or "",
             "organisation": repo.organisation_id or "",
-            "license": repo.license or "",
+            "licence": repo.licence or "",
             "language": repo.language or "",
             "url": repo.url or "",
             "last_commit": repo.last_commit,

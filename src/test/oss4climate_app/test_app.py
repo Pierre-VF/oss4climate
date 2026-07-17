@@ -1,5 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
+
 from oss4climate_app import app, mark_test_mode
 from oss4climate_app.src.search import typesense_io
 
@@ -17,7 +18,7 @@ def test_app(app_test_client):
     tc = app_test_client
     assert tc.get("/", follow_redirects=False).status_code == 307
     assert tc.get("/ui/search").status_code == 200
-    assert tc.get("/ui/results?query=iot&license=*&language=*").status_code == 200
+    assert tc.get("/ui/results?query=iot&licence=*&language=*").status_code == 200
 
     assert tc.get("/api/search?query=iot").status_code == 200
     assert tc.get("/api/data/credits").status_code == 200
