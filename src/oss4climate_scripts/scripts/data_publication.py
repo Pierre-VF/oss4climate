@@ -5,8 +5,6 @@ from oss4climate.src.config import (
     SETTINGS,
 )
 from oss4climate.src.log import log_info
-
-
 from oss4climate_scripts.src.config import (
     FILE_OUTPUT_SUMMARY_TOML,
 )
@@ -23,18 +21,16 @@ def publish_to_ftp() -> None:
         FILE_OUTPUT_LISTING_FEATHER,
     )
 
-    for i in [
-        SETTINGS.EXPORT_FTP_URL,
-        SETTINGS.EXPORT_FTP_USER,
-        SETTINGS.EXPORT_FTP_PASSWORD,
+    for v, i in [
+        ("EXPORT_FTP_URL", SETTINGS.EXPORT_FTP_URL),
+        ("EXPORT_FTP_USER", SETTINGS.EXPORT_FTP_USER),
+        ("EXPORT_FTP_PASSWORD", SETTINGS.EXPORT_FTP_PASSWORD),
     ]:
         if i is None:
-            raise EnvironmentError(
-                f"{i.__name__} must be defined for FTP export to work"
-            )
+            raise EnvironmentError(f"{v} must be defined for FTP export to work")
         if len(i) == 0:
             raise EnvironmentError(
-                f"{i.__name__} must have an adequate value for FTP export to work"
+                f"{v} must have an adequate value for FTP export to work"
             )
     files_out = [
         FILE_OUTPUT_SUMMARY_TOML,
