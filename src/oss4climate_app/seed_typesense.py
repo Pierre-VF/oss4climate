@@ -14,7 +14,8 @@ from oss4climate_app.src.search.typesense_io import (
     reset_typesense_schema,
 )
 
-if __name__ == "__main__":
+
+def seed():
     client = typesense.Client(
         {
             "nodes": [SETTINGS.typesense_config],
@@ -58,3 +59,7 @@ if __name__ == "__main__":
     index_data_in_typesense(ts_client, df)
 
     print("DONE")
+
+
+if __name__ == "__main__":
+    seed()
