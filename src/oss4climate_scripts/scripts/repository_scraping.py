@@ -1,10 +1,16 @@
-from oss4climate.src.crawler import scrape_all_targets
-from oss4climate.src.helpers import sorted_list_of_unique_elements
-from oss4climate.src.log import log_info, log_warning
-from oss4climate.src.parsers import (
-    ParsingTargets,
-)
-from tomlkit import document, dump
+"""
+Script to run fetching of the data from the repositories.
+
+This module provides the scrape_all function which orchestrates the full
+scraping pipeline using the RepositoryScraper class. The scraper:
+- Reads the TOML index as the source of truth for which orgs/repos to track
+- Stores scraped data in a SQLModel-backed database
+- Supports incremental re-scraping based on a refresh interval
+- Exports results to feather file, summary TOML, and failures TOML
+
+Warning: unauthenticated users have a rate limit of 60 calls per hour
+(source: https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28)
+"""
 
 from oss4climate_scripts import scripts
 from oss4climate_scripts.src.config import (
@@ -16,19 +22,23 @@ from oss4climate_scripts.src.config import (
 
 def scrape_all(
     target_output_file: str | None = None,
-    fail_on_issue=False,
+    fail_on_issue: bool = False,
+    refresh_days: int = 28,
 ) -> None:
     """
-    Script to run fetching of the data from the repositories
+    Script to run fetching of the data from the repositories.
 
-    Warning: unauthenticated users have a rate limit of 60 calls per hour
-    (source: https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28)
-
+    Uses the RepositoryScraper to sync from TOML, scrape active repos,
+    and export results to database and files.
 
     :param target_output_file: name of file to output results to, defaults to FILE_OUTPUT_LISTING_FEATHER
+    :param fail_on_issue: if True, raises a failure if encountering an issue
+    :param refresh_days: number of days since last scrape before re-scraping (default: 28)
     :raises ValueError: if output file type is not supported (CSV, JSON)
     :return: /
     """
+    from oss4climate.src.repository_scraper import RepositoryScraper
+
     if target_output_file is None:
         # This should only be needed when actually needed (as it's a side feature)
         from oss4climate_app.src.config import (
@@ -37,35 +47,23 @@ def scrape_all(
 
         target_output_file = FILE_OUTPUT_LISTING_FEATHER
 
-    log_info("Loading organisations and repositories to be indexed")
-    targets = ParsingTargets.from_toml(FILE_INPUT_INDEX)
-
-    scrape_result = scrape_all_targets(
-        targets=targets,
-        fail_on_issue=fail_on_issue,
-    )
-    df = scrape_result.results_as_df
-    scrape_failures = scrape_result.errors
-
-    failure_during_scraping = len(scrape_failures) > 1
-
-    if target_output_file.endswith(".csv"):
-        # Dropping READMEs for CSV to look reasonable
-        df.drop(columns=["readme"]).to_csv(target_output_file, sep=";")
-    elif target_output_file.endswith(".json"):
-        df.T.to_json(target_output_file)
-    elif target_output_file.endswith(".feather"):
-        pass  # Export happens below
-    else:
-        raise ValueError(f"Unsupported file type for export: {target_output_file}")
-
-    # Exporting the file to Feather too (faster processing)
+    # Determine binary output path (feather)
     binary_target_output_file = target_output_file
     for i in ["csv", "json"]:
         binary_target_output_file = binary_target_output_file.replace(
             f".{i}", ".feather"
         )
-    df.reset_index().to_feather(binary_target_output_file)
+
+    # Initialize the repository scraper
+    scraper = RepositoryScraper(refresh_days=refresh_days)
+
+    # Run the full pipeline
+    scraper.run(
+        toml_path=FILE_INPUT_INDEX,
+        feather_output=binary_target_output_file,
+        summary_output=FILE_OUTPUT_SUMMARY_TOML,
+        failures_output=f"{FILE_OUTPUT_DIR}/failures_scraping.toml",
+    )
 
     print(
         f"""
@@ -75,32 +73,6 @@ def scrape_all(
     """
     )
 
-    # Outputting details to a new TOML
-    languages = sorted_list_of_unique_elements(df["language"])
-    organisations = sorted_list_of_unique_elements(df["organisation"])
-    licences = sorted_list_of_unique_elements(df["license"])
-
-    stats = {
-        "repositories": len(df),
-        "organisations": len(organisations),
-    }
-
-    failed = dict(
-        organisations=scrape_result.failing_organisations,
-        repositories=scrape_result.failing_repositories,
-    )
-
-    # TOML formatting
-    doc = document()
-    doc.add("statistics", stats)
-    doc.add("failures", failed)
-    doc.add("organisations", [str(i) for i in organisations])
-    doc.add("language", [str(i) for i in languages])
-    doc.add("licences", [str(i) for i in licences])
-    log_info(f"Exporting new index to {FILE_OUTPUT_SUMMARY_TOML}")
-    with open(FILE_OUTPUT_SUMMARY_TOML, "w") as fp:
-        dump(doc, fp, sort_keys=True)
-
     print(
         f"""
 
@@ -108,20 +80,12 @@ def scrape_all(
 
     """
     )
+
     scripts.format_all_files()
 
     file_failures_toml = f"{FILE_OUTPUT_DIR}/failures_scraping.toml"
-    scrape_failures_as_jsonable_dict = {
-        str(k): str(v) for k, v in scrape_failures.items()
-    }
-    doc_failures = document()
-    doc_failures.add("failures", scrape_failures_as_jsonable_dict)
-    log_info(f"Exporting failures to {file_failures_toml}")
-    with open(file_failures_toml, "w") as fp:
-        dump(doc_failures, fp, sort_keys=True)
     scripts.format_individual_file(file_failures_toml)
 
-    if failure_during_scraping:
-        log_warning("Failure(s) happened during the scraping!")
 
-    log_info("Done")
+if __name__ == "__main__":
+    scrape_all()

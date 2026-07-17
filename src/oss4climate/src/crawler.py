@@ -47,8 +47,6 @@ def scrape_all_targets(
     :return: ScrapeResult containing all results
     """
 
-    targets.ensure_sorted_cleaned_and_unique_elements()
-
     scrape_failures = dict()
 
     bad_organisations = []
@@ -131,7 +129,6 @@ def scrape_all_targets(
             log_warning(f" > Error with organisation ({e})")
             bad_organisations.append(org_url)
 
-    targets.ensure_sorted_cleaned_and_unique_elements()  # since elements were added
     screening_results = []
 
     log_info("Fetching data for all repositories in Gitlab")

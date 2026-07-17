@@ -28,7 +28,7 @@
                     <input type="text" id="query" name="query" placeholder="Search repositories..." value="{{ query if query else '' }}" autocomplete="off">
                     <button type="submit" class="search_button" data-umami-event="search-click">Search</button>
                 </div>
-                <input type="hidden" name="license_category" value="{{ request.query_params.get('license_category', '*') }}">
+                <input type="hidden" name="licence_category" value="{{ request.query_params.get('licence_category', '*') }}">
                 <input type="hidden" name="language" value="{{ request.query_params.get('language', '*') }}">
                 <input type="hidden" name="exclude_forks" value="{{ request.query_params.get('exclude_forks', '') }}">
                 <input type="hidden" name="exclude_inactive" value="{{ request.query_params.get('exclude_inactive', '') }}">
@@ -46,7 +46,7 @@
                     see <a href="about">details here</a>.
                 </p>
                 <p>
-                    If you specified a license or language, you might also want to rerun the query without these filters.
+                    If you specified a licence or language, you might also want to rerun the query without these filters.
                 </p>
             </div>
         {% else %}
@@ -69,11 +69,11 @@
                                 data-umami-event="redirect-to-solution-page"
                                 data-umami-event-url="{{ r.url }}"
                                 data-umami-event-keyword="{{ query }}"
-                            >{{ r["organisation"] }}/{{ r["name"] }}</a>
+                            >{{ r["organisation_id"] }}/{{ r["name"] }}</a>
                         </div>
                         <div class="result-card-meta">
                             <span class="result-card-badge language" title="Language">{{ r.language }}</span>
-                            <span class="result-card-badge license" title="License">{{ r.license }}</span>
+                            <span class="result-card-badge licence" title="Licence">{{ r.licence }}</span>
                             <span class="result-card-badge last-commit" title="Last commit">{{ r.last_commit }}</span>
                         </div>
                     </div>
@@ -106,7 +106,7 @@
         document.getElementById("search_again_form").addEventListener("submit", function (event) {
             event.preventDefault();
             var queryValue = document.getElementById("query").value;
-            var licenseValue = {{ request.query_params.get('license_category', '*') | tojson }};
+            var licenceValue = {{ request.query_params.get('licence_category', '*') | tojson }};
             var languageValue = {{ request.query_params.get('language', '*') | tojson }};
             var excludeForks = {{ request.query_params.get('exclude_forks', '') | tojson }};
             var excludeInactive = {{ request.query_params.get('exclude_inactive', '') | tojson }};
@@ -116,7 +116,7 @@
             if (queryValue) {
                 url += "query=" + encodeURIComponent(queryValue) + "&";
             }
-            url += "license_category=" + encodeURIComponent(licenseValue) + "&";
+            url += "licence_category=" + encodeURIComponent(licenceValue) + "&";
             url += "language=" + encodeURIComponent(languageValue) + "&";
             url += "exclude_forks=" + encodeURIComponent(excludeForks) + "&";
             url += "extended_search=" + encodeURIComponent(extendedSearch) + "&";

@@ -17,8 +17,8 @@ _TYPESENSE_EMBEDDING_MODEL = "ts/all-MiniLM-L12-v2"
 
 class ResultItem(BaseModel):
     name: str
-    organisation: str
-    license: str = "?"
+    organisation_id: str | None = None
+    licence: str = "?"
     description: str
     language: str | None = None
     url: str
@@ -29,7 +29,7 @@ class ResultItem(BaseModel):
     def last_commit_as_date(self) -> date:
         return datetime.fromtimestamp(self.last_commit_timestamp).date()
 
-    # Remaining options: id;website;license_url;latest_update;all_languages;open_pull_requests;master_branch;is_fork;forked_from;readme_type
+    # Remaining options: id;website;licence_url;latest_update;all_languages;open_pull_requests;master_branch;is_fork;forked_from;readme_type
 
 
 _TYPESENSE_REPO_SCHEMA = {
@@ -46,7 +46,7 @@ _TYPESENSE_REPO_SCHEMA = {
                 "model_config": {"model_name": _TYPESENSE_EMBEDDING_MODEL},
             },
         },
-        {"name": "readme", "type": "string"},
+        {"name": "readme", "type": "string", "optional": True},
         {
             "name": "embedding_readme",
             "type": "float[]",
@@ -54,17 +54,18 @@ _TYPESENSE_REPO_SCHEMA = {
                 "from": ["readme"],
                 "model_config": {"model_name": _TYPESENSE_EMBEDDING_MODEL},
             },
+            "optional": True,
         },
-        {"name": "organisation", "type": "string", "facet": True},
-        {"name": "license", "type": "string", "facet": True},
-        {"name": "language", "type": "string", "facet": True},
-        {"name": "url", "type": "string"},
+        {"name": "organisation_id", "type": "string", "facet": True, "optional": True},
+        {"name": "licence", "type": "string", "facet": True, "optional": True},
+        {"name": "language", "type": "string", "facet": True, "optional": True},
+        {"name": "url", "type": "string", "optional": True},
         {
             "name": "last_commit_timestamp",
             "type": "int64",
         },  # date is not supported by TypeSense
-        {"name": "is_fork", "type": "bool", "facet": True},
-        {"name": "high_quality", "type": "bool", "facet": True},
+        {"name": "is_fork", "type": "bool", "facet": True, "optional": True},
+        {"name": "high_quality", "type": "bool", "facet": True, "optional": True},
         # TODO : add hints from the README files (just need to compress key information well enough there)
     ],
     "default_sorting_field": "idx",
@@ -115,12 +116,11 @@ def index_data_in_typesense(ts_client: typesense.Client, df: pd.DataFrame) -> No
     if "last_commit_timestamp" not in df.columns:
         df["last_commit_timestamp"] = df["last_commit"].apply(_date_to_timestamp)
 
-    [
-        ts_client.collections["projects"].documents.import_(
-            [{k: r[k] for k in _TYPESENSE_REPO_SCHEMA_FIELDS}]
-        )
+    docs = [
+        {k: r.get(k) for k in _TYPESENSE_REPO_SCHEMA_FIELDS}
         for __, r in tqdm(df.iterrows())
     ]
+    ts_client.collections["projects"].documents.import_(docs)
 
 
 class SearchResult(BaseModel):
@@ -131,7 +131,7 @@ class SearchResult(BaseModel):
 
 def _search_kwargs(
     languages: list[str] | str | None = None,
-    license_category: str | None = None,
+    licence_category: str | None = None,
     high_quality_only: bool = True,
 ) -> dict[str, str]:
     kwargs_search = dict()
@@ -140,10 +140,10 @@ def _search_kwargs(
         if isinstance(languages, str):
             languages = [languages]
         filter_by.append(f"language: [{','.join(languages)}]")
-    if license_category not in [None, "*"]:
+    if licence_category not in [None, "*"]:
         # TODO: this needs to be better aligned with actual usages
-        licenses = license_category.split(",")
-        filter_by.append(f"license: [{','.join(licenses)}]")
+        licences = licence_category.split(",")
+        filter_by.append(f"licence: [{','.join(licences)}]")
     if high_quality_only:
         filter_by.append("high_quality := true")
 
@@ -182,16 +182,16 @@ def search_with_query(
     results_per_page: int = 50,
     page: int = 1,
     languages: list[str] | str | None = None,
-    license_category: str | None = None,
+    licence_category: str | None = None,
     high_quality_only: bool = True,
 ) -> SearchResult:
     if query is None:
         query = " "
 
-    # Keyword search with field weights: name > organisation > description > readme.
-    # This ensures title matches rank highest, followed by organisation,
+    # Keyword search with field weights: name > organisation_id > description > readme.
+    # This ensures title matches rank highest, followed by organisation_id,
     # then description, and finally the full readme text.
-    keyword_fields = "name, organisation, description, readme"
+    keyword_fields = "name, organisation_id, description, readme"
     keyword_weights = [5, 4, 3, 2]
     hybrid_params: dict[str, str | bool] = {}
     use_hybrid = SETTINGS.ENABLE_HYBRID_SEARCH
@@ -205,7 +205,7 @@ def search_with_query(
 
     s_kwargs = _search_kwargs(
         languages=languages,
-        license_category=license_category,
+        licence_category=licence_category,
         high_quality_only=high_quality_only,
     )
 
@@ -228,7 +228,7 @@ def search_with_query(
         # Hybrid search failed (e.g. embeddings not yet generated).
         # Fall back to keyword-only search.
         if use_hybrid:
-            keyword_fields = "name, organisation, description, readme"
+            keyword_fields = "name, organisation_id, description, readme"
             keyword_weights = [5, 4, 3, 2]
             hybrid_params = {}
             r = ts_client.collections["projects"].documents.search(
@@ -255,9 +255,9 @@ def search_with_query(
 
 
 class CountableFieldsEnum(Enum):
-    license = "license"
+    licence = "licence"
     language = "language"
-    organisation = "organisation"
+    organisation = "organisation_id"
 
 
 def count_values(
@@ -293,7 +293,7 @@ def list_values(
 
 if __name__ == "__main__":
     ts_client = generate_client()
-    c1 = list_values(ts_client, CountableFieldsEnum.license)
+    c1 = list_values(ts_client, CountableFieldsEnum.licence)
     c2 = list_values(ts_client, CountableFieldsEnum.language)
 
     r = search_with_query(ts_client, "wind power")  # , languages="C++")

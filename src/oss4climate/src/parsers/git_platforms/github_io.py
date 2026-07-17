@@ -89,7 +89,7 @@ def _github_headers() -> dict[str, str]:
     return headers
 
 
-def _web_get(
+def web_get(
     url: str,
     with_headers: bool = True,
     is_json: bool = True,
@@ -133,7 +133,7 @@ def _master_branch_name(
     branches_names = []
     page = 1
     while more_data_needed:
-        r_branches = _web_get(
+        r_branches = web_get(
             f"https://api.github.com/repos/{cleaned_repo_path}/branches?per_page=100&page={page}",
             cache_lifetime=cache_lifetime,
         )
@@ -166,8 +166,10 @@ class GithubScraper(_GPScraper):
 
     # Private methods first
     def _extract_organisation_and_repository_as_url_block(self, x: str) -> str:
-        # Cleaning up Github prefix
-        if self.is_relevant_url(x):
+        # Strip host prefix if present (handles host-prefixed IDs like "github.com/org/repo")
+        if x.startswith(f"{_GITHUB_DOMAIN}/"):
+            x = x[len(_GITHUB_DOMAIN) :].lstrip("/")
+        elif self.is_relevant_url(x):
             x = x.replace(_GITHUB_URL_BASE, "")
         fixed_x = "/".join(x.split("/")[:2])
         # Removing eventual extra information in URL
@@ -243,7 +245,7 @@ class GithubScraper(_GPScraper):
                         )
                     else:
                         readme_url = f"https://raw.githubusercontent.com/{repo_name}/refs/heads/{branch}/{i}"
-                    md_content = _web_get(
+                    md_content = web_get(
                         readme_url,
                         with_headers=None,
                         is_json=False,
@@ -275,7 +277,7 @@ class GithubScraper(_GPScraper):
         cache_lifetime = self.cache_lifetime
         repo_path = self._extract_organisation_and_repository_as_url_block(repo_id)
 
-        r = _web_get(
+        r = web_get(
             f"https://api.github.com/repos/{repo_path}",
             cache_lifetime=cache_lifetime,
         )
@@ -293,7 +295,7 @@ class GithubScraper(_GPScraper):
         else:
             # If ever getting issues with the size here, "?per_page=10" can be added to the URL
             #  (just need to ensure that all latest commits are included)
-            r_last_commit_to_master = _web_get(
+            r_last_commit_to_master = web_get(
                 f"https://api.github.com/repos/{repo_path}/commits/{branch2use}",
                 cache_lifetime=cache_lifetime,
             )
@@ -314,7 +316,7 @@ class GithubScraper(_GPScraper):
             forked_from = None
 
         # Note: this does not work well as the limit is set to 30
-        r_pull_requests = _web_get(
+        r_pull_requests = web_get(
             f"https://api.github.com/repos/{repo_path}/pulls",
             cache_lifetime=cache_lifetime,
         )
@@ -323,11 +325,11 @@ class GithubScraper(_GPScraper):
         if n_open_pull_requests == 30:
             n_open_pull_requests = None
 
-        license = r["license"]
-        if license is not None:
-            license = license.get("name")
+        licence = r["license"]
+        if licence is not None:
+            licence = licence.get("name")
 
-        license_url = self.fetch_license_url(
+        licence_url = self.fetch_licence_url(
             repo_path,
             branch=branch2use,
             fail_on_issue=fail_on_issue,
@@ -346,14 +348,14 @@ class GithubScraper(_GPScraper):
         languages = list(raw_languages.keys())
 
         details = ProjectDetails(
-            id=repo_path,
+            id=repo_id,
             name=r["name"],
-            organisation=self.extract_repository_organisation(repo_path),
+            organisation_id=self.extract_repository_organisation(repo_path),
             url=r["html_url"],
             website=r["homepage"],
             description=r["description"],
-            license=license,
-            license_url=license_url,
+            licence=licence,
+            licence_url=licence_url,
             language=dominant_language,
             all_languages=languages,
             latest_update=datetime.fromisoformat(r["updated_at"]).date(),
@@ -373,7 +375,7 @@ class GithubScraper(_GPScraper):
         repo_id: str,
     ) -> dict[Any, float | int]:
         repo_path = self._extract_organisation_and_repository_as_url_block(repo_id)
-        r = _web_get(
+        r = web_get(
             f"https://api.github.com/repos/{repo_path}/languages",
             cache_lifetime=self.cache_lifetime,
         )
@@ -394,7 +396,7 @@ class GithubScraper(_GPScraper):
         per_page = 100
         while get_more:
             try:
-                res = _web_get(
+                res = web_get(
                     f"https://api.github.com/orgs/{organisation_name}/repos?per_page={per_page}&page={page}",
                     cache_lifetime=cache_lifetime,
                 )
@@ -403,7 +405,7 @@ class GithubScraper(_GPScraper):
                 if page > 1:
                     raise e
                 # Where orgs do not work, one is potentially looking at a user instead (not supporting several pages on users)
-                res = _web_get(
+                res = web_get(
                     f"https://api.github.com/users/{organisation_name}/repos",
                     cache_lifetime=cache_lifetime,
                 )
@@ -432,7 +434,7 @@ class GithubScraper(_GPScraper):
         if branch is None:
             return "ERROR with file tree (unclear master branch)"
         try:
-            r = _web_get(
+            r = web_get(
                 url=f"https://api.github.com/repos/{repo_name}/git/trees/{branch}?recursive=1",
                 with_headers=True,
                 is_json=True,
@@ -460,7 +462,7 @@ class GithubScraper(_GPScraper):
         page = 1
         per_page = 100
         while more_to_fetch:
-            r = _web_get(
+            r = web_get(
                 url=f"https://api.github.com/repos/{repo_name}/pulls?state={state}&per_page={per_page}&page={page}",
                 with_headers=True,
                 is_json=True,
@@ -491,7 +493,7 @@ class GithubScraper(_GPScraper):
     # --------------------------------------------------------------------------------
     # Not part of the abstract class
     # --------------------------------------------------------------------------------
-    def fetch_license_url(
+    def fetch_licence_url(
         self,
         repo_id: str,
         branch: str | None = None,
@@ -503,22 +505,22 @@ class GithubScraper(_GPScraper):
         if branch is None:
             branch = _master_branch_name(repo_id, cache_lifetime=cache_lifetime)
 
-        license_url = None
+        licence_url = None
         file_tree = self.fetch_repository_file_tree(
             repo_id,
             fail_on_issue=fail_on_issue,
         )
         for i in file_tree:
             lower_i = i.lower()
-            if lower_i.startswith("license"):
+            if lower_i.startswith(("license", "licence")):
                 if branch == "main":
                     # Keeping what worked well so far
-                    license_url = (
+                    licence_url = (
                         f"https://raw.githubusercontent.com/{repo_id}/main/{i}"
                     )
                 else:
-                    license_url = f"https://raw.githubusercontent.com/{repo_id}/refs/heads/{branch}/{i}"
-        return license_url
+                    licence_url = f"https://raw.githubusercontent.com/{repo_id}/refs/heads/{branch}/{i}"
+        return licence_url
 
     def fetch_organisation_details(
         self,
@@ -527,7 +529,7 @@ class GithubScraper(_GPScraper):
         organisation_id = self._extract_organisation_and_repository_as_url_block(
             organisation_id
         ).split("/")[0]
-        r = _web_get(
+        r = web_get(
             url=f"https://api.github.com/orgs/{organisation_id}",
             with_headers=True,
             is_json=True,

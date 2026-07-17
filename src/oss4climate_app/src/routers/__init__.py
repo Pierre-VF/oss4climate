@@ -1,11 +1,11 @@
 from functools import lru_cache
 
 import pandas as pd
-from oss4climate.src.parsers.licenses import (
-    licence_url_from_license_name,
+
+from oss4climate.src.parsers.licences import (
+    licence_url_from_licence_name,
 )
 from oss4climate.src.parsers.listings import ResourceListing
-
 from oss4climate_app.src.config import FILE_INPUT_LISTINGS_INDEX
 
 
@@ -18,8 +18,8 @@ def listing_credits_df() -> pd.DataFrame:
     min_targets = 10
 
     for i, r in df.iterrows():
-        if (not isinstance(r["license_url"], str)) or r["license_url"] == "NaN":
-            df.loc[i, "license_url"] = licence_url_from_license_name(r["license"])
+        if (not isinstance(r["licence_url"], str)) or r["licence_url"] == "NaN":
+            df.loc[i, "licence_url"] = licence_url_from_licence_name(r["licence"])
 
     df_no_nas = (
         df.dropna()

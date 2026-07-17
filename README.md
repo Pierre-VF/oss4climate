@@ -23,9 +23,9 @@ However, in the current stage it is indeed not providing all of these features y
 
 To carry out a search without installing anything, you can just use the **web-app** here: https://oss4climate.apps.pierrevf.com/
 
-## What is the license of the code and the data?
+## What is the licence of the code and the data?
 
-The license differs between the source code and the listings data. Please make sure to check the [license file](LICENSE) for all details.
+The licence differs between the source code and the listings data. Please make sure to check the [licence file](LICENSE) for all details.
 
 The underlying listing data comes from a variety of repositories, some of which have a creative common licence. **That means that while you are free to reuse and adapt the software, there are restrictions on the usage of the listings data below.**
 
@@ -41,7 +41,7 @@ Input to the discovery process are given in the files in the **indexes** folder 
 
 The following projects are credited as major contributors to the underlying dataset:
 
-- [OpenSustain.tech](https://opensustain.tech/) (who kindly licensed their dataset under *Creative Commons Attribution 4.0 International*)
+- [OpenSustain.tech](https://opensustain.tech/) (who kindly licenced their dataset under *Creative Commons Attribution 4.0 International*)
 
 - Other listings found in [listings.json](indexes/listings.json)
 

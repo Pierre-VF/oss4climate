@@ -358,18 +358,18 @@ button[type="submit"]:active {
     color: var(--color-primary, #2e8b57);
 }
 
-.source-license {
+.source-licence {
     font-size: var(--font-size-small, 14px);
     color: var(--color-text-secondary, #666666);
     margin-top: var(--spacing-xs, 4px);
 }
 
-.source-license a {
+.source-licence a {
     color: var(--color-secondary, #3498db);
     font-size: var(--font-size-small, 14px);
 }
 
-.source-license a:hover {
+.source-licence a:hover {
     color: #2980b9;
 }
 
@@ -541,7 +541,7 @@ button[type="submit"]:active {
     content: "💻";
 }
 
-.result-card-badge.license::before {
+.result-card-badge.licence::before {
     content: "📜";
 }
 

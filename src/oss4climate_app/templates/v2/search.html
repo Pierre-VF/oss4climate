@@ -25,10 +25,10 @@
 
             <div class="search_refining_form">
                 <label>Refine your search</label><br/>
-                <label for="license_category">License:</label>
-                <select name="license_category" id="license_category">
+                <label for="licence_category">Licence:</label>
+                <select name="licence_category" id="licence_category">
                     <option value="*">(Any)</option>
-                    {% for i in unique_license_categories %}
+                    {% for i in unique_licence_categories %}
                     <option value="{{ i.name }}">{{ i.value }}</option>
                     {% endfor %}
                 </select>
@@ -66,8 +66,8 @@
                         <div class="source-name">
                             <a href="{{r.url}}" target="_blank" rel="noopener">{{r.url | replace("https://", "") | replace("http://", "") | replace("www.", "") | truncate(40, True, "...")}}</a>
                         </div>
-                        <div class="source-license">
-                            Licensed under <a href="{{ r.license_url }}" target="_blank" rel="noopener">{{r.license}}</a>
+                        <div class="source-licence">
+                            Licenced under <a href="{{ r.licence_url }}" target="_blank" rel="noopener">{{r.licence}}</a>
                         </div>
                     </div>
                     <div class="source-count{% if r.target_count > 1000 %} source-count--gold{% elif r.target_count > 50 %} source-count--silver{% else %} source-count--bronze{% endif %}">{{r.target_count}} projects</div>
@@ -81,7 +81,7 @@
         document.getElementById("code_search_form").addEventListener("submit", function (event) {
             event.preventDefault();
             var queryValue = document.getElementById("query").value;
-            var licenseValue = document.getElementById("license_category").value;
+            var licenceValue = document.getElementById("licence_category").value;
             var languageValue = document.getElementById("language").value;
             var excludeForks = document.getElementById("exclude_forks").checked;
             var excludeInactive = document.getElementById("exclude_inactive").checked;
@@ -92,7 +92,7 @@
             if (queryValue) {
                 url += "query=" + encodeURIComponent(queryValue) + "&";
             }
-            url += "license_category=" + encodeURIComponent(licenseValue) + "&";
+            url += "licence_category=" + encodeURIComponent(licenceValue) + "&";
             url += "language=" + encodeURIComponent(languageValue) + "&";
             url += "exclude_forks=" + encodeURIComponent(excludeForks) + "&";
             url += "extended_search=" + encodeURIComponent(extendedSearch) + "&";

@@ -44,8 +44,12 @@ def _extract_host_organisation_and_repository_as_url_block(x: str) -> tuple[str,
     parsed_url = urlparse(url)
     host = parsed_url.hostname
     if host is None:
-        # If no host is found, then use Gitlab as default
-        host = GITLAB_DOMAIN
+        # No protocol — extract host from path prefix (e.g., "gitlab.com/org/repo")
+        first_segment = x.split("/")[0]
+        if first_segment.startswith("gitlab.") or first_segment.startswith("git."):
+            host = first_segment
+        else:
+            host = GITLAB_DOMAIN
 
     # Then focus on the project
     # Cleaning up Gitlab prefix
@@ -74,7 +78,7 @@ def _gitlab_headers() -> dict[str, str]:
     return headers
 
 
-def _web_get(
+def web_get(
     url: str,
     with_headers: bool = True,
     is_json: bool = True,
@@ -175,14 +179,14 @@ class GitlabScraper(_GPScraper):
         if branch:
             raise NotImplementedError()
         host, repo_id = _extract_host_organisation_and_repository_as_url_block(repo_id)
-        r = _web_get(
+        r = web_get(
             f"https://{host}/api/v4/projects/{quote_plus(repo_id)}?license=yes",
             is_json=True,
             cache_lifetime=self.cache_lifetime,
         )
         try:
             url_readme_file = r["readme_url"].replace("/blob/", "/raw/")
-            readme = _web_get(
+            readme = web_get(
                 url_readme_file + "?inline=false", with_headers=False, is_json=False
             )
             readme_type = EnumDocumentationFileType.from_filename(url_readme_file)
@@ -205,15 +209,15 @@ class GitlabScraper(_GPScraper):
         host, repo_id_min = _extract_host_organisation_and_repository_as_url_block(
             repo_id
         )
-        r = _web_get(
+        r = web_get(
             f"https://{host}/api/v4/projects/{quote_plus(repo_id_min)}?license=yes",
             is_json=True,
             cache_lifetime=cache_lifetime,
         )
         # organisation_url = f"https://{gitlab_host}/{repo_id.split('/')[0]}"
         organisation = repo_id_min.split("/")[0]
-        license = _get_from_dict_with_default(r, "license", {}).get("name")
-        license_url = r.get("license_url")
+        licence = _get_from_dict_with_default(r, "license", {}).get("name")
+        licence_url = r.get("license_url")
         (
             readme,
             readme_type,
@@ -248,20 +252,20 @@ class GitlabScraper(_GPScraper):
         if url_open_pr_raw:
             url_open_pr = url_open_pr_raw.get("merge_requests")
             if url_open_pr:
-                r_open_pr = _web_get(
+                r_open_pr = web_get(
                     url_open_pr, is_json=True, cache_lifetime=cache_lifetime
                 )
                 n_open_prs = len([i for i in r_open_pr if i.get("state") == "open"])
 
         details = ProjectDetails(
-            id=repo_id_min,
+            id=repo_id,
             name=r["name"],
-            organisation=organisation,
+            organisation_id=organisation,
             url=r["web_url"],
             website=None,
             description=r["description"],
-            license=license,
-            license_url=license_url,
+            licence=licence,
+            licence_url=licence_url,
             language=dominant_language,
             all_languages=languages,
             latest_update=latest_update,
@@ -281,7 +285,7 @@ class GitlabScraper(_GPScraper):
         repo_id: str,
     ) -> dict[Any, float | int]:
         host, repo_id = _extract_host_organisation_and_repository_as_url_block(repo_id)
-        r = _web_get(
+        r = web_get(
             f"https://{host}/api/v4/projects/{quote_plus(repo_id)}/languages",
             cache_lifetime=self.cache_lifetime,
         )
@@ -294,7 +298,7 @@ class GitlabScraper(_GPScraper):
         host, group_id = _extract_host_organisation_and_repository_as_url_block(
             organisation_name
         )
-        res = _web_get(
+        res = web_get(
             f"https://{host}/api/v4/groups/{group_id}/projects",
             cache_lifetime=self.cache_lifetime,
         )
