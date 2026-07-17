@@ -440,10 +440,16 @@ class RepositoryScraper:
             cache_lifetime=self.cache_lifetime,
         )
 
+        # Build an O(1) lookup index from the DataFrame (once, not per-repo)
+        results_by_id: dict[str, Any] = {}
+        for detail in scrape_result.results_as_df.itertuples():
+            if hasattr(detail, "id"):
+                results_by_id[detail.id] = detail
+
         # Sync results back to the DB
         errors: dict[str, str] = {}
         with Session(get_engine()) as session:
-            for repo_id, repo in repo_map.items():
+            for repo_id in repo_map.keys():
                 # Check if this repo was in the scrape results
                 if repo_id in scrape_result.errors:
                     error_msg = str(scrape_result.errors[repo_id])
@@ -451,12 +457,7 @@ class RepositoryScraper:
                     errors[repo_id] = error_msg
                     continue
 
-                # Find the corresponding ProjectDetails in the results
-                project_details = None
-                for detail in scrape_result.results_as_df.itertuples():
-                    if hasattr(detail, "id") and detail.id == repo_id:
-                        project_details = detail
-                        break
+                project_details = results_by_id.get(repo_id)
 
                 if project_details is None:
                     # Repo was skipped (e.g., .github repo)
