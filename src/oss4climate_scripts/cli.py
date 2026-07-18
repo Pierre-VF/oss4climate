@@ -4,6 +4,7 @@ CLI module
 
 from datetime import timedelta
 
+from oss4climate.src.log import log_info
 from oss4climate_scripts import scripts
 from oss4climate_scripts.scripts import (
     data_publication,
@@ -25,7 +26,7 @@ def add():
         x = x.strip()
         if len(x) > 0:
             urls_to_add.append(x)
-    print(f"Adding {urls_to_add}")
+    log_info(f"Adding {urls_to_add}")
     scripts.add_projects_to_listing(urls_to_add)
 
 

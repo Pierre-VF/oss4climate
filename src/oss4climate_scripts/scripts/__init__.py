@@ -37,11 +37,11 @@ def format_all_files():
     try:
         format_individual_file(FILE_INPUT_INDEX)
     except Exception as e:
-        print(f"Failed to reprocess the index : {e}")
+        log_info(f"Failed to reprocess the index : {e}")
     try:
         format_individual_file(FILE_OUTPUT_SUMMARY_TOML)
     except Exception as e:
-        print(f"Failed to reprocess the summary : {e}")
+        log_info(f"Failed to reprocess the summary : {e}")
 
 
 def _add_projects_to_listing_file(

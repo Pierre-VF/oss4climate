@@ -11,6 +11,7 @@ from typesense.types.document import (
 )
 
 from oss4climate.src.config import SETTINGS
+from oss4climate.src.log import log_info
 
 _TYPESENSE_EMBEDDING_MODEL = "ts/all-MiniLM-L12-v2"
 
@@ -90,13 +91,13 @@ def generate_client() -> typesense.Client:
 def reset_typesense_schema(ts_client: typesense.Client):
     # Delete the collection
     try:
-        print("First deleting all projects")
+        log_info("First deleting all projects")
         ts_client.collections["projects"].delete()
-        print("Delete completed")
+        log_info("Delete completed")
     except typesense.exceptions.ObjectNotFound:
-        print("No projects defined")
-    print(" ")
-    print("Then recreating collections")
+        log_info("No projects defined")
+    log_info(" ")
+    log_info("Then recreating collections")
     try:
         ts_client.collections.create(_TYPESENSE_REPO_SCHEMA)
 
@@ -304,4 +305,4 @@ if __name__ == "__main__":
     c2 = list_values(ts_client, CountableFieldsEnum.language)
 
     r = search_with_query(ts_client, "wind power")  # , languages="C++")
-    print(r)
+    log_info(r)

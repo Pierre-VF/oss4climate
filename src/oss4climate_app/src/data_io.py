@@ -5,7 +5,7 @@ from functools import lru_cache
 from urllib.request import urlretrieve
 
 from oss4climate.src.helpers import sorted_list_of_unique_elements
-from oss4climate.src.log import log_warning
+from oss4climate.src.log import log_info, log_warning
 from oss4climate.src.models import EnumLicenceCategories
 from oss4climate_app.src.config import (
     FILE_INPUT_LISTINGS_INDEX,
@@ -20,9 +20,9 @@ from oss4climate_app.src.search import typesense_io
 def download_file(url: str, target: str, force_refresh: bool = True) -> None:
     if os.path.exists(target) and (not force_refresh):
         return
-    print(f"Fetching {url}")
+    log_info(f"Fetching {url}")
     urlretrieve(url, target)
-    print(f"-> Downloaded to {target}")
+    log_info(f"-> Downloaded to {target}")
 
 
 def download_listing_data_for_app(
@@ -38,7 +38,7 @@ def download_listing_data_for_app(
             FILE_OUTPUT_LISTING_FEATHER,
             force_refresh=force_refresh,
         )
-    print("Download complete")
+    log_info("Download complete")
 
 
 def _f_none_to_unknown(x: str | date | None) -> str:

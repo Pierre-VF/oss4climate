@@ -63,5 +63,3 @@ def test_fetch_functions(gitlab_repo_url, gitlab_group_url):
 
     res_org = gls.fetch_repositories_in_organisation(gitlab_group_url)
     assert isinstance(res_org, dict)
-
-    print("ok")

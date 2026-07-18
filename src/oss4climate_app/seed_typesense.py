@@ -7,6 +7,7 @@ from sqlmodel import Session
 
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.database.repos import get_engine, get_repos_for_typesense
+from oss4climate.src.log import log_info
 from oss4climate.src.parsers.listings import opensustain_tech
 from oss4climate_app.src.search.typesense_io import (
     generate_client,
@@ -24,7 +25,7 @@ def seed():
         }
     )
 
-    print("Starting seeding of Typesense")
+    log_info("Starting seeding of Typesense")
 
     # ==============================================================================
     # Seeding the search engine
@@ -47,7 +48,7 @@ def seed():
         cache_lifetime=timedelta(hours=6)
     )
     df["high_quality"] = df["url"].apply(lambda i: i in osst_targets)
-    print(osst_targets)
+    log_info(osst_targets)
 
     # ==============================================================================
     # Proceed with seeding
@@ -58,7 +59,7 @@ def seed():
     df["idx"] = df.index.to_series().astype(int)
     index_data_in_typesense(ts_client, df)
 
-    print("DONE")
+    log_info("DONE")
 
 
 if __name__ == "__main__":
