@@ -18,7 +18,7 @@ def now() -> datetime:
     return datetime.now(tz=UTC)
 
 
-def sorted_list_of_unique_elements(x: list | pd.Series):
+def sorted_list_of_unique_elements(x: list | pd.Series) -> list:
     """
     Return a sorted list of unique elements from input
 
