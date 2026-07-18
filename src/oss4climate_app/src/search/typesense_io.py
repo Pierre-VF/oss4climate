@@ -104,9 +104,16 @@ def reset_typesense_schema(ts_client: typesense.Client):
         pass
 
 
-def _date_to_timestamp(x: date | None) -> int:
+def _date_to_timestamp(x: date | str | float | None) -> int | None:
     if x is None:
-        return 0  # TODO: find a better placeholder
+        return None  # TODO: find a better placeholder
+    if isinstance(x, float):
+        try:
+            return int(x)
+        except ValueError:
+            return None
+    if isinstance(x, str):
+        x = datetime.fromisoformat(x)
     return int(datetime(x.year, x.month, x.day).timestamp())
 
 
