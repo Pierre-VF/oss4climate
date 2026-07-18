@@ -138,12 +138,19 @@ def get_engine() -> Engine:
     return _ENGINE
 
 
-def upsert_organisation(session: Session, org_data: dict) -> Organisation:
+def upsert_organisation(
+    session: Session,
+    org_data: dict,
+    commit: bool = False,
+    update_scraped_at: bool = False,
+) -> Organisation:
     """
     Upsert an organisation into the database.
 
     :param session: Database session
     :param org_data: Dictionary of organisation fields (id, name, description, etc.)
+    :param commit: bool, where True means commit the session (Default is False)
+    :param update_scraped_at: bool, where True means update the scraped_at field to now time (Default is False)
     :return: The upserted Organisation object
     """
     org_id = org_data.get("id")
@@ -154,6 +161,9 @@ def upsert_organisation(session: Session, org_data: dict) -> Organisation:
         select(Organisation).where(Organisation.id == org_id)
     ).first()
 
+    if update_scraped_at:
+        org_data["last_scraped_at"] = now()
+
     if existing is None:
         org = Organisation.model_validate(org_data)
         session.add(org)
@@ -162,17 +172,22 @@ def upsert_organisation(session: Session, org_data: dict) -> Organisation:
         for key, value in org_data.items():
             if hasattr(existing, key) and value is not None:
                 setattr(existing, key, getattr(new_org, key))
-
-    session.commit()
+    if commit:
+        session.commit()
     return existing if existing else org
 
 
-def upsert_repository(session: Session, repo_data: dict) -> Repository:
+def upsert_repository(
+    session: Session,
+    repo_data: dict,
+    commit: bool = False,
+) -> Repository:
     """
     Upsert a repository into the database.
 
     :param session: Database session
     :param repo_data: Dictionary of repository fields (id, name, url, etc.)
+    :param commit: bool, where True means commit the session (Default is False)
     :return: The upserted Repository object
     """
     repo_id = repo_data.get("id")
@@ -189,8 +204,10 @@ def upsert_repository(session: Session, repo_data: dict) -> Repository:
         for key, value in repo_data.items():
             if hasattr(existing, key) and value is not None:
                 setattr(existing, key, getattr(new_repo, key))
+        session.add(existing)
 
-    session.commit()
+    if commit:
+        session.commit()
     return existing if existing else repo
 
 
