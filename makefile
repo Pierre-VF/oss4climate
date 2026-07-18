@@ -17,7 +17,7 @@ code_cleanup:
 
 .PHONY: run_app
 run_app:
-	uv run gunicorn -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8080 app:app
+	uv run gunicorn -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 app:app
 
 .PHONY: test
 test:
