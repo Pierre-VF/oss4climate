@@ -452,7 +452,7 @@ class RepositoryScraper:
             for repo_id in repo_map.keys():
                 # Check if this repo was in the scrape results
                 if repo_id in scrape_result.errors:
-                    error_msg = str(scrape_result.errors[repo_id])
+                    error_msg = str(scrape_result.errors[repo_id].exception)
                     set_repo_error(session, repo_id, error_msg)
                     errors[repo_id] = error_msg
                     continue
