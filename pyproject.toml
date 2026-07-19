@@ -37,7 +37,6 @@ packages = [
     "src/oss4climate",
     "src/oss4climate_scripts",
     "src/oss4climate_app",
-    "src/oss4climate_mcp",
 ]
 
 [build-system]
