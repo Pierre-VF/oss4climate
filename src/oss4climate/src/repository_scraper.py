@@ -799,8 +799,8 @@ class RepositoryScraper:
         with Session(get_engine()) as session:
             repos = session.exec(
                 select(Repository).where(
-                    Repository.active,
-                    Repository.last_error is not None,
+                    Repository.active == True,  # noqa: E712
+                    Repository.last_error != None,  # noqa: E711
                 )
             ).all()
 

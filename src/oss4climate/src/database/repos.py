@@ -230,9 +230,9 @@ def get_active_repos_to_scrape(
     threshold = now() - timedelta(days=refresh_days)
     result = session.exec(
         select(Repository).where(
-            Repository.active,
-            (Repository.last_scraped_at is None)
-            | (Repository.last_scraped_at < threshold),
+            Repository.active == True,  # noqa: E712
+            (Repository.last_scraped_at == None)
+            | (Repository.last_scraped_at < threshold),  # noqa: E711
         )
     ).all()
     return list(result)
@@ -256,7 +256,7 @@ def mark_repos_inactive(
 
     result = session.exec(
         select(Repository).where(
-            Repository.active,
+            Repository.active == True,  # noqa: E712
             Repository.id.not_in(repo_ids_to_keep),
         )
     ).all()
@@ -281,7 +281,9 @@ def get_all_active_repos(session: Session) -> list[Repository]:
     :param session: Database session
     :return: List of all active Repository objects
     """
-    result = session.exec(select(Repository).where(Repository.active)).all()
+    result = session.exec(
+        select(Repository).where(Repository.active == True)  # noqa: E712
+    ).all()
     return list(result)
 
 
