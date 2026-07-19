@@ -171,6 +171,9 @@ def index_data_in_typesense(
         how="all",
     )
 
+    # Only focus on repos that have data scraped
+    df = df[df["name"].apply(lambda x: isinstance(x, str) and len(x) > 0)]
+
     docs = [
         _to_native_python({k: r.get(k) for k in _TYPESENSE_REPO_SCHEMA_FIELDS})
         for __, r in df.iterrows()
