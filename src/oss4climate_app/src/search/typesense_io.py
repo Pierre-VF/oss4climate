@@ -24,10 +24,12 @@ class ResultItem(BaseModel):
     language: str | None = None
     url: str
     readme: str
-    last_commit_timestamp: int
-    is_fork: bool = False
+    last_commit_timestamp: int | None
+    is_fork: bool | None = None
 
-    def last_commit_as_date(self) -> date:
+    def last_commit_as_date(self) -> date | None:
+        if self.last_commit_timestamp is None:
+            return None
         return datetime.fromtimestamp(self.last_commit_timestamp).date()
 
     # Remaining options: id;website;licence_url;latest_update;all_languages;open_pull_requests;master_branch;is_fork;forked_from;readme_type
@@ -64,6 +66,7 @@ _TYPESENSE_REPO_SCHEMA = {
         {
             "name": "last_commit_timestamp",
             "type": "int64",
+            "optional": True,
         },  # date is not supported by TypeSense
         {"name": "is_fork", "type": "bool", "facet": True, "optional": True},
         {"name": "high_quality", "type": "bool", "facet": True, "optional": True},
@@ -107,12 +110,12 @@ def reset_typesense_schema(ts_client: typesense.Client):
 
 def _date_to_timestamp(x: date | str | float | None) -> int | None:
     if x is None:
-        return None  # TODO: find a better placeholder
+        return 0  # TODO: find a better placeholder
     if isinstance(x, float):
         try:
             return int(x)
         except ValueError:
-            return None
+            return 0
     if isinstance(x, str):
         x = datetime.fromisoformat(x)
     return int(datetime(x.year, x.month, x.day).timestamp())
@@ -124,11 +127,19 @@ def index_data_in_typesense(ts_client: typesense.Client, df: pd.DataFrame) -> No
     if "last_commit_timestamp" not in df.columns:
         df["last_commit_timestamp"] = df["last_commit"].apply(_date_to_timestamp)
 
+    # Fix the booleans
+    df["is_fork"] = df["is_fork"].apply(_boolean_fix)
+
+    # Drop NAs creating issues
+    # df.dropna(axis=["last_commit_timestamp"], inplace=True)
+
     docs = [
         {k: r.get(k) for k in _TYPESENSE_REPO_SCHEMA_FIELDS}
         for __, r in tqdm(df.iterrows())
     ]
-    ts_client.collections["projects"].documents.import_(docs)
+    res = ts_client.collections["projects"].documents.import_(docs)
+    if all([not i.get("success") for i in res]):
+        raise ValueError(f"Failed to index data in Typesense : issue example {res[0]}")
 
 
 class SearchResult(BaseModel):
