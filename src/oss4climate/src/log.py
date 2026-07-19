@@ -4,6 +4,9 @@ Module for logging
 
 import logging
 
+# Configure the logging level to INFO
+logging.basicConfig(level=logging.INFO)
+
 
 def log_info(msg: str):
     """
