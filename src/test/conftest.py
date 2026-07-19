@@ -3,8 +3,10 @@ from pathlib import Path
 import pytest
 from sqlmodel import Session
 
-from oss4climate.src.database.repos import (
+from oss4climate.src.database import (
     get_engine,
+)
+from oss4climate.src.database.repos import (
     upsert_repository,
 )
 from oss4climate.src.helpers import now

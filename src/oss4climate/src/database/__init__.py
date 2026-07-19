@@ -1,97 +1,39 @@
-"""
-Module to manage a database input
-"""
-
-import json
-import os
-from datetime import UTC, datetime, timedelta
-
-from sqlmodel import Field, Session, SQLModel, create_engine, delete, select
+from sqlalchemy import Engine
+from sqlmodel import Session, SQLModel, create_engine
 
 from oss4climate.src.config import SETTINGS
-from oss4climate.src.helpers import now
-from oss4climate.src.log import log_info
-
-
-# -------------------------------------------------------------------------------------
-# Models
-# -------------------------------------------------------------------------------------
-class Cache(SQLModel, table=True):
-    id: str = Field(default=None, primary_key=True, nullable=False)
-    value: str
-    fetched_at: datetime
-
-
-# -------------------------------------------------------------------------------------
-# Engine
-# -------------------------------------------------------------------------------------
 
 
 def _open_engine_and_create_database_if_missing():
-    db_path = SETTINGS.path_scraping_sqlite_db
-    db_folder, __ = os.path.split(db_path)
-    os.makedirs(db_folder, exist_ok=True)
+    # Ensuring that all models are loaded
+    from oss4climate.src.database.repos import Repository, Organisation  # noqa
+    from oss4climate_app.src.database import SearchLog, RequestLog  # noqa
+
     x = create_engine(
-        f"sqlite:///{db_path}",
+        SETTINGS.database_connection_string,
         echo=False,
     )
+    # TODO : this currently also creates empty tables for the "oss4climate" part of the code,
+    #   this is likely avoidable and could be removed in a later version
     SQLModel.metadata.create_all(x)
     return x
 
 
-_ENGINE = _open_engine_and_create_database_if_missing()
+global _ENGINE
+_ENGINE = None
 
 
-# -------------------------------------------------------------------------------------
-# Actual methods
-# -------------------------------------------------------------------------------------
-
-
-def load_from_database(
-    key: str,
-    is_json: bool,
-    cache_lifetime: timedelta | None = None,
-) -> dict | None:
+def get_engine() -> Engine:
     """
-    Load data from database cache
+    Get the database engine.
 
-    :param key: Cache key to retrieve
-    :param is_json: Whether the cached value is JSON data
-    :param cache_lifetime: Optional maximum age for cached data
-    :return: Cached data as dictionary or None if not found/expired
+    :return: SQLAlchemy engine
     """
-    with Session(_ENGINE) as session:
-        res = session.exec(select(Cache).where(Cache.id == key)).first()
-        if res is None:
-            return None
-        else:
-            if cache_lifetime is not None:
-                # Shortcircuit in case cache is too old
-                if res.fetched_at.astimezone(UTC) <= now() - cache_lifetime:
-                    session.exec(delete(Cache).where(Cache.id == key))
-                    session.commit()
-                    log_info(f"Dropped expired cache for {key}")
-                    return None
-
-            if is_json:
-                return json.loads(res.value)
-            else:
-                return res.value
+    global _ENGINE
+    if _ENGINE is None:
+        _ENGINE = _open_engine_and_create_database_if_missing()
+    return _ENGINE
 
 
-def save_to_database(key: str, value: dict, is_json: bool) -> None:
-    """
-    Save data to database cache
-
-    :param key: Cache key to store data under
-    :param value: Data to cache
-    :param is_json: Whether the value should be stored as JSON
-    """
-    if is_json:
-        value_to_write = json.dumps(value)
-    else:
-        value_to_write = value
-
-    with Session(_ENGINE) as session:
-        session.add(Cache(id=key, value=value_to_write, fetched_at=now()))
-        session.commit()
+def open_database_session() -> Session:
+    return Session(_ENGINE)

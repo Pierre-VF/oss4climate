@@ -13,7 +13,10 @@ import pandas as pd
 import requests
 from tomlkit import document, dump
 
-from oss4climate.src.database import load_from_database, save_to_database
+from oss4climate.src.database.scrape_cache import (
+    load_from_scrape_cache,
+    save_to_scrape_cache,
+)
 from oss4climate.src.helpers import (
     cleaned_url,
     sorted_list_of_cleaned_urls,
@@ -57,7 +60,7 @@ def _cached_web_get(
     :raises RateLimitError: If rate limit is hit and raise_rate_limit_error_on_403 is True
     """
     # Uses the cache to ensure that requests are minimised
-    out = load_from_database(url, is_json=is_json, cache_lifetime=cache_lifetime)
+    out = load_from_scrape_cache(url, is_json=is_json, cache_lifetime=cache_lifetime)
 
     if out is None:
         log_info(f"Web GET: {url}")
@@ -66,7 +69,7 @@ def _cached_web_get(
             headers=headers,
         )
         if r.status_code == 404:
-            save_to_database(url, ERROR_404_MARKER, is_json=is_json)
+            save_to_scrape_cache(url, ERROR_404_MARKER, is_json=is_json)
             raise requests.exceptions.HTTPError(
                 f"404 Client Error: Not Found for url: {url}"
             )
@@ -77,7 +80,7 @@ def _cached_web_get(
             out = r.json()
         else:
             out = r.text
-        save_to_database(url, out, is_json=is_json)
+        save_to_scrape_cache(url, out, is_json=is_json)
         if wait_after_web_query:
             # To avoid triggering rate limits on APIs and be nice to servers
             time.sleep(rate_limiting_wait_s)

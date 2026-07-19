@@ -15,11 +15,11 @@ from typing import Any
 import pandas as pd
 from sqlmodel import Session, select
 
+from oss4climate.src.database import open_database_session
 from oss4climate.src.database.repos import (
     Repository,
     get_active_repos_to_scrape,
     get_all_active_repos,
-    get_engine,
     mark_repos_inactive,
     reset_repo_error,
     set_repo_error,
@@ -185,7 +185,7 @@ class RepositoryScraper:
         active_repo_ids: set[str] = set()
         active_org_ids: set[str] = set()
 
-        with Session(get_engine()) as session:
+        with open_database_session() as session:
             # First sync Github and commit
             self._sync_github_organisations(
                 session, targets, active_org_ids, active_repo_ids
@@ -471,7 +471,7 @@ class RepositoryScraper:
         """
         log_info(f"Scraping active repos (refresh threshold: {self.refresh_days} days)")
 
-        with Session(get_engine()) as session:
+        with open_database_session() as session:
             repos_to_scrape = get_active_repos_to_scrape(session, self.refresh_days)
 
         if not repos_to_scrape:
@@ -518,7 +518,7 @@ class RepositoryScraper:
                     errors[rid] = f"github.com/RateLimitError: {e}"
                 break
             except Exception as e:
-                with Session(get_engine()) as session:
+                with open_database_session() as session:
                     set_repo_error(session, repo_id, str(e))
                     session.commit()
                 errors[repo_id] = str(e)
@@ -529,7 +529,7 @@ class RepositoryScraper:
                 repo_data["id"] = repo_id
                 repo_data["last_scraped_at"] = self._now()
                 repo_data["active"] = True
-                with Session(get_engine()) as session:
+                with open_database_session() as session:
                     reset_repo_error(session, repo_id)
                     upsert_repository(session, repo_data)
                     log_info(f" > Committed repository to the database ({repo_id})")
@@ -548,7 +548,7 @@ class RepositoryScraper:
                     url, fail_on_issue=False
                 )
             except Exception as e:
-                with Session(get_engine()) as session:
+                with open_database_session() as session:
                     set_repo_error(session, repo_id, str(e))
                     session.commit()
                 errors[repo_id] = str(e)
@@ -557,7 +557,7 @@ class RepositoryScraper:
             try:
                 repo_data = self._project_details_to_dict(project_details)
                 repo_data["id"] = repo_id
-                with Session(get_engine()) as session:
+                with open_database_session() as session:
                     reset_repo_error(session, repo_id)
                     upsert_repository(session, repo_data)
                     session.commit()
@@ -571,7 +571,7 @@ class RepositoryScraper:
                     codeberg_id, fail_on_issue=False
                 )
             except Exception as e:
-                with Session(get_engine()) as session:
+                with open_database_session() as session:
                     set_repo_error(session, codeberg_id, str(e))
                     session.commit()
                 errors[codeberg_id] = str(e)
@@ -582,7 +582,7 @@ class RepositoryScraper:
                 repo_data["id"] = codeberg_id
                 repo_data["last_scraped_at"] = self._now()
                 repo_data["active"] = True
-                with Session(get_engine()) as session:
+                with open_database_session() as session:
                     reset_repo_error(session, codeberg_id)
                     upsert_repository(session, repo_data)
                     session.commit()
@@ -596,7 +596,7 @@ class RepositoryScraper:
                     bitbucket_id, fail_on_issue=False
                 )
             except Exception as e:
-                with Session(get_engine()) as session:
+                with open_database_session() as session:
                     set_repo_error(session, bitbucket_id, str(e))
                     session.commit()
                 errors[bitbucket_id] = str(e)
@@ -607,7 +607,7 @@ class RepositoryScraper:
                 repo_data["id"] = bitbucket_id
                 repo_data["last_scraped_at"] = self._now()
                 repo_data["active"] = True
-                with Session(get_engine()) as session:
+                with open_database_session() as session:
                     reset_repo_error(session, bitbucket_id)
                     upsert_repository(session, repo_data)
                     session.commit()
@@ -687,7 +687,7 @@ class RepositoryScraper:
         :param output_path: Path to the output feather file
         """
 
-        with Session(get_engine()) as session:
+        with open_database_session() as session:
             repos = get_all_active_repos(session)
 
         if not repos:
@@ -745,7 +745,7 @@ class RepositoryScraper:
         """
         from tomlkit import document, dump
 
-        with Session(get_engine()) as session:
+        with open_database_session() as session:
             repos = get_all_active_repos(session)
 
         if not repos:
@@ -796,7 +796,7 @@ class RepositoryScraper:
         """
         from tomlkit import document, dump
 
-        with Session(get_engine()) as session:
+        with open_database_session() as session:
             repos = session.exec(
                 select(Repository).where(
                     Repository.active == True,  # noqa: E712

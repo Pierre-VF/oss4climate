@@ -2,10 +2,10 @@ from datetime import timedelta
 
 import pandas as pd
 import typesense
-from sqlmodel import Session
 
 from oss4climate.src.config import SETTINGS
-from oss4climate.src.database.repos import get_engine, get_repos_for_typesense
+from oss4climate.src.database import open_database_session
+from oss4climate.src.database.repos import get_repos_for_typesense
 from oss4climate.src.log import log_info
 from oss4climate.src.parsers.listings import opensustain_tech
 from oss4climate_app.src.search.typesense_io import (
@@ -31,7 +31,7 @@ def seed(reset: bool = False):
     # ==============================================================================
 
     # Load repos from database
-    with Session(get_engine()) as session:
+    with open_database_session() as session:
         repo_dicts = get_repos_for_typesense(session)
 
     # Convert to DataFrame (matching the expected schema from the old feather-based pipeline)

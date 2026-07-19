@@ -10,10 +10,8 @@ from datetime import date, datetime, timedelta
 from typing import Any
 
 from pydantic import model_validator
-from sqlalchemy import Engine
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Field, Session, SQLModel, select
 
-from oss4climate.src.config import SETTINGS
 from oss4climate.src.helpers import now
 from oss4climate.src.log import log_info
 
@@ -103,39 +101,8 @@ class Repository(SQLModel, table=True):
 
 
 # -------------------------------------------------------------------------------------
-# Engine
-# -------------------------------------------------------------------------------------
-
-
-def _open_engine_and_create_database_if_missing():
-    """
-    Open a connection to the repository database and create tables if missing.
-
-    :return: SQLAlchemy engine for the repository database
-    """
-    x = create_engine(
-        SETTINGS.REPOS_DATABASE_URL,
-        echo=False,
-    )
-    SQLModel.metadata.create_all(x)
-    return x
-
-
-_ENGINE = _open_engine_and_create_database_if_missing()
-
-
-# -------------------------------------------------------------------------------------
 # Helper functions
 # -------------------------------------------------------------------------------------
-
-
-def get_engine() -> Engine:
-    """
-    Get the database engine.
-
-    :return: SQLAlchemy engine
-    """
-    return _ENGINE
 
 
 def upsert_organisation(
