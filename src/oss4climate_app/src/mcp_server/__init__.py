@@ -8,6 +8,7 @@ from fastmcp.dependencies import Depends
 from fastmcp.exceptions import NotFoundError
 from pydantic import BaseModel
 
+from oss4climate.src.log import log_info
 from oss4climate_app.src.search import typesense_io
 
 # Create an MCP server
@@ -58,10 +59,10 @@ def read_project_details(url: str) -> ProjectDetails:
     res = typesense_io.search_for_url(_TS_CLIENT, url)
     r = [ProjectDetails.from_typesense_item(i) for i in res.results]
     if len(r) < 1:
-        print(f"[read_project_details] url= {url} [NOT FOUND]")
+        log_info(f"[read_project_details] url= {url} [NOT FOUND]")
         raise NotFoundError()
     else:
-        print(f"[read_project_details] url= {url} [FOUND] ({len(r)} results)")
+        log_info(f"[read_project_details] url= {url} [FOUND] ({len(r)} results)")
         return r[0]
 
 
@@ -83,7 +84,7 @@ def search_for_projects(
         page=1,
         high_quality_only=True,  # For now, MCP is restricted to high quality
     )
-    print(
+    log_info(
         f"""[search] keywords= {topic} / {len(res.results)} results (max={n_max_results})
         User objective is: {user_objective}
         """

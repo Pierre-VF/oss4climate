@@ -1,6 +1,6 @@
 import os
 
-
+from oss4climate.src.log import log_info
 from oss4climate_scripts.src.config import FILE_OUTPUT_SUMMARY_TOML
 
 
@@ -21,4 +21,4 @@ def download_data():
     ]:
         data_io.download_file(url_i, file_i)
 
-    print("Download complete")
+    log_info("Download complete")

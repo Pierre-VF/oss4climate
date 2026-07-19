@@ -47,7 +47,7 @@ jobs:
         run: uv sync --group=scripts --group=app
 
       - name: Running discovery
-        run: make discover
+        run: uv run discover
         env:
           GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Skipping authentication on Gitlab for now

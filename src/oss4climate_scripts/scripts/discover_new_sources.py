@@ -4,6 +4,8 @@ This module contains methods to discover new sources of code
 
 import os
 
+from tqdm import tqdm
+
 from oss4climate.src.database.projects import project_dataframe_loader
 from oss4climate.src.log import (
     log_info,
@@ -16,9 +18,6 @@ from oss4climate.src.parsers import (
     url_qualifies,
 )
 from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
-
-from tqdm import tqdm
-
 from oss4climate_scripts.src.config import (
     FILE_INPUT_INDEX,
 )
@@ -69,7 +68,7 @@ def discover_repositories_in_existing_readmes(output_file: str) -> None:
                 elif readme_type == EnumDocumentationFileType.RESTRUCTURED_TEXT:
                     full_targets += fetch_all_project_urls_from_rst_str(r["readme"])
         except Exception as e:
-            print(f"Error with {r} // e={e}")
+            log_info(f"Error with {r} // e={e}")
 
     def _url_cleanup(x: str) -> str:
         x = x.split("?")[0]

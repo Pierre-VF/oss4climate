@@ -30,15 +30,18 @@ from oss4climate_scripts.src.config import (
 
 
 def format_individual_file(file_path: str) -> None:
-    subprocess.run(["black", file_path], check=True)
+    subprocess.run(["black", str(file_path)], check=True)
 
 
 def format_all_files():
-    format_individual_file(FILE_INPUT_INDEX)
+    try:
+        format_individual_file(FILE_INPUT_INDEX)
+    except Exception as e:
+        log_info(f"Failed to reprocess the index : {e}")
     try:
         format_individual_file(FILE_OUTPUT_SUMMARY_TOML)
     except Exception as e:
-        print(f"Failed to reprocess the summary : {e}")
+        log_info(f"Failed to reprocess the summary : {e}")
 
 
 def _add_projects_to_listing_file(

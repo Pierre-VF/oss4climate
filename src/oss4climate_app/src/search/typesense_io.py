@@ -5,12 +5,13 @@ import pandas as pd
 import typesense
 import typesense.exceptions
 from pydantic import BaseModel
-from tqdm import tqdm
 from typesense.types.document import (
     SearchParameters,
 )
 
 from oss4climate.src.config import SETTINGS
+from oss4climate.src.helpers import split_list_in_list_of_batches
+from oss4climate.src.log import log_info
 
 _TYPESENSE_EMBEDDING_MODEL = "ts/all-MiniLM-L12-v2"
 
@@ -23,10 +24,12 @@ class ResultItem(BaseModel):
     language: str | None = None
     url: str
     readme: str
-    last_commit_timestamp: int
-    is_fork: bool = False
+    last_commit_timestamp: int | None
+    is_fork: bool | None = None
 
-    def last_commit_as_date(self) -> date:
+    def last_commit_as_date(self) -> date | None:
+        if self.last_commit_timestamp is None:
+            return None
         return datetime.fromtimestamp(self.last_commit_timestamp).date()
 
     # Remaining options: id;website;licence_url;latest_update;all_languages;open_pull_requests;master_branch;is_fork;forked_from;readme_type
@@ -35,7 +38,7 @@ class ResultItem(BaseModel):
 _TYPESENSE_REPO_SCHEMA = {
     "name": "projects",
     "fields": [
-        {"name": "idx", "type": "int32"},
+        {"name": "idx", "type": "string"},
         {"name": "name", "type": "string"},
         {"name": "description", "type": "string"},
         {
@@ -63,12 +66,13 @@ _TYPESENSE_REPO_SCHEMA = {
         {
             "name": "last_commit_timestamp",
             "type": "int64",
+            "optional": True,
         },  # date is not supported by TypeSense
         {"name": "is_fork", "type": "bool", "facet": True, "optional": True},
         {"name": "high_quality", "type": "bool", "facet": True, "optional": True},
         # TODO : add hints from the README files (just need to compress key information well enough there)
     ],
-    "default_sorting_field": "idx",
+    # "default_sorting_field": "idx",
 }
 _TYPESENSE_REPO_SCHEMA_FIELDS = [
     i["name"]
@@ -90,13 +94,13 @@ def generate_client() -> typesense.Client:
 def reset_typesense_schema(ts_client: typesense.Client):
     # Delete the collection
     try:
-        print("First deleting all projects")
+        log_info("First deleting all projects")
         ts_client.collections["projects"].delete()
-        print("Delete completed")
+        log_info("Delete completed")
     except typesense.exceptions.ObjectNotFound:
-        print("No projects defined")
-    print(" ")
-    print("Then recreating collections")
+        log_info("No projects defined")
+    log_info(" ")
+    log_info("Then recreating collections")
     try:
         ts_client.collections.create(_TYPESENSE_REPO_SCHEMA)
 
@@ -104,23 +108,65 @@ def reset_typesense_schema(ts_client: typesense.Client):
         pass
 
 
-def _date_to_timestamp(x: date | None) -> int:
+def _date_to_timestamp(x: date | str | float | None) -> int | None:
     if x is None:
         return 0  # TODO: find a better placeholder
+    if isinstance(x, float):
+        try:
+            return int(x)
+        except ValueError:
+            return 0
+    if isinstance(x, str):
+        x = datetime.fromisoformat(x)
     return int(datetime(x.year, x.month, x.day).timestamp())
 
 
-def index_data_in_typesense(ts_client: typesense.Client, df: pd.DataFrame) -> None:
+def _boolean_fix(x):
+    if isinstance(x, bool | None):
+        return x
+    elif isinstance(x, int | float):
+        if x == 0:
+            return False
+        elif x == 1:
+            return True
+    return None
+
+
+def index_data_in_typesense(
+    ts_client: typesense.Client,
+    df: pd.DataFrame,
+    batch_size: int = 10,
+) -> None:
     if "high_quality" not in df.columns:
         df["high_quality"] = True
     if "last_commit_timestamp" not in df.columns:
         df["last_commit_timestamp"] = df["last_commit"].apply(_date_to_timestamp)
 
+    # Fix the booleans
+    df["is_fork"] = df["is_fork"].apply(_boolean_fix)
+    subset = ["description", "readme"]
+    if "last_scraped_at" in df.columns:
+        subset.append("last_scraped_at")
+    df = df.dropna(
+        subset=subset,
+        how="all",
+    ).fillna(value=None)
+
     docs = [
-        {k: r.get(k) for k in _TYPESENSE_REPO_SCHEMA_FIELDS}
-        for __, r in tqdm(df.iterrows())
+        {k: r.get(k) for k in _TYPESENSE_REPO_SCHEMA_FIELDS} for __, r in df.iterrows()
     ]
-    ts_client.collections["projects"].documents.import_(docs)
+    full_res = []
+    for b in split_list_in_list_of_batches(docs, batch_size=batch_size):
+        res = ts_client.collections["projects"].documents.import_(b)
+        if all([not i.get("success") for i in res]):
+            raise ValueError(
+                f"Failed to index data in Typesense : issue example {res[0]}"
+            )
+        full_res += res
+
+    log_info(
+        f"Indexed {len([i for i in full_res if i.get('success')])} documents and failed on {len([i for i in full_res if not i.get('success')])}"
+    )
 
 
 class SearchResult(BaseModel):
@@ -163,7 +209,7 @@ def search_for_url(
         SearchParameters(
             q=url,
             query_by="url",
-            sort_by="idx:asc",
+            # sort_by="idx:asc",
             exclude_fields=["embedding_description", "embedding_readme"],
             per_page=results_per_page,
             page=page,
@@ -297,4 +343,4 @@ if __name__ == "__main__":
     c2 = list_values(ts_client, CountableFieldsEnum.language)
 
     r = search_with_query(ts_client, "wind power")  # , languages="C++")
-    print(r)
+    log_info(r)

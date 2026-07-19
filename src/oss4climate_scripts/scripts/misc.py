@@ -5,7 +5,6 @@ from oss4climate.src.parsers.listings.opensustain_tech import (
     fetch_categorised_projects_from_opensustain_webpage,
 )
 from oss4climate.src.parsers.website import crawl_website
-
 from oss4climate_scripts.scripts import format_individual_file
 from oss4climate_scripts.src.config import FILE_INPUT_INDEX
 
@@ -26,7 +25,7 @@ if __name__ == "__main__":
 
         res = scrape_all_targets(tgs)
 
-        print("OK")
+        log_info("OK")
 
     ## -------------------------------------------------------------------------
     # Openmod target identification build
@@ -50,6 +49,6 @@ if __name__ == "__main__":
 
         format_individual_file(FILE_INPUT_INDEX)
 
-        print(f"{len(new_targets)} new targets scraped")
+        log_info(f"{len(new_targets)} new targets scraped")
 
-        print("Done")
+        log_info("Done")

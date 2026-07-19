@@ -2,11 +2,11 @@ from datetime import timedelta
 
 import pandas as pd
 import typesense
-import typesense.exceptions
-from sqlmodel import Session
 
 from oss4climate.src.config import SETTINGS
-from oss4climate.src.database.repos import get_engine, get_repos_for_typesense
+from oss4climate.src.database import open_database_session
+from oss4climate.src.database.repos import get_repos_for_typesense
+from oss4climate.src.log import log_info
 from oss4climate.src.parsers.listings import opensustain_tech
 from oss4climate_app.src.search.typesense_io import (
     generate_client,
@@ -14,7 +14,8 @@ from oss4climate_app.src.search.typesense_io import (
     reset_typesense_schema,
 )
 
-if __name__ == "__main__":
+
+def seed(reset: bool = False):
     client = typesense.Client(
         {
             "nodes": [SETTINGS.typesense_config],
@@ -23,18 +24,21 @@ if __name__ == "__main__":
         }
     )
 
-    print("Starting seeding of Typesense")
+    log_info("Starting seeding of Typesense")
 
     # ==============================================================================
     # Seeding the search engine
     # ==============================================================================
 
     # Load repos from database
-    with Session(get_engine()) as session:
+    with open_database_session() as session:
         repo_dicts = get_repos_for_typesense(session)
 
     # Convert to DataFrame (matching the expected schema from the old feather-based pipeline)
     df = pd.DataFrame(repo_dicts)
+    # Remove all the ones that aren't properly scraped yet (proxy = name is not available)
+    df.dropna(subset=["name"])
+    # Then check for emptiness
     if df.empty:
         raise ValueError("No data to index")
 
@@ -46,7 +50,7 @@ if __name__ == "__main__":
         cache_lifetime=timedelta(hours=6)
     )
     df["high_quality"] = df["url"].apply(lambda i: i in osst_targets)
-    print(osst_targets)
+    log_info(osst_targets)
 
     # ==============================================================================
     # Proceed with seeding
@@ -54,7 +58,14 @@ if __name__ == "__main__":
     ts_client = generate_client()
     reset_typesense_schema(ts_client)
 
-    df["idx"] = df.index.to_series().astype(int)
-    index_data_in_typesense(ts_client, df)
+    index_data_in_typesense(ts_client, df.rename(columns={"id": "idx"}))
 
-    print("DONE")
+    log_info("DONE")
+
+
+def reset_and_seed():
+    seed(reset=True)
+
+
+if __name__ == "__main__":
+    seed(reset=True)

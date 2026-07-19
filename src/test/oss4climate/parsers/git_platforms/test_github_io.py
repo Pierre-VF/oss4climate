@@ -66,5 +66,3 @@ def test_fetch_functions(github_repo_url, github_organisation_url):
 
     res_org = ghs.fetch_repositories_in_organisation(github_organisation_url)
     assert isinstance(res_org, dict)
-
-    print("ok")

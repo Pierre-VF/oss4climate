@@ -7,7 +7,7 @@ import pandas as pd
 
 def project_dataframe_loader(
     documents: pd.DataFrame | str | None, limit: int | None = None
-):
+) -> pd.DataFrame:
     """
     Load project data from DataFrame or Feather file
 

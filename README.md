@@ -107,21 +107,21 @@ Once you have completed the steps above, you can run the following commands (onl
 Typical use-cases:
 
 - To download the dataset:
-    > make download_data
+    > uv run download_data
 - To search in CLI mode (note that this is a very basic CLI):
-    > make search
+    > uv run search
 
 
 Advanced use-cases (to regenerate listings - avoid unless necessary, as this very resource intensive)
 
 - To generate an output dataset:
-    > make generate_listing
+    > uv run generate_listing
 - To add new resources:
-    > make add
+    > uv run add
 - To refresh the list of targets to be scraped:
-    > make discover
+    > uv run discover
 - To export the datasets to FTP (using the credentials from the environment):
-    > make publish
+    > uv run publish
 
 Note: the indexing is heavy and involves a series of web (and API) calls. A caching mechanism is therefore added in the implementation of the requests (with a simple SQLite database). This means that you might potentially end with a large file stored locally on your disk (currently under 500 Mb).
 

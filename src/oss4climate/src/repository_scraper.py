@@ -12,14 +12,14 @@ import json
 from datetime import timedelta
 from typing import Any
 
+import pandas as pd
 from sqlmodel import Session, select
 
-from oss4climate.src.crawler import scrape_all_targets
+from oss4climate.src.database import open_database_session
 from oss4climate.src.database.repos import (
     Repository,
     get_active_repos_to_scrape,
     get_all_active_repos,
-    get_engine,
     mark_repos_inactive,
     reset_repo_error,
     set_repo_error,
@@ -29,7 +29,7 @@ from oss4climate.src.database.repos import (
 from oss4climate.src.helpers import now, sorted_list_of_unique_elements
 from oss4climate.src.log import log_info, log_warning
 from oss4climate.src.models import EnumDocumentationFileType, ProjectDetails
-from oss4climate.src.parsers import ParsingTargets
+from oss4climate.src.parsers import ParsingTargets, RateLimitError
 from oss4climate.src.parsers.git_platforms.bitbucket_io import BitbucketScraper
 from oss4climate.src.parsers.git_platforms.codeberg_io import CodebergScraper
 from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
@@ -176,8 +176,6 @@ class RepositoryScraper:
 
         :param toml_path: Path to the TOML index file
         """
-        from oss4climate.src.parsers.git_platforms import bitbucket_io, gitlab_io
-
         log_info(f"Syncing from TOML: {toml_path}")
 
         # Load targets from TOML
@@ -187,223 +185,293 @@ class RepositoryScraper:
         active_repo_ids: set[str] = set()
         active_org_ids: set[str] = set()
 
-        with Session(get_engine()) as session:
-            # Process GitHub organisations
-            for org_url in targets.github_organisations:
-                try:
-                    scraper = GithubScraper(cache_lifetime=self.cache_lifetime)
-                    org_id = self._get_org_id(org_url)
-                    active_org_ids.add(org_id)
-
-                    # Fetch org metadata
-                    org_data = scraper.fetch_organisation_details(
-                        org_url.split("github.com/")[-1]
-                    )
-                    org_data["id"] = org_id
-                    upsert_organisation(session, org_data)
-
-                    # Discover repos
-                    repos = scraper.fetch_repositories_in_organisation(org_url)
-                    for repo_name, repo_url in repos.items():
-                        repo_id = self._get_repo_id(repo_url)
-                        active_repo_ids.add(repo_id)
-                        # Upsert repo with minimal data (full scrape happens later)
-                        upsert_repository(
-                            session,
-                            {
-                                "id": repo_id,
-                                "organisation_id": org_id,
-                                "name": repo_name,
-                                "url": repo_url,
-                            },
-                        )
-                except Exception as e:
-                    session.rollback()
-                    log_warning(f"Failed to sync GitHub org {org_url}: {e}")
-                    # Still upsert the org with error info
-                    org_id = self._get_org_id(org_url)
-                    active_org_ids.add(org_id)
-                    upsert_organisation(
-                        session,
-                        {
-                            "id": org_id,
-                            "last_error": str(e),
-                            "error_count": 1,
-                        },
-                    )
-
-            # Process GitHub explicit repos
-            for repo_url in targets.github_repositories:
-                repo_id = self._get_repo_id(repo_url)
-                active_repo_ids.add(repo_id)
-                upsert_repository(
-                    session,
-                    {
-                        "id": repo_id,
-                        "url": repo_url,
-                    },
-                )
-
-            # Process GitLab groups
-            for group_url in targets.gitlab_groups:
-                try:
-                    scraper = GitlabScraper(cache_lifetime=self.cache_lifetime)
-                    host, group_path = self._extract_host_and_path(group_url)
-                    org_id = f"{host}/{group_path.split('/')[0]}"
-                    active_org_ids.add(org_id)
-
-                    # Fetch group metadata
-                    group_data = gitlab_io.web_get(
-                        f"https://{host}/api/v4/groups/{group_path}",
-                        is_json=True,
-                        cache_lifetime=self.cache_lifetime,
-                    )
-                    group_data["id"] = org_id
-                    upsert_organisation(session, group_data)
-
-                    # Discover repos
-                    repos = scraper.fetch_repositories_in_group(group_url)
-                    for repo_name, repo_url in repos.items():
-                        repo_id = self._get_repo_id(repo_url)
-                        active_repo_ids.add(repo_id)
-                        upsert_repository(
-                            session,
-                            {
-                                "id": repo_id,
-                                "organisation_id": org_id,
-                                "name": repo_name,
-                                "url": repo_url,
-                            },
-                        )
-                except Exception as e:
-                    session.rollback()
-                    log_warning(f"Failed to sync GitLab group {group_url}: {e}")
-                    host, group_path = self._extract_host_and_path(group_url)
-                    org_id = f"{host}/{group_path.split('/')[0]}"
-                    active_org_ids.add(org_id)
-                    upsert_organisation(
-                        session,
-                        {
-                            "id": org_id,
-                            "last_error": str(e),
-                            "error_count": 1,
-                        },
-                    )
-
-            # Process GitLab explicit projects
-            for project_url in targets.gitlab_projects:
-                repo_id = self._get_repo_id(project_url)
-                active_repo_ids.add(repo_id)
-                upsert_repository(
-                    session,
-                    {
-                        "id": repo_id,
-                        "url": project_url,
-                    },
-                )
-
-            # Process Codeberg organisations
-            for org_url in targets.codeberg_organisations:
-                try:
-                    org_id = self._get_org_id(org_url)
-                    active_org_ids.add(org_id)
-                    # Codeberg scraper doesn't support org details yet, just record the org
-                    upsert_organisation(
-                        session,
-                        {
-                            "id": org_id,
-                        },
-                    )
-                except Exception as e:
-                    session.rollback()
-                    log_warning(f"Failed to sync Codeberg org {org_url}: {e}")
-
-            # Process Codeberg explicit repos
-            for repo_url in targets.codeberg_repositories:
-                repo_id = self._get_repo_id(repo_url)
-                active_repo_ids.add(repo_id)
-                upsert_repository(
-                    session,
-                    {
-                        "id": repo_id,
-                        "url": repo_url,
-                    },
-                )
-
-            # Process Bitbucket projects
-            for project_url in targets.bitbucket_projects:
-                try:
-                    scraper = BitbucketScraper(cache_lifetime=self.cache_lifetime)
-                    org_id = self._get_org_id(project_url)
-                    active_org_ids.add(org_id)
-
-                    # Fetch project/org metadata
-                    project_data = bitbucket_io.web_get(
-                        f"https://api.bitbucket.org/2.0/workspaces/{project_url.split('/')[-1]}",
-                        is_json=True,
-                        cache_lifetime=self.cache_lifetime,
-                    )
-                    project_data["id"] = org_id
-                    upsert_organisation(session, project_data)
-
-                    # Discover repos
-                    repos = scraper.fetch_repositories_in_group(project_url)
-                    for repo_name, repo_url in repos.items():
-                        repo_id = self._get_repo_id(repo_url)
-                        active_repo_ids.add(repo_id)
-                        upsert_repository(
-                            session,
-                            {
-                                "id": repo_id,
-                                "organisation_id": org_id,
-                                "name": repo_name,
-                                "url": repo_url,
-                            },
-                        )
-                except Exception as e:
-                    session.rollback()
-                    log_warning(f"Failed to sync Bitbucket project {project_url}: {e}")
-                    org_id = self._get_org_id(project_url)
-                    active_org_ids.add(org_id)
-                    upsert_organisation(
-                        session,
-                        {
-                            "id": org_id,
-                            "last_error": str(e),
-                            "error_count": 1,
-                        },
-                    )
-
-            # Process Bitbucket explicit repos
-            for repo_url in targets.bitbucket_repositories:
-                repo_id = self._get_repo_id(repo_url)
-                active_repo_ids.add(repo_id)
-                upsert_repository(
-                    session,
-                    {
-                        "id": repo_id,
-                        "url": repo_url,
-                    },
-                )
+        with open_database_session() as session:
+            # First sync Github and commit
+            self._sync_github_organisations(
+                session, targets, active_org_ids, active_repo_ids
+            )
+            self._upsert_explicit_repos(
+                session, targets.github_repositories, active_repo_ids
+            )
+            session.commit()
+            # Then Gitlab
+            self._sync_gitlab_groups(session, targets, active_org_ids, active_repo_ids)
+            self._upsert_explicit_repos(
+                session, targets.gitlab_projects, active_repo_ids
+            )
+            session.commit()
+            # Then codeberg
+            self._sync_codeberg_organisations(
+                session, targets, active_org_ids, active_repo_ids
+            )
+            self._upsert_explicit_repos(
+                session, targets.codeberg_repositories, active_repo_ids
+            )
+            session.commit()
+            # Then Bitbucket
+            self._sync_bitbucket_projects(
+                session, targets, active_org_ids, active_repo_ids
+            )
+            self._upsert_explicit_repos(
+                session, targets.bitbucket_repositories, active_repo_ids
+            )
+            session.commit()
 
             # Mark repos as inactive if they're not in the active set
             mark_repos_inactive(session, active_repo_ids)
-
             session.commit()
 
         log_info(
             f"Sync complete: {len(active_org_ids)} orgs, {len(active_repo_ids)} repos in scope"
         )
 
+    def _upsert_explicit_repos(
+        self, session: Session, urls: set[str], active_repo_ids: set[str]
+    ) -> None:
+        """Upsert a list of explicit repository URLs into the DB.
+
+        :param session: Database session (must be open)
+        :param urls: Set of repo URL strings to upsert
+        :param active_repo_ids: Mutable set tracking all active repo IDs (updated in-place)
+        """
+        for url in urls:
+            repo_id = self._get_repo_id(url)
+            active_repo_ids.add(repo_id)
+            upsert_repository(session, {"id": repo_id, "url": url})
+
+    def _sync_github_organisations(
+        self,
+        session: Session,
+        targets: ParsingTargets,
+        active_org_ids: set[str],
+        active_repo_ids: set[str],
+    ) -> None:
+        """Sync GitHub organisations and their discovered repos.
+
+        :param session: Database session (must be open)
+        :param targets: Parsed TOML targets containing github_organisations list
+        :param active_org_ids: Mutable set tracking all active org IDs (updated in-place)
+        :param active_repo_ids: Mutable set tracking all active repo IDs (updated in-place)
+        """
+        for org_url in targets.github_organisations:
+            try:
+                scraper = GithubScraper(cache_lifetime=self.cache_lifetime)
+                org_id = self._get_org_id(org_url)
+                active_org_ids.add(org_id)
+
+                # Fetch org metadata
+                org_data = scraper.fetch_organisation_details(
+                    org_url.split("github.com/")[-1]
+                )
+                org_data["id"] = org_id
+                upsert_organisation(session, org_data, update_scraped_at=True)
+
+                # Discover repos
+                for repo_name, repo_url in scraper.fetch_repositories_in_organisation(
+                    org_url
+                ).items():
+                    repo_id = self._get_repo_id(repo_url)
+                    active_repo_ids.add(repo_id)
+                    upsert_repository(
+                        session,
+                        {
+                            "id": repo_id,
+                            "organisation_id": org_id,
+                            "name": repo_name,
+                            "url": repo_url,
+                        },
+                    )
+
+                # Commit after each successful org (for interruption tolerance).
+                session.commit()
+            except Exception as e:
+                session.rollback()
+                log_warning(f"Failed to sync GitHub org {org_url}: {e}")
+                # Still upsert the org with error info
+                active_org_ids.add(self._get_org_id(org_url))
+                upsert_organisation(
+                    session,
+                    {
+                        "id": self._get_org_id(org_url),
+                        "last_error": str(e),
+                        "error_count": 1,
+                    },
+                    update_scraped_at=True,
+                )
+
+            # Commit the error record so it's persisted even on interruption.
+            session.commit()
+
+    def _sync_gitlab_groups(
+        self,
+        session: Session,
+        targets: ParsingTargets,
+        active_org_ids: set[str],
+        active_repo_ids: set[str],
+    ) -> None:
+        """Sync GitLab groups and their discovered repos.
+
+        :param session: Database session (must be open)
+        :param targets: Parsed TOML targets containing gitlab_groups list
+        :param active_org_ids: Mutable set tracking all active org IDs (updated in-place)
+        :param active_repo_ids: Mutable set tracking all active repo IDs (updated in-place)
+        """
+        from oss4climate.src.parsers.git_platforms import gitlab_io
+
+        for group_url in targets.gitlab_groups:
+            try:
+                scraper = GitlabScraper(cache_lifetime=self.cache_lifetime)
+                host, group_path = self._extract_host_and_path(group_url)
+                org_id = f"{host}/{group_path.split('/')[0]}"
+                active_org_ids.add(org_id)
+
+                # Fetch group metadata via API
+                group_data = gitlab_io.web_get(
+                    f"https://{host}/api/v4/groups/{group_path}",
+                    is_json=True,
+                    cache_lifetime=self.cache_lifetime,
+                )
+                group_data["id"] = org_id
+                upsert_organisation(session, group_data, update_scraped_at=True)
+
+                # Discover repos
+                for repo_name, repo_url in scraper.fetch_repositories_in_group(
+                    group_url
+                ).items():
+                    repo_id = self._get_repo_id(repo_url)
+                    active_repo_ids.add(repo_id)
+                    upsert_repository(
+                        session,
+                        {
+                            "id": repo_id,
+                            "organisation_id": org_id,
+                            "name": repo_name,
+                            "url": repo_url,
+                        },
+                    )
+
+                # Commit after each successful group (for interruption tolerance).
+                session.commit()
+            except Exception as e:
+                session.rollback()
+                log_warning(f"Failed to sync GitLab group {group_url}: {e}")
+                host, group_path = self._extract_host_and_path(group_url)
+                org_id = f"{host}/{group_path.split('/')[0]}"
+                active_org_ids.add(org_id)
+                upsert_organisation(
+                    session,
+                    {"id": org_id, "last_error": str(e), "error_count": 1},
+                    update_scraped_at=True,
+                )
+
+            # Commit the error record so it's persisted even on interruption.
+            session.commit()
+
+    def _sync_codeberg_organisations(
+        self,
+        session: Session,
+        targets: ParsingTargets,
+        active_org_ids: set[str],
+        active_repo_ids: set[str],
+    ) -> None:
+        """Sync Codeberg organisations (org records only; no detailed scraping yet).
+
+        :param session: Database session (must be open)
+        :param targets: Parsed TOML targets containing codeberg_organisations list
+        :param active_org_ids: Mutable set tracking all active org IDs (updated in-place)
+        :param active_repo_ids: Mutable set tracking all active repo IDs (not modified here)
+        """
+        for org_url in targets.codeberg_organisations:
+            try:
+                org_id = self._get_org_id(org_url)
+                active_org_ids.add(org_id)
+                upsert_organisation(session, {"id": org_id}, update_scraped_at=True)
+
+                # Commit after each successful org (for interruption tolerance).
+                session.commit()
+            except Exception as e:
+                session.rollback()
+                log_warning(f"Failed to sync Codeberg org {org_url}: {e}")
+
+    def _sync_bitbucket_projects(
+        self,
+        session: Session,
+        targets: ParsingTargets,
+        active_org_ids: set[str],
+        active_repo_ids: set[str],
+    ) -> None:
+        """Sync Bitbucket projects and their discovered repos.
+
+        :param session: Database session (must be open)
+        :param targets: Parsed TOML targets containing bitbucket_projects list
+        :param active_org_ids: Mutable set tracking all active org IDs (updated in-place)
+        :param active_repo_ids: Mutable set tracking all active repo IDs (updated in-place)
+        """
+        from oss4climate.src.parsers.git_platforms import bitbucket_io
+
+        for project_url in targets.bitbucket_projects:
+            try:
+                scraper = BitbucketScraper(cache_lifetime=self.cache_lifetime)
+                org_id = self._get_org_id(project_url)
+                active_org_ids.add(org_id)
+
+                # Fetch project/org metadata via API
+                project_data = bitbucket_io.web_get(
+                    f"https://api.bitbucket.org/2.0/workspaces/{project_url.split('/')[-1]}",
+                    is_json=True,
+                    cache_lifetime=self.cache_lifetime,
+                )
+                project_data["id"] = org_id
+                upsert_organisation(session, project_data, update_scraped_at=True)
+
+                # Discover repos
+                for repo_name, repo_url in scraper.fetch_repositories_in_group(
+                    project_url
+                ).items():
+                    repo_id = self._get_repo_id(repo_url)
+                    active_repo_ids.add(repo_id)
+                    upsert_repository(
+                        session,
+                        {
+                            "id": repo_id,
+                            "organisation_id": org_id,
+                            "name": repo_name,
+                            "url": repo_url,
+                        },
+                    )
+
+                # Commit after each successful project (for interruption tolerance).
+                session.commit()
+            except Exception as e:
+                session.rollback()
+                log_warning(f"Failed to sync Bitbucket project {project_url}: {e}")
+                active_org_ids.add(self._get_org_id(project_url))
+                upsert_organisation(
+                    session,
+                    {
+                        "id": self._get_org_id(project_url),
+                        "last_error": str(e),
+                        "error_count": 1,
+                    },
+                    update_scraped_at=True,
+                )
+
+            # Commit the error record so it's persisted even on interruption.
+            session.commit()
+
     def scrape_active_repos(self) -> dict[str, str]:
         """
         Scrape all active repositories that are past their refresh threshold.
+
+        Processes repos one at a time per platform with immediate DB commits for
+        interruption tolerance. Rate limit errors on one provider do not block
+        other providers from continuing.
 
         :return: Dictionary of errors keyed by repo ID
         """
         log_info(f"Scraping active repos (refresh threshold: {self.refresh_days} days)")
 
-        with Session(get_engine()) as session:
+        with open_database_session() as session:
             repos_to_scrape = get_active_repos_to_scrape(session, self.refresh_days)
 
         if not repos_to_scrape:
@@ -412,70 +480,143 @@ class RepositoryScraper:
 
         log_info(f"{len(repos_to_scrape)} repos need scraping")
 
-        # Build a ParsingTargets from the repos to scrape
-        targets = ParsingTargets()
-        repo_map: dict[str, Repository] = {}
+        # Group repo IDs by platform for per-provider streaming.
+        github_ids: list[str] = []
+        gitlab_entries: list[tuple[str, str]] = []  # (url, repo_id) pairs
+        codeberg_ids: list[str] = []
+        bitbucket_ids: list[str] = []
 
         for repo in repos_to_scrape:
-            repo_map[repo.id] = repo
-            # Parse the repo ID to determine platform and add to targets
-            repo_id = repo.id
-            if repo_id.startswith("github.com/"):
-                targets.github_repositories.add(repo_id)
-            elif repo_id.startswith("gitlab.com/") or repo_id.startswith("git."):
-                # For GitLab, we need the full path
-                if repo.url:
-                    targets.gitlab_projects.add(repo.url)
-            elif repo_id.startswith("codeberg.org/"):
-                targets.codeberg_repositories.add(repo_id)
-            elif repo_id.startswith("bitbucket.org/"):
-                targets.bitbucket_repositories.add(repo_id)
+            if repo.id.startswith("github.com/"):
+                github_ids.append(repo.id)
+            elif repo.id.startswith("gitlab.com/") or repo.id.startswith("git."):
+                url_str = str(repo.url)  # type: ignore[arg-type]
+                gitlab_entries.append((url_str, repo.id))
+            elif repo.id.startswith("codeberg.org/"):
+                codeberg_ids.append(repo.id)
+            elif repo.id.startswith("bitbucket.org/"):
+                bitbucket_ids.append(repo.id)
 
-        # Use the existing scrape_all_targets for the actual scraping
-        # This reuses all the caching, rate limiting, and platform dispatch logic
-        scrape_result = scrape_all_targets(
-            targets=targets,
-            fail_on_issue=False,
-            cache_lifetime=self.cache_lifetime,
+        log_info(
+            f"{len(repos_to_scrape)} repos need scraping "
+            f"(GitHub: {len(github_ids)}, GitLab: {len(gitlab_entries)}, "
+            f"Codeberg: {len(codeberg_ids)}, Bitbucket: {len(bitbucket_ids)})"
         )
 
-        # Sync results back to the DB
         errors: dict[str, str] = {}
-        with Session(get_engine()) as session:
-            for repo_id, repo in repo_map.items():
-                # Check if this repo was in the scrape results
-                if repo_id in scrape_result.errors:
-                    error_msg = str(scrape_result.errors[repo_id])
-                    set_repo_error(session, repo_id, error_msg)
-                    errors[repo_id] = error_msg
-                    continue
 
-                # Find the corresponding ProjectDetails in the results
-                project_details = None
-                for detail in scrape_result.results_as_df.itertuples():
-                    if hasattr(detail, "id") and detail.id == repo_id:
-                        project_details = detail
-                        break
+        # GitHub — per-repo streaming with rate limit break-out.
+        for repo_id in github_ids:
+            try:
+                scraper = GithubScraper(cache_lifetime=self.cache_lifetime)
+                project_details = scraper.fetch_project_details(
+                    repo_id, fail_on_issue=False
+                )
+            except RateLimitError as e:
+                log_warning("GitHub rate limit hit — skipping remaining GitHub repos")
+                for rid in github_ids[github_ids.index(repo_id) :]:  # type: ignore[arg-type]
+                    errors[rid] = f"github.com/RateLimitError: {e}"
+                break
+            except Exception as e:
+                with open_database_session() as session:
+                    set_repo_error(session, repo_id, str(e))
+                    session.commit()
+                errors[repo_id] = str(e)
+                continue
 
-                if project_details is None:
-                    # Repo was skipped (e.g., .github repo)
-                    continue
-
-                # Convert ProjectDetails to dict for upsert
+            try:
                 repo_data = self._project_details_to_dict(project_details)
                 repo_data["id"] = repo_id
                 repo_data["last_scraped_at"] = self._now()
                 repo_data["active"] = True
+                with open_database_session() as session:
+                    reset_repo_error(session, repo_id)
+                    upsert_repository(session, repo_data)
+                    log_info(f" > Committed repository to the database ({repo_id})")
+                    session.commit()
+            except Exception as e:
+                log_warning(
+                    f" > Failed to commit repository to the database ({repo_id}) : {e}"
+                )
+                errors[repo_id] = str(e)
 
-                # Reset error tracking on success
-                reset_repo_error(session, repo_id)
+        # GitLab — per-repo streaming. Rate limit on other providers does not affect this bucket.
+        for url, repo_id in gitlab_entries:
+            try:
+                scraper = GitlabScraper(cache_lifetime=self.cache_lifetime)
+                project_details = scraper.fetch_project_details(
+                    url, fail_on_issue=False
+                )
+            except Exception as e:
+                with open_database_session() as session:
+                    set_repo_error(session, repo_id, str(e))
+                    session.commit()
+                errors[repo_id] = str(e)
+                continue
 
-                upsert_repository(session, repo_data)
+            try:
+                repo_data = self._project_details_to_dict(project_details)
+                repo_data["id"] = repo_id
+                with open_database_session() as session:
+                    reset_repo_error(session, repo_id)
+                    upsert_repository(session, repo_data)
+                    session.commit()
+            except Exception as e:
+                errors[repo_id] = str(e)
 
-            session.commit()
+        for codeberg_id in codeberg_ids:
+            try:
+                scraper = CodebergScraper(cache_lifetime=self.cache_lifetime)
+                project_details = scraper.fetch_project_details(
+                    codeberg_id, fail_on_issue=False
+                )
+            except Exception as e:
+                with open_database_session() as session:
+                    set_repo_error(session, codeberg_id, str(e))
+                    session.commit()
+                errors[codeberg_id] = str(e)
+                continue
+
+            try:
+                repo_data = self._project_details_to_dict(project_details)
+                repo_data["id"] = codeberg_id
+                repo_data["last_scraped_at"] = self._now()
+                repo_data["active"] = True
+                with open_database_session() as session:
+                    reset_repo_error(session, codeberg_id)
+                    upsert_repository(session, repo_data)
+                    session.commit()
+            except Exception as e:
+                errors[codeberg_id] = str(e)
+
+        for bitbucket_id in bitbucket_ids:
+            try:
+                scraper = BitbucketScraper(cache_lifetime=self.cache_lifetime)
+                project_details = scraper.fetch_project_details(
+                    bitbucket_id, fail_on_issue=False
+                )
+            except Exception as e:
+                with open_database_session() as session:
+                    set_repo_error(session, bitbucket_id, str(e))
+                    session.commit()
+                errors[bitbucket_id] = str(e)
+                continue
+
+            try:
+                repo_data = self._project_details_to_dict(project_details)
+                repo_data["id"] = bitbucket_id
+                repo_data["last_scraped_at"] = self._now()
+                repo_data["active"] = True
+                with open_database_session() as session:
+                    reset_repo_error(session, bitbucket_id)
+                    upsert_repository(session, repo_data)
+                    session.commit()
+            except Exception as e:
+                errors[bitbucket_id] = str(e)
 
         log_info(
-            f"Scraping complete: {len(repos_to_scrape) - len(errors)} succeeded, {len(errors)} failed"
+            f"Scraping complete: {len(repos_to_scrape) - len(errors)} succeeded, "
+            f"{len(errors)} failed"
         )
         return errors
 
@@ -545,9 +686,8 @@ class RepositoryScraper:
 
         :param output_path: Path to the output feather file
         """
-        import pandas as pd
 
-        with Session(get_engine()) as session:
+        with open_database_session() as session:
             repos = get_all_active_repos(session)
 
         if not repos:
@@ -559,7 +699,7 @@ class RepositoryScraper:
             record = {
                 "id": repo.id,
                 "name": repo.name,
-                "organisation_id": None,  # Would need to join with organisations table
+                "organisation_id": repo.organisation_id,
                 "url": repo.url,
                 "website": repo.website,
                 "description": repo.description,
@@ -605,7 +745,7 @@ class RepositoryScraper:
         """
         from tomlkit import document, dump
 
-        with Session(get_engine()) as session:
+        with open_database_session() as session:
             repos = get_all_active_repos(session)
 
         if not repos:
@@ -656,7 +796,7 @@ class RepositoryScraper:
         """
         from tomlkit import document, dump
 
-        with Session(get_engine()) as session:
+        with open_database_session() as session:
             repos = session.exec(
                 select(Repository).where(
                     Repository.active == True,  # noqa: E712

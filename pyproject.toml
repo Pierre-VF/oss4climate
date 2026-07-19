@@ -1,6 +1,6 @@
 [project]
 name = "oss4climate"
-version = "0.10.0"
+version = "0.11.0"
 readme = "README.md"
 description = "Package to create listings of Open Source for Energy"
 authors = [
@@ -37,7 +37,6 @@ packages = [
     "src/oss4climate",
     "src/oss4climate_scripts",
     "src/oss4climate_app",
-    "src/oss4climate_mcp",
 ]
 
 [build-system]
@@ -48,7 +47,6 @@ build-backend = "hatchling.build"
 scripts = [
     "black>=26.3.1",
     "ruff>=0.15.15",
-    "typer>=0.25.1",
 ]
 test = [
     "pytest>=9.0.3",
@@ -71,3 +69,14 @@ mcp = [
     # Security only:
     "anthropic>=0.105.2"
 ]
+
+# scripts
+[project.scripts]
+add = "oss4climate_scripts.cli:add"
+discover = "oss4climate_scripts.cli:discover"
+# download_data = "oss4climate_scripts.cli:download_data"
+format = "oss4climate_scripts.cli:format"
+generate_listing = "oss4climate_scripts.cli:generate_listing"
+publish = "oss4climate_scripts.cli:publish"
+seed_typesense = "oss4climate_app.seed_typesense:seed"
+reset_typesense = "oss4climate_app.seed_typesense:reset_and_seed"

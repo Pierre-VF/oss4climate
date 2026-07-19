@@ -10,10 +10,8 @@ from datetime import date, datetime, timedelta
 from typing import Any
 
 from pydantic import model_validator
-from sqlalchemy import Engine
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Field, Session, SQLModel, select
 
-from oss4climate.src.config import SETTINGS
 from oss4climate.src.helpers import now
 from oss4climate.src.log import log_info
 
@@ -103,47 +101,23 @@ class Repository(SQLModel, table=True):
 
 
 # -------------------------------------------------------------------------------------
-# Engine
-# -------------------------------------------------------------------------------------
-
-
-def _open_engine_and_create_database_if_missing():
-    """
-    Open a connection to the repository database and create tables if missing.
-
-    :return: SQLAlchemy engine for the repository database
-    """
-    x = create_engine(
-        SETTINGS.REPOS_DATABASE_URL,
-        echo=False,
-    )
-    SQLModel.metadata.create_all(x)
-    return x
-
-
-_ENGINE = _open_engine_and_create_database_if_missing()
-
-
-# -------------------------------------------------------------------------------------
 # Helper functions
 # -------------------------------------------------------------------------------------
 
 
-def get_engine() -> Engine:
-    """
-    Get the database engine.
-
-    :return: SQLAlchemy engine
-    """
-    return _ENGINE
-
-
-def upsert_organisation(session: Session, org_data: dict) -> Organisation:
+def upsert_organisation(
+    session: Session,
+    org_data: dict,
+    commit: bool = False,
+    update_scraped_at: bool = False,
+) -> Organisation:
     """
     Upsert an organisation into the database.
 
     :param session: Database session
     :param org_data: Dictionary of organisation fields (id, name, description, etc.)
+    :param commit: bool, where True means commit the session (Default is False)
+    :param update_scraped_at: bool, where True means update the scraped_at field to now time (Default is False)
     :return: The upserted Organisation object
     """
     org_id = org_data.get("id")
@@ -154,6 +128,9 @@ def upsert_organisation(session: Session, org_data: dict) -> Organisation:
         select(Organisation).where(Organisation.id == org_id)
     ).first()
 
+    if update_scraped_at:
+        org_data["last_scraped_at"] = now()
+
     if existing is None:
         org = Organisation.model_validate(org_data)
         session.add(org)
@@ -162,17 +139,22 @@ def upsert_organisation(session: Session, org_data: dict) -> Organisation:
         for key, value in org_data.items():
             if hasattr(existing, key) and value is not None:
                 setattr(existing, key, getattr(new_org, key))
-
-    session.commit()
+    if commit:
+        session.commit()
     return existing if existing else org
 
 
-def upsert_repository(session: Session, repo_data: dict) -> Repository:
+def upsert_repository(
+    session: Session,
+    repo_data: dict,
+    commit: bool = False,
+) -> Repository:
     """
     Upsert a repository into the database.
 
     :param session: Database session
     :param repo_data: Dictionary of repository fields (id, name, url, etc.)
+    :param commit: bool, where True means commit the session (Default is False)
     :return: The upserted Repository object
     """
     repo_id = repo_data.get("id")
@@ -189,8 +171,10 @@ def upsert_repository(session: Session, repo_data: dict) -> Repository:
         for key, value in repo_data.items():
             if hasattr(existing, key) and value is not None:
                 setattr(existing, key, getattr(new_repo, key))
+        session.add(existing)
 
-    session.commit()
+    if commit:
+        session.commit()
     return existing if existing else repo
 
 

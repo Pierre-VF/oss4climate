@@ -21,10 +21,16 @@ from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
 
 @dataclass
+class ErrorResult:
+    error_type: str
+    exception: Exception
+
+
+@dataclass
 class ScrapeResult:
     targets: ParsingTargets
     results_as_df: pd.DataFrame
-    errors: dict
+    errors: dict[str, ErrorResult]
     failing_organisations: list[str]
     failing_repositories: list[str]
 
@@ -71,7 +77,9 @@ def scrape_all_targets(
             x = github_s.fetch_repositories_in_organisation(org_url)
             targets.github_repositories.update(x.values())
         except Exception as e:
-            scrape_failures["GITHUB_ORGANISATION:" + org_url] = e
+            scrape_failures[org_url] = ErrorResult(
+                error_type="GITHUB_ORGANISATION", exception=e
+            )
             log_warning(f" > Error with organisation ({e})")
             bad_organisations.append(org_url)
 
@@ -89,7 +97,9 @@ def scrape_all_targets(
             x = gitlab_s.fetch_repositories_in_group(org_url)
             targets.gitlab_projects.update(x.values())
         except Exception as e:
-            scrape_failures["GITLAB_GROUP:" + org_url] = e
+            scrape_failures[org_url] = ErrorResult(
+                error_type="GITLAB_GROUP", exception=e
+            )
             log_warning(f" > Error with organisation ({e})")
             bad_organisations.append(org_url)
 
@@ -107,7 +117,9 @@ def scrape_all_targets(
             x = bitbucket_s.fetch_repositories_in_group(org_url)
             targets.bitbucket_repositories.update(x.values())
         except Exception as e:
-            scrape_failures["BITBUCKET_ORGANISATION:" + org_url] = e
+            scrape_failures[org_url] = ErrorResult(
+                error_type="BITBUCKET_ORGANISATION", exception=e
+            )
             log_warning(f" > Error with organisation ({e})")
             bad_organisations.append(org_url)
 
@@ -125,7 +137,9 @@ def scrape_all_targets(
             x = codeberg_s.fetch_repositories_in_group(org_url)
             targets.codeberg_repositories.update(x.values())
         except Exception as e:
-            scrape_failures["CODEBERG_GROUP:" + org_url] = e
+            scrape_failures[org_url] = ErrorResult(
+                error_type="CODEBERG_GROUP", exception=e
+            )
             log_warning(f" > Error with organisation ({e})")
             bad_organisations.append(org_url)
 
@@ -138,7 +152,7 @@ def scrape_all_targets(
                 gitlab_s.fetch_project_details(i, fail_on_issue=fail_on_issue)
             )
         except Exception as e:
-            scrape_failures["GITLAB_PROJECT:" + i] = e
+            scrape_failures[i] = ErrorResult(error_type="GITLAB_PROJECT", exception=e)
             log_warning(f" > Error with repo ({e})")
             bad_repositories.append(i)
 
@@ -161,11 +175,11 @@ def scrape_all_targets(
                             f"Github rate limiting hit ({forbidden_for_api_limit_counter} errors with 403 status)"
                         )
 
-                scrape_failures["GITHUB_REPO:" + i] = e
+                scrape_failures[i] = ErrorResult(error_type="GITHUB_REPO", exception=e)
                 log_warning(f" > Error with repo ({e})")
                 bad_repositories.append(i)
     except RateLimitError as e:
-        scrape_failures["SCRAPING"] = e
+        scrape_failures["SCRAPING"] = ErrorResult(error_type="SCRAPING", exception=e)
         log_warning("Rate limit hit for Github - STOPPING Github scraping")
 
     log_info("Fetching data for all repositories in Bitbucket")
@@ -175,7 +189,9 @@ def scrape_all_targets(
                 bitbucket_s.fetch_project_details(i, fail_on_issue=fail_on_issue)
             )
         except Exception as e:
-            scrape_failures["BITBUCKET_REPOSITORY:" + i] = e
+            scrape_failures[i] = ErrorResult(
+                error_type="BITBUCKET_REPOSITORY", exception=e
+            )
             log_warning(f" > Error with repo ({e})")
             bad_repositories.append(i)
 
@@ -186,7 +202,9 @@ def scrape_all_targets(
                 codeberg_s.fetch_project_details(i, fail_on_issue=fail_on_issue)
             )
         except Exception as e:
-            scrape_failures["CODEBERG_REPOSITORY:" + i] = e
+            scrape_failures[i] = ErrorResult(
+                error_type="CODEBERG_REPOSITORY", exception=e
+            )
             log_warning(f" > Error with repo ({e})")
             bad_repositories.append(i)
 

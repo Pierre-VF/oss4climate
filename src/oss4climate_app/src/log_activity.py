@@ -7,11 +7,14 @@ from typing import Optional
 
 from fastapi import Request
 
-from oss4climate_app.src.database import RequestLog, SearchLog, open_database_session
+from oss4climate.src.database import open_database_session
+from oss4climate_app.src.database import RequestLog, SearchLog
 
 
 def log_search(
-    search_term: str | None, number_of_results: int, view_offset: int | None = None
+    search_term: str | None,
+    number_of_results: int,
+    view_offset: int | None = None,
 ) -> None:
     with open_database_session() as session:
         session.add(
