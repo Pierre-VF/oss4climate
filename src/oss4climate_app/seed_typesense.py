@@ -2,7 +2,6 @@ from datetime import timedelta
 
 import pandas as pd
 import typesense
-import typesense.exceptions
 from sqlmodel import Session
 
 from oss4climate.src.config import SETTINGS
@@ -16,7 +15,7 @@ from oss4climate_app.src.search.typesense_io import (
 )
 
 
-def seed():
+def seed(reset: bool = False):
     client = typesense.Client(
         {
             "nodes": [SETTINGS.typesense_config],
@@ -64,5 +63,9 @@ def seed():
     log_info("DONE")
 
 
+def reset_and_seed():
+    seed(reset=True)
+
+
 if __name__ == "__main__":
-    seed()
+    seed(reset=True)
