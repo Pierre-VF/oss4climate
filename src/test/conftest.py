@@ -7,6 +7,7 @@ from oss4climate.src.database.repos import (
     get_engine,
     upsert_repository,
 )
+from oss4climate.src.helpers import now
 
 
 # Test data path
@@ -82,6 +83,9 @@ def filled_database_engine():
                 "organisation_id": "github.com/Pierre-VF",
                 "name": "oss4climate",
                 "url": "https://github.com/Pierre-VF/oss4climate",
+                "description": "A dummy repo for tests",
+                "readme": "# Title",
+                "last_scraped_at": now(),
             },
         )
         session.commit()

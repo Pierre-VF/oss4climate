@@ -89,3 +89,8 @@ def get_key_of_maximum_value(x: dict[Any, float | int]) -> Any:
             max_value = v
             max_key = k
     return max_key
+
+
+def split_list_in_list_of_batches(x: list, batch_size: int):
+    for i in range(0, len(x), batch_size):
+        yield x[i : i + batch_size]

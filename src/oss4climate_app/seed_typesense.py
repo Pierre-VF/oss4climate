@@ -37,6 +37,9 @@ def seed():
 
     # Convert to DataFrame (matching the expected schema from the old feather-based pipeline)
     df = pd.DataFrame(repo_dicts)
+    # Remove all the ones that aren't properly scraped yet (proxy = name is not available)
+    df.dropna(subset=["name"])
+    # Then check for emptiness
     if df.empty:
         raise ValueError("No data to index")
 
@@ -56,8 +59,7 @@ def seed():
     ts_client = generate_client()
     reset_typesense_schema(ts_client)
 
-    df["idx"] = df.index.to_series().astype(int)
-    index_data_in_typesense(ts_client, df)
+    index_data_in_typesense(ts_client, df.rename(columns={"id": "idx"}))
 
     log_info("DONE")
 

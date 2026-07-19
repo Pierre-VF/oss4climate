@@ -37,6 +37,6 @@ def initialised_typesense_client(filled_database_engine, csv_data_for_seeding):
     df_db = pd.read_sql(
         f"SELECT * FROM {Repository.__tablename__}", filled_database_engine
     )
-    index_data_in_typesense(client, df_db)
+    index_data_in_typesense(client, df_db.rename(columns={"id": "idx"}))
 
     return client
