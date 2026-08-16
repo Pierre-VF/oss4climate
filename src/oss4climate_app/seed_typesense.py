@@ -58,7 +58,7 @@ def seed(reset: bool = False):
     ts_client = generate_client()
     reset_typesense_schema(ts_client)
 
-    index_data_in_typesense(ts_client, df.rename(columns={"id": "idx"}))
+    index_data_in_typesense(ts_client, df.rename(columns={"id": "idx"}), batch_size=2)
 
     log_info("DONE")
 
@@ -68,4 +68,11 @@ def reset_and_seed():
 
 
 if __name__ == "__main__":
-    seed(reset=True)
+    yes_to_reset = input("Do you want to resetn typesense? [yes/no]")
+    reset_all = yes_to_reset == "yes"
+    if reset_all:
+        print("Typesense will be RESET")
+    else:
+        print("Typesense will NOT be reset")
+
+    seed(reset=reset_all)
