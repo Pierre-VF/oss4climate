@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from enum import Enum
 
+import httpx
 import numpy as np
 import pandas as pd
 import typesense
@@ -12,7 +13,7 @@ from typesense.types.document import (
 
 from oss4climate.src.config import SETTINGS
 from oss4climate.src.helpers import split_list_in_list_of_batches
-from oss4climate.src.log import log_info
+from oss4climate.src.log import log_info, log_warning
 
 _TYPESENSE_EMBEDDING_MODEL = "ts/all-MiniLM-L12-v2"
 
@@ -181,13 +182,24 @@ def index_data_in_typesense(
         for __, r in df.iterrows()
     ]
     full_res = []
+    n_retries = 3
     for b in split_list_in_list_of_batches(docs, batch_size=batch_size):
-        res = ts_client.collections["projects"].documents.import_(b)
-        if all([not i.get("success") for i in res]):
-            raise ValueError(
-                f"Failed to index data in Typesense : issue example {res[0]}"
-            )
-        full_res += res
+        for attempt_i in range(n_retries):  # Supporting 3 retries in case of timeout
+            try:
+                res = ts_client.collections["projects"].documents.import_(b)
+                if all([not i.get("success") for i in res]):
+                    raise ValueError(
+                        f"Failed to index data in Typesense : issue example {res[0]}"
+                    )
+                full_res += res
+                break
+            except httpx.ReadTimeout as e:
+                n_i = attempt_i + 1
+                log_warning(
+                    f"Timeout on indexing - trying again (attempt {attempt_i + 1})"
+                )
+                if n_i >= n_retries:
+                    raise RuntimeError("Too many timeouts") from e
 
     log_info(
         f"Indexed {len([i for i in full_res if i.get('success')])} documents and failed on {len([i for i in full_res if not i.get('success')])}"
