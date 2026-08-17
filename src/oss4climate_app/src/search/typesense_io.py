@@ -173,6 +173,8 @@ def index_data_in_typesense(
 
     # Only focus on repos that have data scraped
     df = df[df["name"].apply(lambda x: isinstance(x, str) and len(x) > 0)]
+    df = df[df["last_commit_timestamp"].apply(lambda x: x > 0)]
+    log_info(f"Found {len(df)} points to index")
 
     docs = [
         _to_native_python({k: r.get(k) for k in _TYPESENSE_REPO_SCHEMA_FIELDS})
