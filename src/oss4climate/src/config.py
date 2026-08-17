@@ -5,6 +5,7 @@ from urllib.parse import urlsplit
 
 import pydantic_settings
 from dotenv import load_dotenv
+from sqlalchemy.engine import URL
 
 
 class Settings(pydantic_settings.BaseSettings):
@@ -95,7 +96,7 @@ class Settings(pydantic_settings.BaseSettings):
         return f"{self.LOCAL_FOLDER}/{self.SCRAPING_SQLITE_DB}"
 
     @property
-    def database_connection_string(self) -> str:
+    def database_connection_string(self) -> str | URL:
         """
         Get the full database connection string
 
@@ -108,8 +109,16 @@ class Settings(pydantic_settings.BaseSettings):
             self.DATABASE_PORT,
             self.DATABASE_NAME,
         }:
+            out = URL.create(
+                drivername="postgresql",
+                username=self.DATABASE_USERNAME,
+                password=self.DATABASE_PASSWORD,
+                host=self.DATABASE_HOST,
+                port=self.DATABASE_PORT,
+                database=self.DATABASE_NAME,
+            )
             # Postgres case
-            out = f"postgresql+psycopg2://{self.DATABASE_USERNAME}:{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
+            # out = f"://{}:{quote()}@{}:{}/{}"
         else:
             # Sqlite case
             out = f"{self.LOCAL_FOLDER}/{self.DATABASE_HOST}"

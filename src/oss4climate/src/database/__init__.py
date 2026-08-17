@@ -36,4 +36,4 @@ def get_engine() -> Engine:
 
 
 def open_database_session() -> Session:
-    return Session(_ENGINE)
+    return Session(get_engine())
