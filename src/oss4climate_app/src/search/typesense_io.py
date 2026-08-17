@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from enum import Enum
 
+import numpy as np
 import pandas as pd
 import typesense
 import typesense.exceptions
@@ -132,6 +133,24 @@ def _boolean_fix(x):
     return None
 
 
+def _to_native_python(obj) -> object:
+    """Recursively convert pandas/numpy NA and NaN to Python None."""
+
+    def _convert(v):
+        if pd.isna(v):
+            return None
+        if isinstance(v, (np.floating, np.integer)):
+            return int(v) if isinstance(v, np.integer) else float(v)
+        return v
+
+    if isinstance(obj, dict):
+        return {k: _convert(v) for k, v in obj.items()}
+    if isinstance(obj, list | tuple):
+        converted = [_convert(item) for item in obj]
+        return type(obj)(converted)  # preserve tuple type
+    return _convert(obj)
+
+
 def index_data_in_typesense(
     ts_client: typesense.Client,
     df: pd.DataFrame,
@@ -150,10 +169,11 @@ def index_data_in_typesense(
     df = df.dropna(
         subset=subset,
         how="all",
-    ).fillna(value=None)
+    )
 
     docs = [
-        {k: r.get(k) for k in _TYPESENSE_REPO_SCHEMA_FIELDS} for __, r in df.iterrows()
+        _to_native_python({k: r.get(k) for k in _TYPESENSE_REPO_SCHEMA_FIELDS})
+        for __, r in df.iterrows()
     ]
     full_res = []
     for b in split_list_in_list_of_batches(docs, batch_size=batch_size):
