@@ -59,7 +59,12 @@ def seed(reset: bool = False):
     if reset:
         reset_typesense_schema(ts_client)
 
-    index_data_in_typesense(ts_client, df.rename(columns={"id": "idx"}), batch_size=2)
+    index_data_in_typesense(
+        ts_client,
+        df.rename(columns={"id": "idx"}),
+        batch_size=3,
+        tolerate_timeouts=True,
+    )
 
     log_info("DONE")
 

@@ -156,6 +156,7 @@ def index_data_in_typesense(
     ts_client: typesense.Client,
     df: pd.DataFrame,
     batch_size: int = 10,
+    tolerate_timeouts: bool = False,
 ) -> None:
     if "high_quality" not in df.columns:
         df["high_quality"] = True
@@ -183,6 +184,7 @@ def index_data_in_typesense(
     ]
     full_res = []
     n_retries = 3
+    n_fails = 0
     for b in split_list_in_list_of_batches(docs, batch_size=batch_size):
         for attempt_i in range(n_retries):  # Supporting 3 retries in case of timeout
             try:
@@ -199,10 +201,14 @@ def index_data_in_typesense(
                     f"Timeout on indexing - trying again (attempt {attempt_i + 1})"
                 )
                 if n_i >= n_retries:
-                    raise RuntimeError("Too many timeouts") from e
+                    if tolerate_timeouts:
+                        n_fails += batch_size
+                        break
+                    else:
+                        raise RuntimeError("Too many timeouts") from e
 
     log_info(
-        f"Indexed {len([i for i in full_res if i.get('success')])} documents and failed on {len([i for i in full_res if not i.get('success')])}"
+        f"Indexed {len([i for i in full_res if i.get('success')])} documents and failed on {n_fails + len([i for i in full_res if not i.get('success')])}"
     )
 
 
