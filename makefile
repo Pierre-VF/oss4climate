@@ -10,6 +10,12 @@ install:
 build:
 	uv lock
 
+
+.PHONY: cleanup
+cleanup:
+	# Convenience alias
+	make code_cleanup
+
 .PHONY: code_cleanup
 code_cleanup:
 	uv tool run pre-commit install
