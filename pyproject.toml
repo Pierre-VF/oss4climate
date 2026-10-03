@@ -1,6 +1,6 @@
 [project]
 name = "oss4climate"
-version = "0.11.3"
+version = "0.11.4"
 readme = "README.md"
 description = "Package to create listings of Open Source for Energy"
 authors = [
@@ -28,10 +28,12 @@ dependencies = [
     "cryptography>=50.0.1",
     "authlib>=1.7.1",
     "python-multipart>=0.0.31",
-    "psycopg2-binary>=2.9.12",
-    "urllib3>=2.7.0",
+    "psycopg2-binary>=2.9.13",
+    "urllib3>=2.8.0",
     "idna>=3.19",
-    "pyjwt>=2.13.0",
+    "pyjwt>=2.15.1",
+    "anyio>=4.14.2",
+    "soupsieve>=2.9",
 ]
 packages = [
     "src/oss4climate",
