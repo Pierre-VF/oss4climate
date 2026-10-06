@@ -33,6 +33,7 @@ repositories = [
     "https://codeberg.org/dancingCycle/dede-server",
     "https://codeberg.org/dancingCycle/gtfs-display",
     "https://codeberg.org/dancingCycle/gtfs-rt-display",
+    "https://codeberg.org/valueflows/valueflows",
 ]
 
 [dropped_targets]
@@ -190,6 +191,7 @@ organisations = [
     "https://github.com/alliander-opensource/",
     "https://github.com/antagomir",
     "https://github.com/battery-data-alliance",
+    "https://github.com/bonfire-networks",
     "https://github.com/brycejohnston",
     "https://github.com/carbon-data-specification",
     "https://github.com/com-pas/",
@@ -3189,6 +3191,7 @@ repositories = [
     "https://github.com/marlonecobos/kuenm2",
     "https://github.com/marmelab/argos",
     "https://github.com/marmelab/greenframe-cli",
+    "https://github.com/marola-dev/marola",
     "https://github.com/marq24/ha-evcc",
     "https://github.com/martibosch/detectree",
     "https://github.com/martibosch/pylandstats",
