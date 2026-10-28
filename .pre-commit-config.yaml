@@ -27,3 +27,12 @@ repos:
     - id: check-yaml
     - id: end-of-file-fixer
     - id: check-merge-conflict
+  # Fix the non-breaking spaces issues
+- repo: local
+  hooks:
+    - id: replace-nbsp
+      name: Replace non-breaking spaces
+      entry: dev/precommits/non_breaking_char_cleanup.py
+      language: script
+      types: [text]
+      files: \.(md|txt|html|css|js|py|json|yaml|yml)$
