@@ -102,7 +102,9 @@ The default refresh interval is **28 days**. Repositories are re-scraped if:
 Override with the constructor parameters:
 
 ```python
-scraper = RepositoryScraper(refresh_days=7, cache_lifetime=None)  # Re-scrape every 7 days; use default TTL for API caching
+scraper = RepositoryScraper(
+    refresh_days=7, cache_lifetime=None
+)  # Re-scrape every 7 days; use default TTL for API caching
 ```
 
 | Parameter | Default | Description |
@@ -186,8 +188,8 @@ from oss4climate_scripts.scripts.repository_scraping import scrape_all
 
 scrape_all(
     target_output_file=None,  # defaults to FILE_OUTPUT_LISTING_FEATHER from app config
-    fail_on_issue=False,      # if True, raises on scraping failures
-    refresh_days=28,          # days between re-scrapes
+    fail_on_issue=False,  # if True, raises on scraping failures
+    refresh_days=28,  # days between re-scrapes
 )
 ```
 
