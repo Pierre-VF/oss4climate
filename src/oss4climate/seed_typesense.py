@@ -2,17 +2,16 @@ from datetime import timedelta
 
 import pandas as pd
 import typesense
-
-from oss4climate.src.config import SETTINGS
-from oss4climate.src.database import open_database_session
-from oss4climate.src.database.repos import get_repos_for_typesense
-from oss4climate.src.log import log_info
-from oss4climate.src.parsers.listings import opensustain_tech
-from oss4climate_app.src.search.typesense_io import (
+from oss4x.app.src.database import open_database_session
+from oss4x.app.src.search.typesense_io import (
     generate_client,
     index_data_in_typesense,
     reset_typesense_schema,
 )
+from oss4x.src.config import SETTINGS
+from oss4x.src.database.repos import get_repos_for_typesense
+from oss4x.src.log import log_info
+from oss4x.src.parsers.listings import opensustain_tech
 
 
 def seed(reset: bool = False):

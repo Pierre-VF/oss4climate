@@ -1,8 +1,9 @@
 from dotenv import load_dotenv
-from oss4climate_app.src.mcp_server import mcp
 from pydantic_ai import Agent
 from pydantic_ai.toolsets.fastmcp import FastMCPToolset
 from pydantic_settings import BaseSettings
+
+from oss4climate.app import mcp
 
 
 class Settings(BaseSettings):
@@ -55,7 +56,7 @@ elif model_name.startswith("anthropic:"):
     model = AnthropicModel(llm_model, provider=provider)
 
 else:
-    raise EnvironmentError(f"Model not supported ({model_name})")
+    raise OSError(f"Model not supported ({model_name})")
 
 # Spin the MCP in the background
 mcp_tool = FastMCPToolset(mcp)

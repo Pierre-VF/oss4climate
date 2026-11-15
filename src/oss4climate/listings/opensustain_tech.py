@@ -5,14 +5,13 @@ Module parsing https://opensustain.tech/
 from datetime import timedelta
 
 from bs4 import BeautifulSoup
-
-from oss4climate.src.parsers import (
+from oss4x.src.parsers import (
     ParsingTargets,
     ResourceListing,
     cached_web_get_text,
     isolate_relevant_urls,
 )
-from oss4climate.src.parsers import (
+from oss4x.src.parsers import (
     fetch_all_project_urls_from_html_webpage as __fetch_from_html,
 )
 
@@ -47,7 +46,7 @@ def fetch_categorised_projects_from_opensustain_webpage(
     for i in xs:
         if i.name == "h2":
             current_h2 = _f_clean_key(i)
-            if current_h2 not in d.keys():
+            if current_h2 not in d:
                 d[current_h2] = dict()
         elif i.name == "h3":
             current_h3 = _f_clean_key(i)
@@ -64,7 +63,7 @@ def fetch_categorised_projects_from_opensustain_webpage(
 
     # Removing code-irrelevant fields
     for i in ["Contributors", "Artwork and License"]:
-        if i in d.keys():
+        if i in d:
             d.pop(i)
 
     if relevant_urls_only:
@@ -79,8 +78,8 @@ def fetch_categorised_projects_from_opensustain_webpage(
 
 
 def fetch_listing_of_listings_from_opensustain_webpage() -> ResourceListing:
-    from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
-    from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
+    from oss4x.src.parsers.git_platforms.github_io import GithubScraper
+    from oss4x.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
     x = fetch_categorised_projects_from_opensustain_webpage(relevant_urls_only=False)
     listing_urls = x.get("Sustainable Development").get("Curated Lists") + x.get(

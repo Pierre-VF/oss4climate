@@ -1,15 +1,14 @@
 from pathlib import Path
 
 import pytest
-from sqlmodel import Session
-
-from oss4climate.src.database import (
+from oss4x.src.database import (
     get_engine,
 )
-from oss4climate.src.database.repos import (
+from oss4x.src.database.repos import (
     upsert_repository,
 )
-from oss4climate.src.helpers import now
+from oss4x.src.helpers import now
+from sqlmodel import Session
 
 
 # Test data path

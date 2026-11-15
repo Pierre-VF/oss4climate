@@ -4,13 +4,14 @@ CLI module
 
 from datetime import timedelta
 
-from oss4climate.src.log import log_info
+from oss4x.scripts.src import utils
+from oss4x.src.log import log_info
+
 from oss4climate_scripts import scripts
 from oss4climate_scripts.scripts import (
     data_publication,
     repository_scraping,
 )
-from oss4climate_scripts.src import utils
 
 
 def add():

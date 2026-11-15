@@ -9,7 +9,7 @@ ENV UV_NO_CACHE=1
 WORKDIR /home/app
 # Install dependencies missing in slim images and then running the install
 RUN apt-get update
-RUN apt-get install -y ca-certificates
+RUN apt-get install -y ca-certificates git
 RUN update-ca-certificates
 # Limit to relevant groups
 RUN uv sync --group test --group app
