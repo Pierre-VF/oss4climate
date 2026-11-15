@@ -1,13 +1,13 @@
 """
-Tests for the RepositoryScraper class (oss4climate.src.repository_scraper).
+Tests for the RepositoryScraper class (oss4x.src.repository_scraper).
 
 Tests URL parsing, ProjectDetails conversion, and the scraper initialization.
 """
 
 from datetime import date
 
-from oss4climate.src.models import EnumDocumentationFileType, ProjectDetails
-from oss4climate.src.repository_scraper import RepositoryScraper
+from oss4x.src.models import EnumDocumentationFileType, ProjectDetails
+from oss4x.src.repository_scraper import RepositoryScraper
 
 # ---------------------------------------------------------------------------
 # RepositoryScraper initialization tests

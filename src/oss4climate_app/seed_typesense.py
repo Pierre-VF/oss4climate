@@ -11,8 +11,7 @@ from oss4x.app.src.search.typesense_io import (
 from oss4x.src.config import SETTINGS
 from oss4x.src.database.repos import get_repos_for_typesense
 from oss4x.src.log import log_info
-
-from oss4climate.src.parsers.listings import opensustain_tech
+from oss4x.src.parsers.listings import opensustain_tech
 
 
 def seed(reset: bool = False):

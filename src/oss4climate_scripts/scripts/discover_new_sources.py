@@ -4,20 +4,20 @@ This module contains methods to discover new sources of code
 
 import os
 
-from tqdm import tqdm
-
-from oss4climate.src.database.projects import project_dataframe_loader
-from oss4climate.src.log import (
+from oss4x.src.database.projects import project_dataframe_loader
+from oss4x.src.log import (
     log_info,
 )
-from oss4climate.src.models import EnumDocumentationFileType
-from oss4climate.src.parsers import (
+from oss4x.src.models import EnumDocumentationFileType
+from oss4x.src.parsers import (
     ParsingTargets,
     fetch_all_project_urls_from_markdown_str,
     fetch_all_project_urls_from_rst_str,
     url_qualifies,
 )
-from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+from oss4x.src.parsers.git_platforms.github_io import GithubScraper
+from tqdm import tqdm
+
 from oss4climate_scripts.src.config import (
     FILE_INPUT_INDEX,
 )
@@ -73,8 +73,7 @@ def discover_repositories_in_existing_readmes(output_file: str) -> None:
     def _url_cleanup(x: str) -> str:
         x = x.split("?")[0]
         x = x.split("#")[0]
-        if x.endswith("/"):
-            x = x[:-1]
+        x = x.removesuffix("/")
         return x
 
     # Removing problematic resources

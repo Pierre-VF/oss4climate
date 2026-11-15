@@ -1,6 +1,5 @@
 import pytest
-
-from oss4climate.src.parsers.git_platforms.codeberg_io import CodebergScraper
+from oss4x.src.parsers.git_platforms.codeberg_io import CodebergScraper
 
 
 @pytest.fixture

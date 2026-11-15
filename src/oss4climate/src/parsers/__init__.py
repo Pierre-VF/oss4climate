@@ -439,10 +439,10 @@ class ParsingTargets:
 
 
 def identify_parsing_targets(urls: list[str]) -> ParsingTargets:
-    from oss4climate.src.parsers.git_platforms.bitbucket_io import BitbucketScraper
-    from oss4climate.src.parsers.git_platforms.codeberg_io import CodebergScraper
-    from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
-    from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
+    from oss4x.src.parsers.git_platforms.bitbucket_io import BitbucketScraper
+    from oss4x.src.parsers.git_platforms.codeberg_io import CodebergScraper
+    from oss4x.src.parsers.git_platforms.github_io import GithubScraper
+    from oss4x.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
     out_github = GithubScraper().split_across_target_sets(urls)
     out_gitlab = GitlabScraper().split_across_target_sets(out_github.unknown)
@@ -457,10 +457,10 @@ def identify_parsing_targets(urls: list[str]) -> ParsingTargets:
 
 
 def isolate_relevant_urls(urls: list[str]) -> list[str]:
-    from oss4climate.src.parsers.git_platforms.bitbucket_io import BitbucketScraper
-    from oss4climate.src.parsers.git_platforms.codeberg_io import CodebergScraper
-    from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
-    from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
+    from oss4x.src.parsers.git_platforms.bitbucket_io import BitbucketScraper
+    from oss4x.src.parsers.git_platforms.codeberg_io import CodebergScraper
+    from oss4x.src.parsers.git_platforms.github_io import GithubScraper
+    from oss4x.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
     ghs = GithubScraper()
     gls = GitlabScraper()
@@ -705,8 +705,8 @@ class ResourceListing:
         return df
 
     def fetch_all_licences(self, force_update: bool = False) -> None:
-        from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
-        from oss4climate.src.parsers.git_platforms.gitlab_io import GitlabScraper
+        from oss4x.src.parsers.git_platforms.github_io import GithubScraper
+        from oss4x.src.parsers.git_platforms.gitlab_io import GitlabScraper
 
         gitlab_s = GitlabScraper()
         github_s = GithubScraper()
@@ -739,7 +739,7 @@ class ResourceListing:
                         pass
 
     def fetch_all_target_counts(self, force_update: bool = False) -> None:
-        from oss4climate.src.parsers import listings
+        from oss4x.src.parsers import listings
 
         def f_get_target_counts(
             i, listing_type: listings.EnumListingType

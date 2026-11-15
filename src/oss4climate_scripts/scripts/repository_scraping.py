@@ -12,7 +12,8 @@ Warning: unauthenticated users have a rate limit of 60 calls per hour
 (source: https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28)
 """
 
-from oss4climate.src.log import log_info
+from oss4x.src.log import log_info
+
 from oss4climate_scripts import scripts
 from oss4climate_scripts.src.config import (
     FILE_INPUT_INDEX,
@@ -38,7 +39,7 @@ def scrape_all(
     :raises ValueError: if output file type is not supported (CSV, JSON)
     :return: /
     """
-    from oss4climate.src.repository_scraper import RepositoryScraper
+    from oss4x.src.repository_scraper import RepositoryScraper
 
     if target_output_file is None:
         # This should only be needed when actually needed (as it's a side feature)

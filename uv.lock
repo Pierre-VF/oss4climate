@@ -1228,7 +1228,7 @@ test = [
 [[package]]
 name = "oss4x"
 version = "0.1.0"
-source = { git = "https://github.com/Pierre-VF/oss4x.git?branch=restructure#446363b2675adfb0cf4013e6f95f847980a129b2" }
+source = { git = "https://github.com/Pierre-VF/oss4x.git?branch=restructure#b14459d35c22c689b3187dec7b4ff116aa92cd0e" }
 dependencies = [
     { name = "authlib" },
     { name = "beautifulsoup4" },

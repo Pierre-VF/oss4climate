@@ -5,14 +5,15 @@ Module containing methods to be run in scripts
 import subprocess
 from datetime import timedelta
 
-from oss4climate.src.log import log_info
-from oss4climate.src.parsers import (
+from oss4x.src.log import log_info
+from oss4x.src.parsers import (
     ParsingTargets,
     ResourceListing,
     identify_parsing_targets,
     listings,
 )
-from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+from oss4x.src.parsers.git_platforms.github_io import GithubScraper
+
 from oss4climate.src.parsers.listings.lfenergy import (
     fetch_all_project_urls_from_lfe_webpage,
     fetch_project_urls_from_lfe_energy_project_webpage,

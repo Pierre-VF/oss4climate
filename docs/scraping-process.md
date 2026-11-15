@@ -170,7 +170,7 @@ The export methods write results from the database:
 ### From Python (direct)
 
 ```python
-from oss4climate.src.repository_scraper import RepositoryScraper
+from oss4x.src.repository_scraper import RepositoryScraper
 
 scraper = RepositoryScraper(refresh_days=28, cache_lifetime=None)
 scraper.run(

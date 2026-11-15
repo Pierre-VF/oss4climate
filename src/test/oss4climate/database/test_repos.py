@@ -1,5 +1,5 @@
 """
-Tests for the repository database module (oss4climate.src.database.repos).
+Tests for the repository database module (oss4x.src.database.repos).
 
 Uses in-memory SQLite databases to avoid polluting the real DB during tests.
 """
@@ -8,9 +8,7 @@ import json
 from datetime import UTC, date, datetime, timedelta
 
 import pytest
-from sqlmodel import Session, SQLModel, create_engine, select
-
-from oss4climate.src.database.repos import (
+from oss4x.src.database.repos import (
     Organisation,
     Repository,
     get_active_repos_to_scrape,
@@ -23,6 +21,7 @@ from oss4climate.src.database.repos import (
     upsert_organisation,
     upsert_repository,
 )
+from sqlmodel import Session, SQLModel, create_engine, select
 
 # ---------------------------------------------------------------------------
 # Fixtures

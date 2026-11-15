@@ -1,6 +1,7 @@
 import os
 
-from oss4climate.src.log import log_info
+from oss4x.src.log import log_info
+
 from oss4climate_scripts.src.config import FILE_OUTPUT_SUMMARY_TOML
 
 

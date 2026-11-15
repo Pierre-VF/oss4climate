@@ -1,8 +1,8 @@
-from oss4climate.src.models import (
+from oss4x.src.models import (
     ProjectDetails,
 )
-from oss4climate.src.parsers import ParsingTargets
-from oss4climate.src.parsers.git_platforms.github_io import GithubScraper
+from oss4x.src.parsers import ParsingTargets
+from oss4x.src.parsers.git_platforms.github_io import GithubScraper
 
 
 def test_parsing_target_set(

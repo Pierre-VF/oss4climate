@@ -1,4 +1,4 @@
-from oss4climate.src.config import SETTINGS
+from oss4x.src.config import SETTINGS
 
 # Link to all documents
 FILE_INPUT_INDEX = "indexes/repositories.toml"

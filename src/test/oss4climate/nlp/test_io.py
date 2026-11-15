@@ -1,6 +1,6 @@
-from oss4climate.src.nlp.html_io import find_all_links_in_html
-from oss4climate.src.nlp.markdown_io import find_all_links_in_markdown
-from oss4climate.src.nlp.rst_io import find_all_links_in_rst
+from oss4x.src.nlp.html_io import find_all_links_in_html
+from oss4x.src.nlp.markdown_io import find_all_links_in_markdown
+from oss4x.src.nlp.rst_io import find_all_links_in_rst
 
 
 def test_find_all_links(github_organisation_url, github_repo_url):
