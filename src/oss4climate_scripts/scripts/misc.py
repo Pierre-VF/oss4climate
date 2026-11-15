@@ -3,7 +3,7 @@ from oss4x.src.crawler import ParsingTargets, scrape_all_targets
 from oss4x.src.log import log_info
 from oss4x.src.parsers.website import crawl_website
 
-from oss4climate.src.parsers.listings.opensustain_tech import (
+from oss4climate.listings.opensustain_tech import (
     fetch_all_project_urls_from_opensustain_webpage,
     fetch_categorised_projects_from_opensustain_webpage,
 )

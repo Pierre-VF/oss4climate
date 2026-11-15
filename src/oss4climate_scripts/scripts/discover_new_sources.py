@@ -43,7 +43,7 @@ def discover_repositories_in_existing_organisations(output_file: str) -> None:
 
 def discover_repositories_in_existing_readmes(output_file: str) -> None:
     # Importing locally as that's not an absolute file-level requirement (and the file isn't easily available anymore)
-    from oss4climate_app.src.config import (
+    from oss4climate.app import (
         FILE_OUTPUT_LISTING_FEATHER,
     )
 

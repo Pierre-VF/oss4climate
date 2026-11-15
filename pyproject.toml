@@ -39,7 +39,6 @@ dependencies = [
 packages = [
     "src/oss4climate",
     "src/oss4climate_scripts",
-    "src/oss4climate_app",
 ]
 
 [build-system]
@@ -85,5 +84,5 @@ discover = "oss4climate_scripts.cli:discover"
 format = "oss4climate_scripts.cli:format"
 generate_listing = "oss4climate_scripts.cli:generate_listing"
 publish = "oss4climate_scripts.cli:publish"
-seed_typesense = "oss4climate_app.seed_typesense:seed"
-reset_typesense = "oss4climate_app.seed_typesense:reset_and_seed"
+seed_typesense = "oss4climate.seed_typesense:seed"
+reset_typesense = "oss4climate.seed_typesense:reset_and_seed"

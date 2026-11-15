@@ -8,11 +8,13 @@ def test_import():
 
     from oss4x.src import config, helpers, log, nlp, parsers
 
-    from oss4climate import src
+    import oss4climate
+    from oss4climate import listings
 
     # Package
     assert isinstance(oss4x.__name__, str)
-    assert isinstance(src.__name__, str)
+    assert isinstance(oss4climate.__name__, str)
+    assert isinstance(listings.__name__, str)
 
     assert isinstance(scrape_cache.__name__, str)
     assert isinstance(nlp.__name__, str)

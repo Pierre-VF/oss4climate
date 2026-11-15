@@ -40,7 +40,7 @@ test_with_coverage:
 
 .PHONY: seed_typesense
 seed_typesense:
-	uv run src/oss4climate_app/seed_typesense.py
+	uv run src/oss4climate/seed_typesense.py
 
 
 # ----------------------------------------------------------------------------

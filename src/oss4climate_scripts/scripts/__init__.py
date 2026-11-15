@@ -19,12 +19,12 @@ from oss4x.src.parsers import (
 )
 from oss4x.src.parsers.git_platforms.github_io import GithubScraper
 
-from oss4climate.src.parsers.listings.lfenergy import (
+from oss4climate.listings.lfenergy import (
     fetch_all_project_urls_from_lfe_webpage,
     fetch_project_urls_from_lfe_energy_project_webpage,
     get_open_source_energy_projects_from_landscape,
 )
-from oss4climate.src.parsers.listings.opensustain_tech import (
+from oss4climate.listings.opensustain_tech import (
     fetch_all_project_urls_from_opensustain_webpage,
     fetch_listing_of_listings_from_opensustain_webpage,
 )
