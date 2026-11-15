@@ -1,6 +1,6 @@
 # Listing of open-source for climate and energy applications
 
-TLDR; if you're just looking for the search engine, you will find it here: https://oss4x.apps.pierrevf.com/ .
+TLDR; if you're just looking for the search engine, you will find it here: https://oss4climate.apps.pierrevf.com/ .
 
 **WARNING: the project is in active development and still an initial stage, therefore the structure may change without prior notice. If you depend on the code as a dependency to your application, please ensure to pin the specific commits in all your usages.**
 
@@ -21,7 +21,7 @@ However, in the current stage it is indeed not providing all of these features y
 
 ## Do you just want to carry out a search for open-source matching your needs?
 
-To carry out a search without installing anything, you can just use the **web-app** here: https://oss4x.apps.pierrevf.com/
+To carry out a search without installing anything, you can just use the **web-app** here: https://oss4climate.apps.pierrevf.com/
 
 ## What is the licence of the code and the data?
 
