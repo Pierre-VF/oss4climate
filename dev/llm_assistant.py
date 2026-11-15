@@ -1,8 +1,9 @@
 from dotenv import load_dotenv
-from oss4climate_app.src.mcp_server import mcp
 from pydantic_ai import Agent
 from pydantic_ai.toolsets.fastmcp import FastMCPToolset
 from pydantic_settings import BaseSettings
+
+from oss4climate_app.src.mcp_server import mcp
 
 
 class Settings(BaseSettings):
