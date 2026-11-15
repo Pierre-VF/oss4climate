@@ -11,21 +11,20 @@ from typing import Any
 
 import pandas as pd
 import requests
-from tomlkit import document, dump
-
-from oss4climate.src.database.scrape_cache import (
+from oss4x.src.database.scrape_cache import (
     load_from_scrape_cache,
     save_to_scrape_cache,
 )
-from oss4climate.src.helpers import (
+from oss4x.src.helpers import (
     cleaned_url,
     sorted_list_of_cleaned_urls,
     url_base_matches_domain,
 )
-from oss4climate.src.log import log_info
-from oss4climate.src.nlp.html_io import find_all_links_in_html
-from oss4climate.src.nlp.markdown_io import find_all_links_in_markdown
-from oss4climate.src.nlp.rst_io import RstParsingError, find_all_links_in_rst
+from oss4x.src.log import log_info
+from oss4x.src.nlp.html_io import find_all_links_in_html
+from oss4x.src.nlp.markdown_io import find_all_links_in_markdown
+from oss4x.src.nlp.rst_io import RstParsingError, find_all_links_in_rst
+from tomlkit import document, dump
 
 
 class RateLimitError(RuntimeError):
@@ -160,9 +159,7 @@ def url_qualifies(x: str) -> bool:
             or x.startswith("https://github.com/user-attachments/")
             or x.startswith("https://github.com/sponsors/")
             or x.startswith("https://github.com/settings/")
-        ):
-            return False
-        elif (
+        ) or (
             x.endswith("/wiki")
             or ("/wiki/" in x)
             or x.endswith("/discussions")
@@ -233,7 +230,7 @@ class ParsingTargets:
         # Return True if item is in the object, False otherwise
         return project_url in self.as_url_list()
 
-    def __add__(self, other: "ParsingTargets") -> "ParsingTargets":
+    def __add__(self, other: ParsingTargets) -> ParsingTargets:
         return ParsingTargets(
             github_organisations=self.github_organisations | other.github_organisations,
             github_repositories=self.github_repositories | other.github_repositories,
@@ -250,7 +247,7 @@ class ParsingTargets:
             | other.codeberg_repositories,
         )
 
-    def __iadd__(self, other: "ParsingTargets") -> "ParsingTargets":
+    def __iadd__(self, other: ParsingTargets) -> ParsingTargets:
         self.github_repositories |= other.github_repositories
         self.github_organisations |= other.github_organisations
         self.gitlab_groups |= other.gitlab_groups
@@ -372,7 +369,7 @@ class ParsingTargets:
             }
 
     @staticmethod
-    def from_toml(toml_file_path: str) -> "ParsingTargets":
+    def from_toml(toml_file_path: str) -> ParsingTargets:
         if not toml_file_path.endswith(".toml"):
             raise ValueError("Input must be a TOML file")
 
@@ -437,7 +434,7 @@ class ParsingTargets:
             dump(doc, fp, sort_keys=True)
 
     @staticmethod
-    def from_list_of_urls(urls: list[str]) -> "ParsingTargets":
+    def from_list_of_urls(urls: list[str]) -> ParsingTargets:
         return identify_parsing_targets(urls)
 
 
@@ -482,11 +479,7 @@ def isolate_relevant_urls(urls: list[str]) -> list[str]:
                 return False
             else:
                 return True
-        elif gls.is_relevant_url(i):
-            return True
-        elif bbs.is_relevant_url(i):
-            return True
-        elif cbs.is_relevant_url(i):
+        elif gls.is_relevant_url(i) or bbs.is_relevant_url(i) or cbs.is_relevant_url(i):
             return True
         else:
             return False
@@ -547,7 +540,7 @@ class ResourceListing:
     fault_urls: list[_type_listing_entry] = field(default_factory=list)
     fault_invalid_urls: list[_type_listing_entry] = field(default_factory=list)
 
-    def __add__(self, other: "ResourceListing") -> "ResourceListing":
+    def __add__(self, other: ResourceListing) -> ResourceListing:
         return ResourceListing(
             github_readme_listings=self.github_readme_listings
             + other.github_readme_listings,
@@ -558,7 +551,7 @@ class ResourceListing:
             fault_invalid_urls=self.fault_invalid_urls + other.fault_invalid_urls,
         )
 
-    def __iadd__(self, other: "ResourceListing") -> "ResourceListing":
+    def __iadd__(self, other: ResourceListing) -> ResourceListing:
         self.github_readme_listings += other.github_readme_listings
         self.gitlab_readme_listings += other.gitlab_readme_listings
         self.webpage_html += other.webpage_html
@@ -602,7 +595,7 @@ class ResourceListing:
         return r_by_licence
 
     @staticmethod
-    def from_toml(toml_file_path: str) -> "ResourceListing":
+    def from_toml(toml_file_path: str) -> ResourceListing:
         if not toml_file_path.endswith(".toml"):
             raise ValueError("Input must be a TOML file")
 
@@ -623,7 +616,7 @@ class ResourceListing:
         )
 
     @staticmethod
-    def from_json(json_file_path: str) -> "ResourceListing":
+    def from_json(json_file_path: str) -> ResourceListing:
         if not json_file_path.endswith(".json"):
             raise ValueError("Input must be a JSON file")
 
