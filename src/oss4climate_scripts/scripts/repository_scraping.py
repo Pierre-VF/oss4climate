@@ -12,14 +12,13 @@ Warning: unauthenticated users have a rate limit of 60 calls per hour
 (source: https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28)
 """
 
-from oss4x.src.log import log_info
-
-from oss4climate_scripts import scripts
-from oss4climate_scripts.src.config import (
+from oss4x.scripts import scripts
+from oss4x.scripts.src.config import (
     FILE_INPUT_INDEX,
     FILE_OUTPUT_DIR,
     FILE_OUTPUT_SUMMARY_TOML,
 )
+from oss4x.src.log import log_info
 
 
 def scrape_all(

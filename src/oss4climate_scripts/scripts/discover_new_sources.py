@@ -4,6 +4,9 @@ This module contains methods to discover new sources of code
 
 import os
 
+from oss4x.scripts.src.config import (
+    FILE_INPUT_INDEX,
+)
 from oss4x.src.database.projects import project_dataframe_loader
 from oss4x.src.log import (
     log_info,
@@ -17,10 +20,6 @@ from oss4x.src.parsers import (
 )
 from oss4x.src.parsers.git_platforms.github_io import GithubScraper
 from tqdm import tqdm
-
-from oss4climate_scripts.src.config import (
-    FILE_INPUT_INDEX,
-)
 
 
 def discover_repositories_in_existing_organisations(output_file: str) -> None:
