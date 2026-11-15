@@ -1182,7 +1182,7 @@ requires-dist = [
     { name = "idna", specifier = ">=3.19" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "markdown", specifier = ">=3.10.3" },
-    { name = "oss4x", git = "https://github.com/Pierre-VF/oss4x.git?branch=restructure" },
+    { name = "oss4x", git = "https://github.com/Pierre-VF/oss4x.git?tag=v_0.2.0" },
     { name = "pandas", specifier = ">=3.0,<4" },
     { name = "psycopg2-binary", specifier = ">=2.9.13" },
     { name = "pyarrow", specifier = ">=23.0.1" },
@@ -1227,9 +1227,10 @@ test = [
 
 [[package]]
 name = "oss4x"
-version = "0.1.0"
-source = { git = "https://github.com/Pierre-VF/oss4x.git?branch=restructure#752eecb99ec8481c4aecb8f898cb0a9cf6e6ff3b" }
+version = "0.2.0"
+source = { git = "https://github.com/Pierre-VF/oss4x.git?tag=v_0.2.0#1a2399af389f7d040be590e60e42447d860a7a37" }
 dependencies = [
+    { name = "anyio" },
     { name = "authlib" },
     { name = "beautifulsoup4" },
     { name = "cryptography" },
@@ -1243,9 +1244,11 @@ dependencies = [
     { name = "pyarrow" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "pyjwt" },
     { name = "python-multipart" },
     { name = "pyyaml" },
     { name = "requests" },
+    { name = "soupsieve" },
     { name = "sqlmodel" },
     { name = "tomlkit" },
     { name = "tqdm" },

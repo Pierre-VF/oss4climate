@@ -1,3 +1,4 @@
+import oss4x
 from oss4x.src import models
 from oss4x.src.database import scrape_cache
 

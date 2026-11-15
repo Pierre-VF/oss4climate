@@ -75,7 +75,7 @@ mcp = [
 ]
 
 [tool.uv.sources]
-oss4x = { git = "https://github.com/Pierre-VF/oss4x.git" , branch="restructure"}
+oss4x = { git = "https://github.com/Pierre-VF/oss4x.git" , tag="v_0.2.0"}
 
 # scripts
 [project.scripts]
