@@ -43,7 +43,7 @@ def scrape_all(
 
     if target_output_file is None:
         # This should only be needed when actually needed (as it's a side feature)
-        from oss4climate_app.src.config import (
+        from oss4x.app.src.config import (
             FILE_OUTPUT_LISTING_FEATHER,
         )
 
