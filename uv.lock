@@ -1128,6 +1128,7 @@ dependencies = [
     { name = "idna" },
     { name = "jinja2" },
     { name = "markdown" },
+    { name = "oss4x" },
     { name = "pandas" },
     { name = "psycopg2-binary" },
     { name = "pyarrow" },
@@ -1181,6 +1182,7 @@ requires-dist = [
     { name = "idna", specifier = ">=3.19" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "markdown", specifier = ">=3.10.3" },
+    { name = "oss4x", git = "https://github.com/Pierre-VF/oss4x.git" },
     { name = "pandas", specifier = ">=3.0,<4" },
     { name = "psycopg2-binary", specifier = ">=2.9.13" },
     { name = "pyarrow", specifier = ">=23.0.1" },
@@ -1221,6 +1223,34 @@ test = [
     { name = "pygments", specifier = ">=2.21.0" },
     { name = "pytest", specifier = ">=9.0.3" },
     { name = "pytest-asyncio", specifier = ">=1.3.0" },
+]
+
+[[package]]
+name = "oss4x"
+version = "0.1.0"
+source = { git = "https://github.com/Pierre-VF/oss4x.git#9b1a67f01c3f0cbbd2bf6dce22d967d3c7a029f1" }
+dependencies = [
+    { name = "authlib" },
+    { name = "beautifulsoup4" },
+    { name = "cryptography" },
+    { name = "docutils" },
+    { name = "httpx" },
+    { name = "idna" },
+    { name = "jinja2" },
+    { name = "markdown" },
+    { name = "pandas" },
+    { name = "psycopg2-binary" },
+    { name = "pyarrow" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "python-multipart" },
+    { name = "pyyaml" },
+    { name = "requests" },
+    { name = "sqlmodel" },
+    { name = "tomlkit" },
+    { name = "tqdm" },
+    { name = "typesense" },
+    { name = "urllib3" },
 ]
 
 [[package]]

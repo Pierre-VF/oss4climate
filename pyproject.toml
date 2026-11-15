@@ -34,6 +34,7 @@ dependencies = [
     "pyjwt>=2.15.1",
     "anyio>=4.14.2",
     "soupsieve>=2.9",
+    "oss4x",
 ]
 packages = [
     "src/oss4climate",
@@ -72,6 +73,9 @@ mcp = [
     # Security only:
     "anthropic>=0.105.2"
 ]
+
+[tool.uv.sources]
+oss4x = { git = "https://github.com/Pierre-VF/oss4x.git" }
 
 # scripts
 [project.scripts]
