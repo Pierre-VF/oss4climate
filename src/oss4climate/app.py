@@ -11,7 +11,7 @@ from oss4x.app import (
     mark_test_mode,
     mcp,
 )
-from oss4x.src.config import get_file_output_listing_feather
+from oss4x.app.src.config import get_file_output_listing_feather
 
 index_folder = Path(__file__).parent.parent.parent / "indexes"
 
