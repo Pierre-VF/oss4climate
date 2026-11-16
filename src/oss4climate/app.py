@@ -5,13 +5,13 @@ Oss4climate app
 from pathlib import Path
 
 from oss4x.app import (
-    FILE_OUTPUT_LISTING_FEATHER,
     AppConfig,
     Theme,
     create_app,
     mark_test_mode,
     mcp,
 )
+from oss4x.src.config import get_file_output_listing_feather
 
 index_folder = Path(__file__).parent.parent.parent / "indexes"
 
@@ -35,4 +35,4 @@ app = create_app(
 )
 
 # To support imports in other modules (as a one-stop-shop)
-__all__ = ["FILE_OUTPUT_LISTING_FEATHER", "app", "mark_test_mode", "mcp"]
+__all__ = ["app", "get_file_output_listing_feather", "mark_test_mode", "mcp"]
