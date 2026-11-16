@@ -19,6 +19,7 @@ index_folder = Path(__file__).parent.parent.parent / "indexes"
 app = create_app(
     AppConfig(
         theme=Theme(),
+        APPLICATION_FIELD="climate",
         URL_CODE_REPOSITORY="https://github.com/Pierre-VF/oss4climate",
         INDEXES_FOLDER=str(index_folder),
         FILE_INPUT_LISTINGS_INDEX=str(index_folder / "listings.json"),
