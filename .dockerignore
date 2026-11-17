@@ -1,0 +1,13 @@
+.data/
+__pycache__/
+.github/
+.pytest_cache/
+.ruff_cache/
+.vscode/
+
+dev/
+docs/
+typesense-data/
+
+.venv/
+.env

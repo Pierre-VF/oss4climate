@@ -2,6 +2,7 @@
 Oss4climate app
 """
 
+import os.path
 from pathlib import Path
 
 from oss4x.app import (
@@ -17,6 +18,12 @@ index_folder = Path(__file__).parent.parent.parent / "indexes"
 FILE_INPUT_LISTINGS_INDEX = str(index_folder / "listings.json")
 FILE_INPUT_INDEX = str(index_folder / "repositories.toml")
 FILE_OUTPUT_LISTING_FEATHER = get_file_output_listing_feather()
+
+# Check that the indexes exist
+if not os.path.exists(FILE_INPUT_LISTINGS_INDEX):
+    raise RuntimeError(f"Input listings doesn't exist ({FILE_INPUT_LISTINGS_INDEX})")
+if not os.path.exists(FILE_INPUT_INDEX):
+    raise RuntimeError(f"Input index doesn't exist ({FILE_INPUT_INDEX})")
 
 app = create_app(
     AppConfig(
