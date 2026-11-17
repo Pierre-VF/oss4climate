@@ -16,6 +16,7 @@ from oss4x.app.src.config import get_file_output_listing_feather
 index_folder = Path(__file__).parent.parent.parent / "indexes"
 FILE_INPUT_LISTINGS_INDEX = str(index_folder / "listings.json")
 FILE_INPUT_INDEX = str(index_folder / "repositories.toml")
+FILE_OUTPUT_LISTING_FEATHER = get_file_output_listing_feather()
 
 app = create_app(
     AppConfig(
@@ -39,6 +40,7 @@ app = create_app(
 __all__ = [
     "FILE_INPUT_INDEX",
     "FILE_INPUT_LISTINGS_INDEX",
+    "FILE_OUTPUT_LISTING_FEATHER",
     "app",
     "get_file_output_listing_feather",
     "index_folder",

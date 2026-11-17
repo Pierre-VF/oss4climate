@@ -16,7 +16,7 @@ def publish_to_ftp() -> None:
     :raises EnvironmentError: when the FTP credentials are not given in environment
     """
     # This should only be needed when publishing to FTP (as it's a side feature)
-    from oss4x.app.src.config import (
+    from oss4climate.app import (
         FILE_INPUT_LISTINGS_INDEX,
         FILE_OUTPUT_LISTING_FEATHER,
     )

@@ -1,9 +1,7 @@
 FROM ghcr.io/astral-sh/uv:0.13-debian-slim
 WORKDIR /home/app
 # Install dependencies missing in slim images and then running the install
-RUN apt-get update
-RUN apt-get install -y ca-certificates git
-RUN update-ca-certificates
+RUN apt-get update && apt-get install -y ca-certificates git && update-ca-certificates && rm -rf /var/lib/apt/lists/*
 # Copying files over
 # Index folder creation is required for operation when the indexes aren't present
 RUN mkdir -p /home/app/indexes
