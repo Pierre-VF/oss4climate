@@ -42,7 +42,7 @@ mcp = [
 ]
 
 [tool.uv.sources]
-oss4x = { git = "https://github.com/Pierre-VF/oss4x.git" , tag="v_0.3.0"}
+oss4x = { git = "https://github.com/Pierre-VF/oss4x.git" , tag="v_0.3.1"}
 
 # scripts
 [project.scripts]
