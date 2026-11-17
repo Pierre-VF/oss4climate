@@ -7,7 +7,6 @@ from datetime import timedelta
 
 from oss4x.scripts.src.config import (
     FILE_INPUT_INDEX,
-    FILE_INPUT_LISTINGS_INDEX,
     FILE_OUTPUT_SUMMARY_TOML,
 )
 from oss4x.src.log import log_info
@@ -19,6 +18,7 @@ from oss4x.src.parsers import (
 )
 from oss4x.src.parsers.git_platforms.github_io import GithubScraper
 
+from oss4climate.app import FILE_INPUT_LISTINGS_INDEX
 from oss4climate.listings.lfenergy import (
     fetch_all_project_urls_from_lfe_webpage,
     fetch_project_urls_from_lfe_energy_project_webpage,
