@@ -72,8 +72,8 @@ def _add_projects_to_listing_file(
 
 
 def discover_projects(
-    file_path: str = FILE_INPUT_INDEX,
-    listings_file_path: str = FILE_INPUT_LISTINGS_INDEX,
+    file_path: str,
+    listings_file_path: str,
     cache_lifetime: timedelta | None = None,
 ):
     log_info("Indexing LF Energy projects")

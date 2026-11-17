@@ -7,6 +7,10 @@ from datetime import timedelta
 from oss4x.scripts.src import utils
 from oss4x.src.log import log_info
 
+from oss4climate.app import (
+    FILE_INPUT_INDEX,
+    FILE_INPUT_LISTINGS_INDEX,
+)
 from oss4climate_scripts import scripts
 from oss4climate_scripts.scripts import (
     data_publication,
@@ -28,7 +32,7 @@ def add():
         if len(x) > 0:
             urls_to_add.append(x)
     log_info(f"Adding {urls_to_add}")
-    scripts.add_projects_to_listing(urls_to_add)
+    scripts.add_projects_to_listing(urls_to_add, file_path=FILE_INPUT_INDEX)
 
 
 def format():
@@ -39,8 +43,12 @@ def format():
 def discover():
     """Generates an index"""
     ttl_cache = timedelta(days=7)
-    scripts.update_listing_of_listings()
-    scripts.discover_projects(cache_lifetime=ttl_cache)
+    scripts.update_listing_of_listings(target_output_file=FILE_INPUT_LISTINGS_INDEX)
+    scripts.discover_projects(
+        file_path=FILE_INPUT_INDEX,
+        listings_file_path=FILE_INPUT_LISTINGS_INDEX,
+        cache_lifetime=ttl_cache,
+    )
     scripts.format_all_files()
 
 
