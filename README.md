@@ -28,10 +28,6 @@ No installation needed:
 
 - **Web app:** <https://oss4climate.apps.pierrevf.com/> — search by keyword, and refine by licence, programming language or project activity. The same search is also available as an **MCP tool** for your favourite LLM and as a REST **API** (see the links in the app's navigation bar).
 
-With the code installed (see below), you can also search from the command line:
-
-> uv run search
-
 ## Where is the data coming from?
 
 Inputs to the discovery process are given in the files in the **indexes** folder (you are welcome to add your own contribution):
@@ -92,8 +88,12 @@ GITLAB_ACCESS_TOKEN="...[add your token here]..."
 # For app operation, a key to refresh the data (to avoid undesirable refreshing)
 DATA_REFRESH_KEY="...[add a random key here]..."
 
+# Connection to the Typesense search engine (required to run the app and to seed the index)
+TYPESENSE_HOST="http://localhost:8108"
+TYPESENSE_API_KEY="...[add your Typesense API key here]..."
+
 # You can adjust the position of the cache database here (leave to default if you don't need adjustment)
-SQLITE_DB=".data/db.sqlite"
+SCRAPING_SQLITE_DB="db.sqlite"
 
 # If you want to enable publication of the data to FTP, you can also set these variables
 EXPORT_FTP_URL=""
@@ -105,25 +105,20 @@ EXPORT_FTP_PASSWORD=""
 
 Once you have completed the steps above, you can run the following commands (only valid on Unix systems):
 
-Typical use-cases:
-
-- To download the dataset:
-    > uv run download_data
-- To search in CLI mode (note that this is a very basic CLI):
-    > uv run search
-
-Advanced use-cases (to regenerate listings — avoid unless necessary, as this is very resource intensive):
-
-- To generate an output dataset:
+- To refresh the list of targets to be scraped:
+    > uv run discover
+- To generate an output dataset (scrape the repositories):
     > uv run generate_listing
 - To add new resources:
     > uv run add
-- To refresh the list of targets to be scraped:
-    > uv run discover
+- To seed the Typesense search index from the scraped data:
+    > uv run seed_typesense
+- To reset and re-seed the Typesense search index:
+    > uv run reset_typesense
 - To export the datasets to FTP (using the credentials from the environment):
     > uv run publish
 
-Note: the indexing is heavy and involves a series of web (and API) calls. A caching mechanism is therefore added in the implementation of the requests (with a simple SQLite database). This means that you might potentially end up with a large file stored locally on your disk (currently under 500 Mb).
+Note: generating the listing is heavy and involves a series of web (and API) calls — avoid regenerating it unless necessary. A caching mechanism is therefore added in the implementation of the requests (with a simple SQLite database). This means that you might potentially end up with a large file stored locally on your disk (currently under 500 Mb).
 
 ## Need new features or found a bug?
 
